@@ -105,8 +105,8 @@
     "bootstrap_unit": "game_id",
     "bootstrap_draws": 5000,
     "interval": "percentile_95",
-    "paired_test": "paired_cluster_sign_flip_after_family_gate",
-    "paired_test_policy": "For direct-versus-thinking comparisons, match the same endpoint cells by condition identity, aggregate differences by game_id, and run the sign-flip test only when the endpoint's family gate is eligible in both conditions.",
+    "paired_test": "paired_cluster_sign_flip",
+    "paired_test_policy": "For direct-versus-thinking comparisons, match the same prospectively defined endpoint cells by condition identity, aggregate differences by game_id, and run the sign-flip test whenever matched cells exist. Report absolute family gates separately; the paired test cannot rescue or pool a failed family gate.",
     "missing_or_unparseable": "retain raw text and score as failure"
   },
   "execution": {

@@ -49,6 +49,11 @@ Thinking is frozen to native `reasoning_effort=xhigh`, sampled generation
 (`temperature=1.0`, `top_p=0.95`, `top_k=20`, seed `3838`), and exact
 stage-specific preflight/protocol bindings.
 
+The Qwen3.6 H3 cross-model reference uses the same strict
+both-correct-and-semantic-switch endpoint as V6.2. It is a deterministic
+secondary reanalysis of the archived V6.1 raw artifact, preserved with source
+hashes in [`v61_reference_endpoints.json`](../../results/v6_2_reasoning_capability_control/v61_reference_endpoints.json).
+
 ## Reproduction
 
 ```bash
@@ -69,3 +74,8 @@ Paid stages are exposed only through the manual
 Each later launch requires the exact predecessor Actions run ID. The preflight
 also pins the protocol commit and all hashes; later stages fail closed if the
 current commit or restored preflight differs.
+
+Direct-versus-thinking paired sign-flip inference is run whenever the same
+prospectively defined endpoint cells exist in both locked artifacts. The
+absolute family gates are reported independently and do not control whether
+that treatment-effect test is run.

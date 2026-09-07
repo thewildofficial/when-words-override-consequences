@@ -15,3 +15,8 @@ under `raw/`, immutable per-stage `analysis_*.json` files, derived
 `analysis_cumulative.json`, compact model-run manifests, and the persistent
 `cost_ledger.jsonl`. GitHub Actions artifacts are retained for 30 days and are
 not archival storage.
+
+[`v61_reference_endpoints.json`](v61_reference_endpoints.json) is the immutable
+secondary reanalysis that supplies the strict H3 Qwen3.6 reference used by the
+cross-model comparison. It is derived from the archived V6.1 locked raw
+artifact and is not a modification of V6.1's production analysis or gates.

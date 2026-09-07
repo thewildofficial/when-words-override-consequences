@@ -118,6 +118,13 @@ both be correct and produce a selected semantic-choice switch in both
 explicit-rule and provenance-only prompt modes. The raw selected-label change
 rate is retained descriptively and is not a support gate.
 
+For the Qwen3.6-to-Qwen3.8 comparison, the H3 reference is the same strict
+both-correct-and-switch endpoint, deterministically rederived from the archived
+V6.1 locked forced-choice artifact. It is recorded in
+[`v61_reference_endpoints.json`](../../results/v6_2_reasoning_capability_control/v61_reference_endpoints.json)
+with the raw artifact's content hash and release provenance. The V6.1
+preregistered raw contrast remains unchanged.
+
 ### H5 — Active information
 
 Positive-VOI versus negative-VOI pairs must switch correctly. The same payoff
@@ -128,9 +135,11 @@ All confirmatory summaries first aggregate within `game_id`; bootstrap draws
 resample games. Reasoning text is retained, but only the final parsed choice is
 used for thinking-mode primary behavior. When both direct and thinking locked
 artifacts are available, the declared paired cluster sign-flip comparison
-matches identical endpoint cells, averages differences within `game_id`, and
-reports the preregistered two-sided p-value only after both family gates pass.
-It never rescues a failed family gate.
+matches identical prospectively defined endpoint cells, averages differences
+within `game_id`, and reports the preregistered two-sided p-value whenever
+matched cells exist, regardless of either condition's absolute family gate.
+Absolute family gates remain separate, and a paired effect cannot rescue or
+pool a failed family gate.
 
 ## Interpretation matrix
 

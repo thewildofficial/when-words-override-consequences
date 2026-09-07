@@ -6,12 +6,12 @@
     "gpu_seconds": 0,
     "model_forward_passes": 0
   },
-  "config_sha256": "e3c1206dc8adb87b4c498f1947bffc5831512967b237a6e25da8b227ecfb3b2c",
-  "content_sha256": "f8861db94603fa2585468cd8fd6f89bdd4bbfe52230f92772f30ca65b48e5b1c",
+  "config_sha256": "058eed193b86aa1ecc07f4354e2dea0c2b2d6296788e28e4dabf92d575a49413",
+  "content_sha256": "14be252fcec7f7920e4db04eb57627d2dd20b15f87923fee9209193d3ed874fb",
   "gpu_stages_ran": false,
-  "head_commit": "ba4087131e36190b6c8c527b73d524ef1300bdf6",
+  "head_commit": "8e50eee2ece66914257bb2df893a1c69394b3186",
   "interpretation": "No model forwards have occurred on this branch yet.",
-  "protocol_commit_sha": "ba4087131e36190b6c8c527b73d524ef1300bdf6",
+  "protocol_commit_sha": "8e50eee2ece66914257bb2df893a1c69394b3186",
   "row_counts": {
     "diagnostic": 640,
     "direct": 2496,
@@ -21,5 +21,5 @@
   "source_dataset_sha256": "14aea862bd5f195b11ebe77f97fb6be857717bd10c47375e9c11cd773214d77a",
   "status": "local_cpu_controls_complete_no_model_run",
   "study_id": "V6.2-RCC-1",
-  "subset_manifest_sha256": "5f788d4fdcb55e0af3ec773a1580c38717bf5b3d07ddf37fc73341606f94c855"
+  "subset_manifest_sha256": "bb9c96c445ed907d8c674a3d7f2f12eda419c9e4dfd5e6d7678bc2e979eaff40"
 }

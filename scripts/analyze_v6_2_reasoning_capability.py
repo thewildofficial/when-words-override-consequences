@@ -35,6 +35,9 @@ from jspace_policy.v6_2_reasoning_capability import (
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_RESULTS = ROOT / "results/v6_2_reasoning_capability_control"
 V61_REFERENCE = ROOT / "results/v6_1_epistemic_repair/analysis_primary_production.json"
+V61_STRICT_REFERENCE = (
+    ROOT / "results/v6_2_reasoning_capability_control/v61_reference_endpoints.json"
+)
 
 
 def _read_json(path: Path) -> dict[str, Any]:
@@ -172,17 +175,6 @@ def _cluster_mean(values: list[tuple[Any, float]]) -> float | None:
         by_game[game_id].append(float(value))
     means = [sum(game_values) / len(game_values) for game_values in by_game.values()]
     return sum(means) / len(means) if means else None
-
-
-def _not_run_paired_sign_flip(reason: str) -> dict[str, Any]:
-    return {
-        "status": "not_run_gate_failed",
-        "n_cells": 0,
-        "n_clusters": 0,
-        "observed_mean": None,
-        "p_value": None,
-        "reason": reason,
-    }
 
 
 _ENDPOINT_FAMILIES = {
@@ -348,7 +340,9 @@ def _paired_endpoint_comparisons(
         family = _ENDPOINT_FAMILIES[endpoint]
         direct_gate = _family_gate_status(direct_summary, family)
         thinking_gate = _family_gate_status(thinking_summary, family)
-        eligible = direct_gate == "supported" and thinking_gate == "supported"
+        both_families_supported = (
+            direct_gate == "supported" and thinking_gate == "supported"
+        )
         direct_values = [(game_id, float(value)) for game_id, value in direct_cells.values()]
         thinking_values = [
             (game_id, float(value)) for game_id, value in thinking_cells.values()
@@ -361,18 +355,12 @@ def _paired_endpoint_comparisons(
             "family_gate": {
                 "direct": direct_gate,
                 "thinking": thinking_gate,
-                "eligible": eligible,
+                "both_supported": both_families_supported,
             },
-            "paired_cluster_sign_flip": (
-                _paired_sign_flip(
-                    differences,
-                    seed=6700 + index,
-                    draws=draws,
-                )
-                if eligible
-                else _not_run_paired_sign_flip(
-                    "paired test requires the family gate in both conditions"
-                )
+            "paired_cluster_sign_flip": _paired_sign_flip(
+                differences,
+                seed=6700 + index,
+                draws=draws,
             ),
         }
     return output
@@ -600,9 +588,41 @@ def _family_summary(rows: list[dict[str, Any]], config: dict[str, Any]) -> dict[
     return result
 
 
+def _strict_h3_reference() -> dict[str, Any]:
+    derived = _read_json(V61_STRICT_REFERENCE)
+    if not _hash_valid(derived):
+        raise RuntimeError("invalid derived V6.1 strict H3 reference")
+    if (
+        derived.get("study_id") != STUDY_ID
+        or derived.get("reference_study_id") != "V6.1-ES-2"
+        or derived.get("reference_model_id") != "Qwen/Qwen3.6-27B"
+    ):
+        raise RuntimeError("derived V6.1 strict H3 reference identifies another study")
+    source = derived.get("source", {})
+    legacy = _read_json(V61_REFERENCE)
+    for key in ("source_config_sha256", "source_dataset_sha256"):
+        if source.get(key) != legacy.get(key):
+            raise RuntimeError(f"derived V6.1 strict H3 reference {key} mismatch")
+    if source.get("raw_payload_content_sha256") != legacy.get("source_behavior_sha256"):
+        raise RuntimeError("derived V6.1 strict H3 reference raw artifact mismatch")
+    endpoints = derived.get("endpoints", {})
+    endpoint_names = {
+        "H3_explicit_both_correct_and_switch": "H3_explicit_contrast",
+        "H3_provenance_both_correct_and_switch": "H3_provenance_contrast",
+    }
+    values: dict[str, float] = {}
+    for source_name, output_name in endpoint_names.items():
+        endpoint = endpoints.get(source_name, {})
+        if endpoint.get("mean") is None:
+            raise RuntimeError(f"derived V6.1 strict H3 endpoint missing: {source_name}")
+        values[output_name] = float(endpoint["mean"])
+    return {"artifact": derived, "endpoints": values}
+
+
 def _reference_summary() -> dict[str, Any]:
     reference = _read_json(V61_REFERENCE)
     hypotheses = reference["hypotheses"]
+    strict_h3 = _strict_h3_reference()
     return {
         "study_id": reference["study_id"],
         "model_key": reference["model_key"],
@@ -618,12 +638,8 @@ def _reference_summary() -> dict[str, Any]:
             "H2_policy_pair_rate": hypotheses["policy_composition"][
                 "within_game_policy_pair_rate"
             ]["mean"],
-            "H3_explicit_contrast": hypotheses["evidence_update"][
-                "independence_contrast_by_prompt_mode"
-            ]["explicit_rule"]["mean"],
-            "H3_provenance_contrast": hypotheses["evidence_update"][
-                "independence_contrast_by_prompt_mode"
-            ]["provenance_only"]["mean"],
+            "H3_explicit_contrast": strict_h3["endpoints"]["H3_explicit_contrast"],
+            "H3_provenance_contrast": strict_h3["endpoints"]["H3_provenance_contrast"],
             "H5_voi_pair_rate": hypotheses["active_information"]["within_pair_voi_switch_rate"][
                 "mean"
             ],
@@ -633,6 +649,14 @@ def _reference_summary() -> dict[str, Any]:
             "H5_reliability_switch_rate": hypotheses["active_information"][
                 "same_matrix_reliability_switch_rate"
             ]["mean"],
+        },
+        "strict_h3_reference": {
+            "artifact": "results/v6_2_reasoning_capability_control/"
+            "v61_reference_endpoints.json",
+            "content_sha256": strict_h3["artifact"]["content_sha256"],
+            "source_raw_payload_content_sha256": strict_h3["artifact"]["source"][
+                "raw_payload_content_sha256"
+            ],
         },
     }
 

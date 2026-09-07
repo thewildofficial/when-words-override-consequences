@@ -87,3 +87,55 @@ def test_paired_sign_flip_aggregates_cells_by_game() -> None:
     assert result["n_cells"] == 3
     assert result["n_clusters"] == 2
     assert result["observed_mean"] == 0.5
+
+
+def test_v61_reference_uses_strict_h3_reanalysis() -> None:
+    reference = ANALYSIS["_reference_summary"]()
+    derived = json.loads(
+        (
+            ROOT / "results/v6_2_reasoning_capability_control/"
+            "v61_reference_endpoints.json"
+        ).read_text(encoding="utf-8")
+    )
+    assert reference["endpoints"]["H3_explicit_contrast"] == derived["endpoints"][
+        "H3_explicit_both_correct_and_switch"
+    ]["mean"]
+    assert reference["endpoints"]["H3_provenance_contrast"] == derived["endpoints"][
+        "H3_provenance_both_correct_and_switch"
+    ]["mean"]
+    assert reference["strict_h3_reference"]["content_sha256"] == derived[
+        "content_sha256"
+    ]
+    assert (
+        reference["strict_h3_reference"]["source_raw_payload_content_sha256"]
+        == derived["source"]["raw_payload_content_sha256"]
+    )
+
+
+def test_paired_endpoint_test_runs_when_one_family_gate_fails() -> None:
+    def policy_row(policy: str, selected_index: int) -> dict[str, object]:
+        return {
+            "experiment_family": "policy_composition",
+            "game_id": "game-1",
+            "modeled_receiver_belief": 0,
+            "receiver_policy": policy,
+            "selected_index": selected_index,
+            "correct": True,
+        }
+
+    direct = [policy_row("literal", 0), policy_row("contrarian", 0)]
+    thinking = [policy_row("literal", 0), policy_row("contrarian", 1)]
+    result = ANALYSIS["_paired_endpoint_comparisons"](
+        direct,
+        thinking,
+        {"policy_composition_endpoints": {"status": "falsified"}},
+        {"policy_composition_endpoints": {"status": "supported"}},
+        CONFIG,
+    )["H2_policy_pair_rate"]
+    assert result["family_gate"] == {
+        "direct": "falsified",
+        "thinking": "supported",
+        "both_supported": False,
+    }
+    assert result["paired_cluster_sign_flip"]["status"] == "complete"
+    assert result["paired_cluster_sign_flip"]["observed_mean"] == 1.0
