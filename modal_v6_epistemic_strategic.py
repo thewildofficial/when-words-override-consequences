@@ -200,6 +200,18 @@ def _prepare_query(
     candidate_ids = [
         _continuation_id(tokenizer, rendered, candidate) for candidate in candidates
     ]
+    if len(set(candidate_ids)) != len(candidate_ids):
+        raise ValueError(f"candidate token collision after the frozen prompt: {query_id}")
+    for candidate, candidate_id in zip(candidates, candidate_ids, strict=True):
+        decoded = tokenizer.decode(
+            [candidate_id],
+            skip_special_tokens=False,
+            clean_up_tokenization_spaces=False,
+        )
+        if decoded != candidate:
+            raise ValueError(
+                f"candidate token does not decode exactly to {candidate!r}: {query_id}"
+            )
     return {
         "query_id": query_id,
         "messages": messages,
@@ -374,6 +386,26 @@ def _all_preflight_queries(tokenizer: Any, dataset: dict[str, Any]) -> list[dict
             )
         )
     return queries
+
+
+def _preflight_contract(queries: list[dict[str, Any]]) -> dict[str, Any]:
+    """Summarize exact prompt and continuation tokenization for parity checks."""
+    return {
+        "query_count": len(queries),
+        "query_ids_sha256": canonical_sha256([query["query_id"] for query in queries]),
+        "rendered_prompts_sha256": canonical_sha256(
+            [(query["query_id"], query["rendered"]) for query in queries]
+        ),
+        "prompt_token_ids_sha256": canonical_sha256(
+            [(query["query_id"], query["prompt_token_ids"]) for query in queries]
+        ),
+        "candidate_labels_sha256": canonical_sha256(
+            [(query["query_id"], query["candidate_labels"]) for query in queries]
+        ),
+        "candidate_token_ids_sha256": canonical_sha256(
+            [(query["query_id"], query["candidate_token_ids"]) for query in queries]
+        ),
+    }
 
 
 def _family_records(
@@ -782,6 +814,27 @@ def preflight_remote(
     spec = _model_spec_for_preflight(config, model_key)
     tokenizer, tokenizer_metadata = _load_tokenizer(spec)
     queries = _all_preflight_queries(tokenizer, dataset)
+    contract = _preflight_contract(queries)
+    cross_model_parity: dict[str, Any] = {
+        "status": "not_applicable_primary_model",
+        "passed": True,
+    }
+    if model_key != "primary":
+        primary_tokenizer, _ = _load_tokenizer(config["model"])
+        primary_contract = _preflight_contract(
+            _all_preflight_queries(primary_tokenizer, dataset)
+        )
+        cross_model_parity = {
+            "status": "exact_primary_preflight_contract_match",
+            "passed": contract == primary_contract,
+            "primary": primary_contract,
+            "replication": contract,
+        }
+        if not cross_model_parity["passed"]:
+            raise RuntimeError(
+                "Qwen3.8 preflight failed exact primary tokenizer/prompt parity: "
+                + json.dumps(cross_model_parity, sort_keys=True)
+            )
     lengths = [query["sequence_length"] for query in queries]
     payload = {
         "schema_version": 1,
@@ -795,6 +848,8 @@ def preflight_remote(
         "queries_checked": len(queries),
         "minimum_tokens": min(lengths),
         "maximum_tokens": max(lengths),
+        "preflight_contract": contract,
+        "cross_model_parity": cross_model_parity,
         "candidate_token_sets": {
             "actions": list(ACTION_LABELS),
             "reports": list(REPORT_LABELS),

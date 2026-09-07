@@ -14,8 +14,9 @@ uses them in strategic decisions. The study namespace is deliberately stable:
 
 The primary model is the pinned `Qwen/Qwen3.6-27B` checkpoint already used by
 the repository. Qwen3.8-27B is registered separately at a pinned Hugging Face
-revision, but remains opt-in until its rename and tokenizer parity checks pass.
-The two models never share a behavioral or mechanistic gate.
+revision, but remains opt-in until its exact primary preflight contract matches
+(rendered prompts, prompt token IDs, and candidate token IDs). The two models
+never share a behavioral or mechanistic gate.
 
 ## What is frozen locally
 
