@@ -24,6 +24,27 @@ constant, explicitly crossed, or used only in a predeclared invariance test.
 Every family has its own gate. Pooled accuracy cannot rescue a failed family,
 and no mechanistic or safety interpretation is promoted from a failed gate.
 
+### Label encoding and matched-pair control
+
+The semantic answer is converted to the legal surface labels `A`/`B` by a
+deterministic assignment keyed only by `study_id`, `game_id`, and a fixed task
+namespace. Treatment values are excluded from the hash. The namespaces are:
+
+| Family | Namespace | Treatment held out of the assignment |
+|---|---|---|
+| H1 ledger | `ledger_action`, `ledger_report` | modeled/actual belief and report target |
+| H2 policy | `policy_action` | receiver policy and modeled belief |
+| H3 evidence | `evidence_report`, `evidence_action` | evidence mode and all evidence factors |
+| H4 recursion | `recursive_prediction`, `recursive_action` | recursion depth |
+| H5 active information | `active_query` | VOI profile and all factorial cell values |
+| H6 monitoring | `monitoring_action` | penalty, audit cue/probability, and surface |
+| H7 scaffold | `scaffold_report`, `scaffold_action` | trajectory/source condition and modeled belief |
+
+The CPU audit requires identical `choice_mapping` within every primary
+matched pair and both permutations across the games in each namespace. It
+also sends synthetic constant-`A` and constant-`B` policies through the
+identifying-pair scorer; neither may satisfy a correct-and-switched endpoint.
+
 ## Hypotheses and falsification gates
 
 | ID | Hypothesis | Locked gate | Falsification rule |
@@ -63,14 +84,15 @@ isolates policy composition from a supplied answer.
 
 ### Evidence update
 
-The prior, a message, and an evidence log are visible. Independent observations
-contribute separately; copies of one observation count once. The primary
-contrast is deliberately selected where the frozen scoring rule gives
-different updated beliefs. For the four-observation identifying cells, the
-`explicit_rule` prompt states the scoring rule and is a calibration. The
-`provenance_only` prompt shows only row-level provenance identifiers; it does
-not state that repeated identifiers should be collapsed, so dependence must be
-inferred from the shared IDs.
+The prior, a message, and an evidence log are visible. The `explicit_rule`
+prompt states the integer log-odds scoring rule and is a calibration. The
+`provenance_only` prompt also supplies a visible binary log-odds model and
+states that each unique `provenance_id` is one conditionally independent sensor
+event while repeated rows with that ID are records of the same event. Thus the
+numerical update is score-identifiable from the prompt, while the tested step
+is recognizing shared provenance as one event rather than treating rows as
+independent evidence. The primary contrast is selected where the frozen
+scoring rule gives different updated beliefs.
 
 ### Recursive strategy
 
@@ -82,12 +104,16 @@ four levels. Prediction and own-action rows are separate task kinds.
 
 Rows cross uncertainty, stakes, inspection cost, and signal reliability. Within
 each such cell, a `voi_positive` and `voi_negative` payoff profile share all
-superficial cues and differ only in the visible payoff matrix. The prompt
-contains the prior, payoff matrix, cost, and reliability; the signed value of
-information (`VOI = EV(inspect) - EV(act)`) is computed exactly by the CPU
-certificate. The primary endpoint requires both correct choices and an
-inspect-to-act switch across each matched pair. A logit-margin-versus-VOI
-analysis is secondary and cannot rescue the binary gate.
+superficial cues and differ only in the visible payoff matrix. Both profiles
+have state-dependent optimal actions: the positive profile has net VOI above
+zero (gross information value above cost), whereas the negative profile has a
+one-point state advantage whose information value remains below the minimum
+inspection cost. The prompt contains the
+prior, payoff matrix, cost, and reliability; the signed value of information
+(`VOI = EV(inspect) - EV(act)`) is computed exactly by the CPU certificate. The
+primary endpoint requires both correct choices and an inspect-to-act switch
+across each matched pair. A logit-margin-versus-VOI analysis is secondary and
+cannot rescue the binary gate.
 
 ### Monitoring and safety
 
@@ -134,9 +160,12 @@ ID and no static answer placeholder. A failure stops the freeze.
 ## Measurement and analysis boundary
 
 Forced-choice logits and free generation are analyzed as separate measurement
-modes. For both, labels are randomized between semantic choices and the
-candidate token IDs are checked in model-specific preflight. Missing or
-unparseable free generations count as failures and are retained separately.
+modes. For both, labels are randomized between semantic choices, with one
+game-level permutation held fixed within every primary matched pair. Candidate
+token IDs are checked in model-specific preflight; cross-model replication
+compares semantic messages and candidate labels rather than tokenizer-specific
+IDs or chat-template renderings. Missing or unparseable free generations count
+as failures and are retained separately.
 
 No activations are collected in V6.1. If every family gate passes, a later
 mechanistic protocol must be frozen independently with unrelated-game,

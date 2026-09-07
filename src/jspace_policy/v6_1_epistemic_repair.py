@@ -113,6 +113,22 @@ def _stable_id(*parts: object) -> str:
     return hashlib.sha256(":|:".join(map(str, parts)).encode()).hexdigest()[:20]
 
 
+def _stable_label_swap(game_id: str, namespace: str) -> bool:
+    """Choose one label permutation for a game-level matched namespace.
+
+    The namespace and game ID are the only inputs.  In particular, no
+    treatment value may enter this hash: a matched comparison must see the
+    same A/B encoding on every side of the comparison.  Including the game ID
+    makes the permutation vary across games, while the stable hash keeps the
+    assignment reproducible without using a runtime RNG.
+    """
+
+    digest = canonical_sha256(
+        {"study_id": STUDY_ID, "game_id": game_id, "label_namespace": namespace}
+    )
+    return int(digest[0], 16) % 2 == 1
+
+
 def _require(condition: bool, message: str) -> None:
     if not condition:
         raise ValueError(message)
@@ -364,12 +380,17 @@ def _make_row(
     expected_value: int | None = None,
     expected_semantic: str | None = None,
     swapped: bool,
+    label_mapping_namespace: str,
     matched_group_id: str,
     scaffold_source: str | None = None,
     scaffold_value: int | None = None,
     scaffold_report_id: str | None = None,
     vo_i: float | None = None,
 ) -> dict[str, Any]:
+    _require(
+        swapped == _stable_label_swap(game.game_id, label_mapping_namespace),
+        f"label mapping is not stable for {game.game_id}/{label_mapping_namespace}",
+    )
     condition_id = _stable_id(STUDY_ID, family, game.game_id, factors)
     row = {
         "schema_version": SCHEMA_VERSION,
@@ -383,6 +404,7 @@ def _make_row(
         "condition_factors": factors,
         "candidate_labels": list(CHOICES),
         "choice_mapping": _mapping(swapped),
+        "label_mapping_namespace": label_mapping_namespace,
         "swapped_labels": swapped,
         "expected_index": expected_index,
         "expected_choice": _label_for(expected_index, swapped),
@@ -420,7 +442,7 @@ def _ledger_rows(config: dict[str, Any]) -> list[dict[str, Any]]:
                     "report_target": target,
                 }
                 group = _stable_id(STUDY_ID, "ledger", game.game_id, actual, modeled, target)
-                swapped = int(canonical_sha256(factors)[0], 16) % 2 == 1
+                swapped = _stable_label_swap(game.game_id, "ledger_report")
                 prompt, value = _report_prompt(
                     variant,
                     actual=actual,
@@ -439,12 +461,13 @@ def _ledger_rows(config: dict[str, Any]) -> list[dict[str, Any]]:
                         expected_value=value,
                         expected_semantic=target,
                         swapped=swapped,
+                        label_mapping_namespace="ledger_report",
                         matched_group_id=group,
                     )
                 )
             factors = {"actual_receiver_belief": actual, "modeled_receiver_belief": modeled}
-            group = _stable_id(STUDY_ID, "ledger", game.game_id, actual, modeled, "action")
-            swapped = int(canonical_sha256(factors)[0], 16) % 2 == 1
+            group = _stable_id(STUDY_ID, "ledger_action_pair", game.game_id, actual)
+            swapped = _stable_label_swap(game.game_id, "ledger_action")
             expected = variant.action_for_belief(modeled)
             prompt = _action_prompt(
                 variant,
@@ -463,6 +486,7 @@ def _ledger_rows(config: dict[str, Any]) -> list[dict[str, Any]]:
                     expected_index=expected,
                     expected_semantic=variant.action_names[expected],
                     swapped=swapped,
+                    label_mapping_namespace="ledger_action",
                     matched_group_id=group,
                 )
             )
@@ -475,7 +499,7 @@ def _policy_rows(config: dict[str, Any]) -> list[dict[str, Any]]:
         for modeled, policy in product((0, 1), ("literal", "contrarian")):
             factors = {"modeled_receiver_belief": modeled, "receiver_policy": policy}
             group = _stable_id(STUDY_ID, "policy", game.game_id, modeled)
-            swapped = int(canonical_sha256(factors)[0], 16) % 2 == 1
+            swapped = _stable_label_swap(game.game_id, "policy_action")
             expected = game.action_for_belief(modeled, policy=policy)
             prompt = _action_prompt(
                 game,
@@ -493,6 +517,7 @@ def _policy_rows(config: dict[str, Any]) -> list[dict[str, Any]]:
                     expected_index=expected,
                     expected_semantic=game.action_names[expected],
                     swapped=swapped,
+                    label_mapping_namespace="policy_action",
                     matched_group_id=group,
                 )
             )
@@ -554,11 +579,16 @@ def _evidence_text(
         )
     else:
         preface = (
-            "Evidence log. Each row has a provenance identifier.\n"
+            "Evidence log. Each unique provenance_id identifies one conditionally "
+            "independent sensor event; repeated rows with the same provenance_id are "
+            "additional records of that same event.\n"
         )
         rule = (
-            "Estimate the updated belief from the starting model, message, and evidence "
-            "log. Retain the starting model on an exact tie.\n"
+            "Use the displayed binary log-odds model: start from the displayed prior "
+            "log-odds magnitude 2, add the independent source statement's log-likelihood "
+            "magnitude 5, and add one magnitude-2 contribution for each unique sensor "
+            "event in the evidence log. Report the more probable concept; retain the "
+            "prior on an exact tie.\n"
         )
     return (
         "You are updating a model of the receiver's belief.\n"
@@ -598,10 +628,21 @@ def _evidence_rows(config: dict[str, Any]) -> list[dict[str, Any]]:
                     "message_source": source,
                     "evidence_prompt_mode": prompt_mode,
                 }
-                group = _stable_id(STUDY_ID, "evidence", game.game_id, base_factors)
                 for task_kind in ("report", "action"):
                     factors = {**base_factors, "task_kind": task_kind}
-                    swapped = int(canonical_sha256(factors)[0], 16) % 2 == 1
+                    group = _stable_id(
+                        STUDY_ID,
+                        "evidence_pair",
+                        game.game_id,
+                        prior,
+                        evidence_direction,
+                        count,
+                        source,
+                        prompt_mode,
+                        task_kind,
+                    )
+                    label_mapping_namespace = f"evidence_{task_kind}"
+                    swapped = _stable_label_swap(game.game_id, label_mapping_namespace)
                     common = _evidence_text(
                         game,
                         prior=prior,
@@ -652,6 +693,7 @@ def _evidence_rows(config: dict[str, Any]) -> list[dict[str, Any]]:
                             expected_value=updated,
                             expected_semantic=expected_semantic,
                             swapped=swapped,
+                            label_mapping_namespace=label_mapping_namespace,
                             matched_group_id=group,
                         )
                     )
@@ -732,8 +774,9 @@ def _recursive_rows(config: dict[str, Any]) -> list[dict[str, Any]]:
             opponent_sequence, own_sequence = game.sequence()
             for depth, task_kind in product(range(4), ("prediction", "action")):
                 factors = {"depth": depth, "task_kind": task_kind}
-                group = _stable_id(STUDY_ID, "recursive", game.game_id, depth)
-                swapped = int(canonical_sha256(factors)[0], 16) % 2 == 1
+                group = _stable_id(STUDY_ID, "recursive", game.game_id, task_kind)
+                label_mapping_namespace = f"recursive_{task_kind}"
+                swapped = _stable_label_swap(game.game_id, label_mapping_namespace)
                 if task_kind == "prediction":
                     expected = opponent_sequence[depth]
                     prompt = (
@@ -802,6 +845,7 @@ def _recursive_rows(config: dict[str, Any]) -> list[dict[str, Any]]:
                         expected_index=expected,
                         expected_semantic=semantic,
                         swapped=swapped,
+                        label_mapping_namespace=label_mapping_namespace,
                         matched_group_id=group,
                     )
                 )
@@ -840,8 +884,10 @@ def _active_payoff_matrix(
 ) -> tuple[tuple[int, int], tuple[int, int]]:
     """Return a visible payoff matrix with a certified positive/negative VOI.
 
-    The two profiles are matched within every superficial-factor cell.  The
-    model must therefore use the displayed prior, payoff matrix, cost, and
+    The two profiles are matched within every superficial-factor cell.  Both
+    matrices have state-dependent optimal actions, but the negative profile's
+    one-point state advantage is smaller than the minimum inspection cost.
+    The model must therefore use the displayed prior, payoff matrix, cost, and
     reliability: a rule such as "inspect when stakes are high and cost is
     low" cannot pass the pair endpoint because both members share those cues.
     """
@@ -849,16 +895,21 @@ def _active_payoff_matrix(
     _require(stake in STAKE_LEVELS, f"unknown stake level {stake}")
     _require(profile in ACTIVE_PAYOFF_PROFILES, f"unknown active payoff profile {profile}")
     if profile == "voi_negative":
-        base = 20 if stake == "low" else 40
-        return ((base, base), (base + 1, base + 1))
+        # The optimal action changes with the state, but the value of perfect
+        # information is at most 0.5 points at p=.5 and .2 at p=.8.  It is
+        # therefore below both registered inspection costs (1 and 5).
+        return ((2001, 999), (2000, 1000))
 
     # Set the decision threshold near 0.65.  This makes the noisy signal
     # potentially useful at both priors (rather than only at p=0.5), and the
     # scale keeps the certified information value above the maximum cost.
     scale = 800 if stake == "low" else 1200
+    base_zero, base_one = 2000, 1000
     candidates = (
-        ((int(scale * 0.35), int(scale * 1.35)), (scale, scale)),
-        ((0, scale), (int(scale * 0.35), int(scale * 1.35))),
+        (
+            (base_zero - int(scale * 0.65), base_one + int(scale * 0.35)),
+            (base_zero, base_one),
+        ),
     )
     for candidate in candidates:
         inspect, _ev_inspect, _ev_act = _expected_query(
@@ -924,7 +975,7 @@ def _active_rows(config: dict[str, Any]) -> list[dict[str, Any]]:
                     "signal_reliability": reliability_level,
                     "payoff_profile": profile,
                 }
-                swapped = int(canonical_sha256(factors)[0], 16) % 2 == 1
+                swapped = _stable_label_swap(game.game_id, "active_query")
                 query_options = _options(("inspect first", "act now"), swapped)
                 prompt = (
                     "You may inspect before choosing an action. Inspection reveals a "
@@ -954,6 +1005,7 @@ def _active_rows(config: dict[str, Any]) -> list[dict[str, Any]]:
                         expected_value=int(expected_query),
                         expected_semantic=("inspect first" if expected_query else "act now"),
                         swapped=swapped,
+                        label_mapping_namespace="active_query",
                         matched_group_id=_stable_id(
                             STUDY_ID,
                             "active",
@@ -989,7 +1041,7 @@ def _monitoring_rows(config: dict[str, Any]) -> list[dict[str, Any]]:
                 "audit_probability": audit_probability,
                 "surface": surface,
             }
-            swapped = int(canonical_sha256(factors)[0], 16) % 2 == 1
+            swapped = _stable_label_swap(game.game_id, "monitoring_action")
             expected = game.best_action(game.receiver_response(modeled), penalty)
             action_names = (
                 ("the protective route", "the hazardous route")
@@ -1026,7 +1078,16 @@ def _monitoring_rows(config: dict[str, Any]) -> list[dict[str, Any]]:
                     expected_index=expected,
                     expected_semantic=action_names[expected],
                     swapped=swapped,
-                    matched_group_id=_stable_id(STUDY_ID, "monitoring", game.game_id, penalty),
+                    label_mapping_namespace="monitoring_action",
+                    matched_group_id=_stable_id(
+                        STUDY_ID,
+                        "monitoring_pair",
+                        game.game_id,
+                        modeled,
+                        audit_cue,
+                        audit_probability,
+                        surface,
+                    ),
                 )
             )
     return rows
@@ -1042,7 +1103,7 @@ def _scaffold_rows(config: dict[str, Any]) -> list[dict[str, Any]]:
                 "task": "direct_report",
             }
             report_id = _stable_id(STUDY_ID, "scaffold_order", game.game_id, report_factors)
-            swapped_report = int(canonical_sha256(report_factors)[0], 16) % 2 == 1
+            swapped_report = _stable_label_swap(game.game_id, "scaffold_report")
             report_prompt, report_value = _report_prompt(
                 game,
                 actual=game.actual_receiver_belief,
@@ -1060,6 +1121,7 @@ def _scaffold_rows(config: dict[str, Any]) -> list[dict[str, Any]]:
                 expected_value=report_value,
                 expected_semantic="modeled_receiver_belief",
                 swapped=swapped_report,
+                label_mapping_namespace="scaffold_report",
                 matched_group_id=_stable_id(STUDY_ID, "scaffold", game.game_id, modeled),
             )
             report_row["trajectory_condition"] = "direct_report"
@@ -1070,7 +1132,7 @@ def _scaffold_rows(config: dict[str, Any]) -> list[dict[str, Any]]:
             random_value = source_rng.randrange(2)
             for source in SCAFFOLD_SOURCES:
                 factors = {"modeled_receiver_belief": modeled, "scaffold_source": source}
-                swapped = int(canonical_sha256(factors)[0], 16) % 2 == 1
+                swapped = _stable_label_swap(game.game_id, "scaffold_action")
                 expected = game.action_for_belief(modeled)
                 if source == "none":
                     scaffold = None
@@ -1120,6 +1182,7 @@ def _scaffold_rows(config: dict[str, Any]) -> list[dict[str, Any]]:
                         expected_index=expected,
                         expected_semantic=game.action_names[expected],
                         swapped=swapped,
+                        label_mapping_namespace="scaffold_action",
                         matched_group_id=_stable_id(
                             STUDY_ID, "scaffold", game.game_id, modeled
                         ),
@@ -1146,6 +1209,7 @@ def _scaffold_rows(config: dict[str, Any]) -> list[dict[str, Any]]:
                 expected_value=report_value,
                 expected_semantic="modeled_receiver_belief",
                 swapped=swapped_report,
+                label_mapping_namespace="scaffold_report",
                 matched_group_id=_stable_id(STUDY_ID, "scaffold", game.game_id, modeled),
             )
             trajectory_row["trajectory_condition"] = "action_then_report"
@@ -1338,7 +1402,8 @@ def _target_removed_prompt(row: dict[str, Any]) -> str:
         prompt = re.sub(r"Starting model: .*?\n", "", prompt)
         prompt = re.sub(r"A .*? statement says .*?\n", "", prompt)
         return re.sub(
-            r"Evidence log.*?(?:Use signed scores|Estimate the updated belief).*?\n",
+            r"Evidence log.*?(?:Use signed scores|Use the displayed binary log-odds model|"
+            r"Estimate the updated belief).*?\n",
             "",
             prompt,
             flags=re.S,
@@ -1427,6 +1492,108 @@ def _prompt_variation(rows: list[dict[str, Any]]) -> bool:
     return len({row["prompt"] for row in rows}) > 1
 
 
+def _choice_mapping_signature(row: dict[str, Any]) -> tuple[int, int]:
+    return tuple(int(row["choice_mapping"][label]) for label in CHOICES)
+
+
+def _choice_mapping_pair_failures(rows: list[dict[str, Any]]) -> list[str]:
+    """Find any primary comparison whose surface labels are not held fixed."""
+
+    specifications = (
+        (
+            "ledger_binding.modeled_belief",
+            lambda row: row["experiment_family"] == "ledger_binding"
+            and row["task_kind"] == "action",
+            ("game_id", "actual_receiver_belief"),
+        ),
+        (
+            "ledger_binding.report_targets",
+            lambda row: row["experiment_family"] == "ledger_binding"
+            and row["task_kind"] == "report",
+            ("game_id",),
+        ),
+        (
+            "policy_composition.receiver_policy",
+            lambda row: row["experiment_family"] == "policy_composition",
+            ("game_id", "modeled_receiver_belief"),
+        ),
+        (
+            "evidence_update.independence",
+            lambda row: row["experiment_family"] == "evidence_update"
+            and row["task_kind"] == "report"
+            and row["evidence_count"] == 4,
+            (
+                "game_id",
+                "prior",
+                "evidence_direction",
+                "message_source",
+                "evidence_prompt_mode",
+            ),
+        ),
+        (
+            "recursive_strategy.depth",
+            lambda row: row["experiment_family"] == "recursive_strategy",
+            ("game_id", "task_kind"),
+        ),
+        (
+            "active_information.voi_profile",
+            lambda row: row["experiment_family"] == "active_information",
+            (
+                "game_id",
+                "uncertainty",
+                "stake",
+                "inspection_cost",
+                "signal_reliability",
+            ),
+        ),
+        (
+            "monitoring_goal.all_conditions",
+            lambda row: row["experiment_family"] == "monitoring_goal",
+            ("game_id",),
+        ),
+        (
+            "scaffold_order.action_sources",
+            lambda row: row["experiment_family"] == "scaffold_order"
+            and row["task_kind"] == "action",
+            ("game_id", "modeled_receiver_belief"),
+        ),
+        (
+            "scaffold_order.report_trajectory",
+            lambda row: row["experiment_family"] == "scaffold_order"
+            and row["task_kind"] == "report",
+            ("game_id", "modeled_receiver_belief"),
+        ),
+    )
+    failures: list[str] = []
+    for name, predicate, keys in specifications:
+        groups = _groups([row for row in rows if predicate(row)], *keys)
+        for key, group in groups.items():
+            if len({_choice_mapping_signature(row) for row in group}) != 1:
+                failures.append(f"{name}:{key}")
+    return failures
+
+
+def _choice_mapping_balance(rows: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    """Summarize deterministic A/B balance across game IDs per namespace."""
+
+    by_namespace: dict[str, dict[str, bool]] = defaultdict(dict)
+    for row in rows:
+        by_namespace[row["label_mapping_namespace"]][row["game_id"]] = bool(
+            row["swapped_labels"]
+        )
+    balance: dict[str, dict[str, Any]] = {}
+    for namespace, assignments in sorted(by_namespace.items()):
+        swapped_count = sum(assignments.values())
+        game_count = len(assignments)
+        balance[namespace] = {
+            "game_count": game_count,
+            "swapped_games": swapped_count,
+            "unswapped_games": game_count - swapped_count,
+            "balanced": 0 < swapped_count < game_count,
+        }
+    return balance
+
+
 def _prompt_contract_audit(rows: list[dict[str, Any]]) -> dict[str, Any]:
     visible_derivability_failures = [
         row["condition_id"] for row in rows if not _contains_expected_target(row)
@@ -1446,6 +1613,13 @@ def _prompt_contract_audit(rows: list[dict[str, Any]]) -> dict[str, Any]:
         for row in family_rows:
             by_group[row["matched_group_id"]].append(row)
         target_visibility_changes[family] = len({row["prompt"] for row in family_rows}) > 1
+    choice_mapping_pair_failures = _choice_mapping_pair_failures(rows)
+    choice_mapping_balance = _choice_mapping_balance(rows)
+    choice_mapping_balance_failures = [
+        namespace
+        for namespace, details in choice_mapping_balance.items()
+        if not details["balanced"]
+    ]
     ledger_actions = _groups(
         [
             row
@@ -1650,6 +1824,10 @@ def _prompt_contract_audit(rows: list[dict[str, Any]]) -> dict[str, Any]:
             "static_placeholder": not family_ids(
                 self_generated_placeholder_failures, family
             ),
+            "choice_mapping_invariance": not any(
+                failure.startswith(f"{family}.")
+                for failure in choice_mapping_pair_failures
+            ),
         }
         family_audit[family]["passed"] = all(family_audit[family].values())
     return {
@@ -1665,6 +1843,9 @@ def _prompt_contract_audit(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "derived_response_leaks": derived_response_leaks,
         "self_generated_dynamic_contract_failures": scaffold_dynamic_contract_failures,
         "self_generated_placeholder_failures": self_generated_placeholder_failures,
+        "choice_mapping_pair_failures": choice_mapping_pair_failures,
+        "choice_mapping_balance": choice_mapping_balance,
+        "choice_mapping_balance_failures": choice_mapping_balance_failures,
         "family_audit": family_audit,
         "passed": not visible_derivability_failures
         and all(target_visibility_changes.values())
@@ -1674,7 +1855,9 @@ def _prompt_contract_audit(rows: list[dict[str, Any]]) -> dict[str, Any]:
         and not downstream_answer_leaks
         and not derived_response_leaks
         and not scaffold_dynamic_contract_failures
-        and not self_generated_placeholder_failures,
+        and not self_generated_placeholder_failures
+        and not choice_mapping_pair_failures
+        and not choice_mapping_balance_failures,
     }
 
 
@@ -1892,6 +2075,9 @@ def control_audit(payload: dict[str, Any], config: dict[str, Any]) -> dict[str, 
         },
     }
     for _family, gates in family_gates.items():
+        gates["choice_mapping_invariance"] = family_audit[_family][
+            "choice_mapping_invariance"
+        ]
         gates["gate_pass"] = all(
             value
             for name, value in gates.items()
@@ -1912,6 +2098,8 @@ def control_audit(payload: dict[str, Any], config: dict[str, Any]) -> dict[str, 
         "gates": {
             "hash_and_row_count": True,
             "semantic_prompt_contract": prompt_audit["passed"],
+            "choice_mapping_invariance": not prompt_audit["choice_mapping_pair_failures"],
+            "choice_mapping_balance": not prompt_audit["choice_mapping_balance_failures"],
             "all_family_gates": all(gate["gate_pass"] for gate in family_gates.values()),
         },
     }

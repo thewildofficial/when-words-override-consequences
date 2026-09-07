@@ -25,9 +25,10 @@ interpretations are quarantined by that erratum.
 | Modal app | `jspace-v6-1-epistemic-repair` |
 
 The primary model is the pinned `Qwen/Qwen3.6-27B` checkpoint. Qwen3.8-27B is
-registered separately, but is disabled until its own tokenizer and rendered
-prompt preflight exactly matches the V6.1 contract. It has no shared gate or
-pooled result.
+registered separately, but is disabled until its own model-specific tokenizer
+preflight passes and its semantic prompt/label contract matches V6.1. Different
+chat templates and token IDs are recorded per model and are not themselves a
+replication failure. It has no shared gate or pooled result.
 
 ## What the CPU audit froze
 
@@ -49,8 +50,8 @@ before any Modal stage.
 
 The CPU control record reports:
 
-- config SHA256: `0931f43b68d155708168190e10f2173d3f7b9547f63493f64f54f48faaa8dff4`
-- dataset SHA256: `4a0caeabefd8a52883d0e3632460fec138f4919cc541f7ecb21d255a39712114`
+- config SHA256: `948bcb3674ad8c5dc6f6363174b9d2e93b59062c813717457c857d9fb1ee7df6`
+- dataset SHA256: `d4f8e70035d9c7504d0f1e0be3319c0c57b12c08aa2304c7c864a51fb674b3a4`
 - all seven structural and semantic family gates: passed
 - GPU seconds: `0`
 - model forward passes: `0`
@@ -76,9 +77,14 @@ The CPU control record reports:
    wording control, not a safety conclusion.
 6. Independent and copied evidence are crossed at counts 0, 1, 2, and 4. The
    four-observation cells have both an explicit-rule calibration and a
-   provenance-only prompt that exposes IDs without stating how repeated IDs
-   should be weighted.
-7. Fixed scaffold rows are content-only controls. Only the `self_generated`
+   provenance-only prompt that exposes shared event IDs plus a visible
+   log-odds model; the dependence-sensitive step is identifying repeated rows
+   as records of the same event.
+7. Every primary matched comparison uses one deterministic A/B permutation per
+   game-level namespace. The hash includes the game ID and namespace, never
+   the treatment value, and the CPU audit checks pairwise invariance and
+   across-game balance.
+8. Fixed scaffold rows are content-only controls. Only the `self_generated`
    rows receive an earlier sampled report as a genuine assistant turn; no
    fixed-source row is interpreted as evidence of source provenance.
 

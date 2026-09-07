@@ -1,6 +1,6 @@
 {
-  "config_sha256": "0931f43b68d155708168190e10f2173d3f7b9547f63493f64f54f48faaa8dff4",
-  "dataset_sha256": "4a0caeabefd8a52883d0e3632460fec138f4919cc541f7ecb21d255a39712114",
+  "config_sha256": "948bcb3674ad8c5dc6f6363174b9d2e93b59062c813717457c857d9fb1ee7df6",
+  "dataset_sha256": "d4f8e70035d9c7504d0f1e0be3319c0c57b12c08aa2304c7c864a51fb674b3a4",
   "family_counts": {
     "active_information": 768,
     "evidence_update": 4320,
@@ -13,12 +13,14 @@
   "family_gates": {
     "active_information": {
       "both_query_outcomes_exist": true,
+      "choice_mapping_invariance": true,
       "factorial_cells_complete": true,
       "gate_pass": true,
       "stop_if_failed": "do not infer value-of-information sensitivity",
       "within_pair_voi_switches_present": true
     },
     "evidence_update": {
+      "choice_mapping_invariance": true,
       "evidence_prompts_are_visible": true,
       "gate_pass": true,
       "independent_and_copied_cells_complete": true,
@@ -26,6 +28,7 @@
       "target_perturbation_contract": true
     },
     "ledger_binding": {
+      "choice_mapping_invariance": true,
       "complete_ledger_cells": true,
       "gate_pass": true,
       "nuisance_invariance_contract": true,
@@ -35,11 +38,13 @@
     },
     "monitoring_goal": {
       "audit_cue_is_payoff_invariant": true,
+      "choice_mapping_invariance": true,
       "gate_pass": true,
       "risk_identifying_cells": true,
       "stop_if_failed": "do not interpret evaluation-cue effects or safety dose response"
     },
     "policy_composition": {
+      "choice_mapping_invariance": true,
       "derived_response_not_supplied": true,
       "gate_pass": true,
       "stop_if_failed": "do not call policy differences a belief-policy composition result",
@@ -47,12 +52,14 @@
       "within_game_policy_pairs_complete": true
     },
     "recursive_strategy": {
+      "choice_mapping_invariance": true,
       "depth_and_task_cells_present": true,
       "gate_pass": true,
       "stop_if_failed": "do not infer recursive ToM from pooled game accuracy"
     },
     "scaffold_order": {
       "all_sources_present": true,
+      "choice_mapping_invariance": true,
       "direct_and_action_first_report_prompts_identical": true,
       "gate_pass": true,
       "self_generated_is_true_trajectory": true,
@@ -61,15 +68,88 @@
   },
   "gates": {
     "all_family_gates": true,
+    "choice_mapping_balance": true,
+    "choice_mapping_invariance": true,
     "hash_and_row_count": true,
     "semantic_prompt_contract": true
   },
   "interpretation": "No model has been run; this is protocol validation only.",
   "prompt_audit": {
+    "choice_mapping_balance": {
+      "active_query": {
+        "balanced": true,
+        "game_count": 24,
+        "swapped_games": 11,
+        "unswapped_games": 13
+      },
+      "evidence_action": {
+        "balanced": true,
+        "game_count": 18,
+        "swapped_games": 10,
+        "unswapped_games": 8
+      },
+      "evidence_report": {
+        "balanced": true,
+        "game_count": 18,
+        "swapped_games": 5,
+        "unswapped_games": 13
+      },
+      "ledger_action": {
+        "balanced": true,
+        "game_count": 24,
+        "swapped_games": 9,
+        "unswapped_games": 15
+      },
+      "ledger_report": {
+        "balanced": true,
+        "game_count": 24,
+        "swapped_games": 9,
+        "unswapped_games": 15
+      },
+      "monitoring_action": {
+        "balanced": true,
+        "game_count": 36,
+        "swapped_games": 18,
+        "unswapped_games": 18
+      },
+      "policy_action": {
+        "balanced": true,
+        "game_count": 36,
+        "swapped_games": 15,
+        "unswapped_games": 21
+      },
+      "recursive_action": {
+        "balanced": true,
+        "game_count": 24,
+        "swapped_games": 9,
+        "unswapped_games": 15
+      },
+      "recursive_prediction": {
+        "balanced": true,
+        "game_count": 24,
+        "swapped_games": 10,
+        "unswapped_games": 14
+      },
+      "scaffold_action": {
+        "balanced": true,
+        "game_count": 24,
+        "swapped_games": 14,
+        "unswapped_games": 10
+      },
+      "scaffold_report": {
+        "balanced": true,
+        "game_count": 24,
+        "swapped_games": 13,
+        "unswapped_games": 11
+      }
+    },
+    "choice_mapping_balance_failures": [],
+    "choice_mapping_pair_failures": [],
     "derived_response_leaks": [],
     "downstream_answer_leaks": [],
     "family_audit": {
       "active_information": {
+        "choice_mapping_invariance": true,
         "derived_response_leak": true,
         "downstream_answer_leak": true,
         "dynamic_contract": true,
@@ -81,6 +161,7 @@
         "visible_derivability": true
       },
       "evidence_update": {
+        "choice_mapping_invariance": true,
         "derived_response_leak": true,
         "downstream_answer_leak": true,
         "dynamic_contract": true,
@@ -92,6 +173,7 @@
         "visible_derivability": true
       },
       "ledger_binding": {
+        "choice_mapping_invariance": true,
         "derived_response_leak": true,
         "downstream_answer_leak": true,
         "dynamic_contract": true,
@@ -103,6 +185,7 @@
         "visible_derivability": true
       },
       "monitoring_goal": {
+        "choice_mapping_invariance": true,
         "derived_response_leak": true,
         "downstream_answer_leak": true,
         "dynamic_contract": true,
@@ -114,6 +197,7 @@
         "visible_derivability": true
       },
       "policy_composition": {
+        "choice_mapping_invariance": true,
         "derived_response_leak": true,
         "downstream_answer_leak": true,
         "dynamic_contract": true,
@@ -125,6 +209,7 @@
         "visible_derivability": true
       },
       "recursive_strategy": {
+        "choice_mapping_invariance": true,
         "derived_response_leak": true,
         "downstream_answer_leak": true,
         "dynamic_contract": true,
@@ -136,6 +221,7 @@
         "visible_derivability": true
       },
       "scaffold_order": {
+        "choice_mapping_invariance": true,
         "derived_response_leak": true,
         "downstream_answer_leak": true,
         "dynamic_contract": true,

@@ -23,6 +23,8 @@ cluster before bootstrapping. Paired sign-flip tests are conditional on a
 family gate and never rescue a failed gate. H5 uses matched positive/negative
 VOI profiles; H7 treats fixed scaffolds as content-only and reserves the
 “self-generated” label for a real preceding assistant report turn.
+All primary matched pairs also reuse one deterministic A/B label permutation;
+the mapping hash excludes the treatment and is audited before execution.
 
 The expected remote artifacts, once the manual GitHub Actions workflow runs,
 are stored under `raw/`:

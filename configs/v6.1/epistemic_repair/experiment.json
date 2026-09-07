@@ -33,9 +33,11 @@
     "scaffold_games_per_split": 8,
     "splits": ["discovery", "validation", "locked"],
     "candidate_labels": ["A", "B"],
-    "factor_policy": "all row-generating factors are deterministic and frozen; game IDs never cross splits",
+    "factor_policy": "all row-generating factors are deterministic and frozen; game IDs never cross splits; label permutations are hashed by game_id and treatment-invariant namespace",
     "evidence_prompt_modes": ["explicit_rule", "provenance_only"],
+    "provenance_only_rule": "visible binary log-odds model with unique provenance_id as one conditionally independent sensor event and repeated rows as records of that event",
     "active_payoff_profiles": ["voi_positive", "voi_negative"],
+    "active_profile_note": "both profiles have state-dependent optimal actions; positive net VOI is above zero because gross information value exceeds cost, while negative information value stays below the minimum inspection cost",
     "monitoring_surface_note": "lexical_conflict intentionally names the penalized action protective and the unpenalized action hazardous"
   },
   "behavior": {

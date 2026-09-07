@@ -489,6 +489,28 @@ def _preflight_contract(queries: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
+def _semantic_preflight_contract(queries: list[dict[str, Any]]) -> dict[str, Any]:
+    """Hash the model-independent prompt/label contract.
+
+    Token IDs, rendered chat templates, and tokenizer-specific special-token
+    behavior are recorded by ``_preflight_contract`` but are not replication
+    invariants.  A valid checkpoint can encode the same semantic stimulus with
+    different IDs or a different chat wrapper.  Cross-model parity therefore
+    compares query identity, message content, and legal candidate labels only.
+    """
+
+    return {
+        "query_count": len(queries),
+        "query_ids_sha256": canonical_sha256([q["query_id"] for q in queries]),
+        "messages_sha256": canonical_sha256(
+            [(q["query_id"], q["messages"]) for q in queries]
+        ),
+        "candidate_labels_sha256": canonical_sha256(
+            [(q["query_id"], q["candidate_labels"]) for q in queries]
+        ),
+    }
+
+
 def _hash_valid(payload: dict[str, Any]) -> bool:
     claimed = payload.get("content_sha256")
     body = {key: value for key, value in payload.items() if key != "content_sha256"}
@@ -530,22 +552,28 @@ def preflight_remote(dataset: dict[str, Any], config: dict[str, Any], model_key:
     verify_dataset_payload(dataset, config)
     spec = _model_spec_for_preflight(config, model_key)
     tokenizer, tokenizer_metadata = _load_tokenizer(spec)
-    contract = _preflight_contract(_preflight_queries(tokenizer, dataset))
+    queries = _preflight_queries(tokenizer, dataset)
+    contract = _preflight_contract(queries)
+    semantic_contract = _semantic_preflight_contract(queries)
     cross_model_parity: dict[str, Any] = {
         "status": "not_applicable_primary_model",
         "passed": True,
     }
     if model_key != "primary":
         primary_tokenizer, _ = _load_tokenizer(config["model"])
-        primary_contract = _preflight_contract(_preflight_queries(primary_tokenizer, dataset))
+        primary_queries = _preflight_queries(primary_tokenizer, dataset)
+        primary_contract = _preflight_contract(primary_queries)
+        primary_semantic_contract = _semantic_preflight_contract(primary_queries)
         cross_model_parity = {
-            "status": "exact_primary_preflight_contract_match",
-            "passed": contract == primary_contract,
+            "status": "semantic_prompt_contract_match",
+            "passed": semantic_contract == primary_semantic_contract,
             "primary": primary_contract,
             "replication": contract,
+            "primary_semantic": primary_semantic_contract,
+            "replication_semantic": semantic_contract,
         }
         if not cross_model_parity["passed"]:
-            raise RuntimeError("replication tokenizer/prompt parity failed")
+            raise RuntimeError("replication semantic prompt/label parity failed")
     payload = {
         "schema_version": 1,
         "study_id": STUDY_ID,
@@ -556,6 +584,7 @@ def preflight_remote(dataset: dict[str, Any], config: dict[str, Any], model_key:
         "model_revision_requested": spec["revision"],
         "source_dataset_sha256": dataset["content_sha256"],
         "preflight_contract": contract,
+        "semantic_preflight_contract": semantic_contract,
         "cross_model_parity": cross_model_parity,
         **tokenizer_metadata,
     }
