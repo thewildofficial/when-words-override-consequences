@@ -9,7 +9,13 @@
   "stages": {
     "behavior": {
       "measurement": "candidate_token_logits_no_activations",
-      "records": 2496,
+      "records_total": 7488,
+      "records_by_split": {
+        "discovery": 2496,
+        "validation": 2496,
+        "locked": 2496
+      },
+      "confirmatory_records": 2496,
       "content_sha256": "7c41c8ed2ae611f10291d2104558cf54fff5b4eb3620c98a29c4c043b11dc455",
       "run_id": "2baf643038f047eca6e76e3e85d185ad",
       "actions_run": "34152531767",
@@ -39,6 +45,7 @@
   },
   "artifact_links": {
     "behavior_and_full_primary": "https://github.com/thewildofficial/when-words-override-consequences/actions/runs/34152531767/artifacts/10030218459",
-    "blackbox": "https://github.com/thewildofficial/when-words-override-consequences/actions/runs/34154058341/artifacts/10030538627"
+    "blackbox": "https://github.com/thewildofficial/when-words-override-consequences/actions/runs/34154058341/artifacts/10030538627",
+    "persistent_raw_archive": "https://github.com/thewildofficial/when-words-override-consequences/releases/tag/v6.1-es2-qwen36-primary"
   }
 }

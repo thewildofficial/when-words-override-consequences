@@ -19,6 +19,8 @@ The original [`run_manifest.json`](run_manifest.json) remains the immutable
 pre-run CPU-control record. Post-run provenance is recorded separately in
 [`model_run_manifest_primary.json`](model_run_manifest_primary.json),
 [`analysis_primary.json`](analysis_primary.json), and
+[`analysis_primary_production.json`](analysis_primary_production.json), which
+is the exact full output of the production analyzer,
 [`cost_ledger_primary.jsonl`](cost_ledger_primary.jsonl).
 
 The machine-readable records are:
@@ -37,15 +39,16 @@ control; H7 treats fixed scaffolds as content-only and reserves the
 All primary matched pairs also reuse one deterministic A/B label permutation;
 the mapping hash excludes the treatment and is audited before execution.
 
-The raw remote artifacts are retained as GitHub Actions artifacts rather than
-committed as large git blobs. Their content hashes and links are recorded in
-[`model_run_manifest_primary.json`](model_run_manifest_primary.json):
+The raw remote artifacts are retained in the persistent
+[V6.1 Qwen3.6 raw-output release](https://github.com/thewildofficial/when-words-override-consequences/releases/tag/v6.1-es2-qwen36-primary)
+and mirrored in the original GitHub Actions artifacts. Their content hashes
+and links are recorded in [`model_run_manifest_primary.json`](model_run_manifest_primary.json):
 
 - `preflight_primary.json`
 - `behavior_primary.json`
 - `blackbox_primary.json`
-- `analysis_primary.json` (committed summary; the raw Actions analysis was
-  assembled from the two stage artifacts)
+- `analysis_primary.json` (compact overview)
+- `analysis_primary_production.json` (full production analyzer output)
 
 These files are content-addressed and refuse non-identical overwrite. A model
 failure is retained as a family-specific negative; infrastructure or parity
