@@ -5,8 +5,8 @@ Branch: `research/v6-1-epistemic-repair`
 
 ## Current status
 
-The local CPU protocol audit passed. It generated and verified 7,392 rows
-across seven family-specific factorials and three splits, including 2,464
+The local CPU protocol audit passed. It generated and verified 7,488 rows
+across seven family-specific factorials and three splits, including 2,496
 locked rows. The generated table is hash-pinned but git-ignored; it is
 materialized by the control step in every clean checkout. No model forward
 pass has occurred in this checkout yet.
@@ -20,8 +20,9 @@ The machine-readable records are:
 
 Confirmatory analysis aggregates each endpoint to the declared `game_id`
 cluster before bootstrapping. Paired sign-flip tests are conditional on a
-family gate and never rescue a failed gate. H5 uses matched positive/negative
-VOI profiles; H7 treats fixed scaffolds as content-only and reserves the
+family gate and never rescue a failed gate. H5 uses matched
+positive/negative VOI profiles plus a same-matrix cost/reliability threshold
+control; H7 treats fixed scaffolds as content-only and reserves the
 “self-generated” label for a real preceding assistant report turn.
 All primary matched pairs also reuse one deterministic A/B label permutation;
 the mapping hash excludes the treatment and is audited before execution.

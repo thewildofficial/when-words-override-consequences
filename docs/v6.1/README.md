@@ -32,9 +32,9 @@ replication failure. It has no shared gate or pooled result.
 
 ## What the CPU audit froze
 
-The committed generator produces 7,392 deterministic rows at control time:
-2,464 per split across discovery, validation, and locked. The locked split is
-2,464 rows. The generated row table is intentionally ignored by git; the
+The committed generator produces 7,488 deterministic rows at control time:
+2,496 per split across discovery, validation, and locked. The locked split is
+2,496 rows. The generated row table is intentionally ignored by git; the
 manifest pins its hash, and the CPU control step regenerates and verifies it
 before any Modal stage.
 
@@ -44,14 +44,14 @@ before any Modal stage.
 | `policy_composition` | 144 | 48 | Is receiver belief composed with a within-game policy flip? |
 | `evidence_update` | 4,320 | 1,440 | Do independent observations count differently from copies, including provenance-only prompts? |
 | `recursive_strategy` | 192 | 64 | Does explicit level-k recursion affect prediction and action? |
-| `active_information` | 768 | 256 | Is inspection chosen by certified value of information rather than superficial cues? |
+| `active_information` | 864 | 288 | Is inspection chosen by certified value of information rather than superficial cues, including cost/reliability thresholds? |
 | `monitoring_goal` | 1,152 | 384 | Do real penalties matter while audit wording stays inert, including lexical conflict? |
 | `scaffold_order` | 336 | 112 | Does preceding content matter beyond turn/label priming, with a real prior-report trajectory? |
 
 The CPU control record reports:
 
-- config SHA256: `948bcb3674ad8c5dc6f6363174b9d2e93b59062c813717457c857d9fb1ee7df6`
-- dataset SHA256: `d4f8e70035d9c7504d0f1e0be3319c0c57b12c08aa2304c7c864a51fb674b3a4`
+- config SHA256: `c2c272a2fb7f3feeceb3651b85b334bfcd9177b05353fb1ee5e86c9b0ff1b9a5`
+- dataset SHA256: `14aea862bd5f195b11ebe77f97fb6be857717bd10c47375e9c11cd773214d77a`
 - all seven structural and semantic family gates: passed
 - GPU seconds: `0`
 - model forward passes: `0`
@@ -67,9 +67,11 @@ The CPU control record reports:
    prompt. The only extra content is the preceding action turn, whose answer
    is recorded separately.
 4. Active-information rows pair positive-VOI and negative-VOI payoff profiles
-   within the same uncertainty, stake, cost, and reliability cell. The gate is
-   a within-pair inspect/act switch; a superficial stake/cost heuristic cannot
-   satisfy it.
+   within the same uncertainty, stake, cost, and reliability cell. A separate
+   `voi_threshold` control reuses one payoff matrix while cost and signal
+   reliability cross net VOI through zero. The gate requires all three
+   within-pair inspect/act switches; a superficial payoff-magnitude heuristic
+   cannot satisfy it.
 5. Safety rows cross both modeled beliefs and force a penalty switch in every
    game/belief cell. Audit cues are payoff-, policy-, and information-neutral.
    The `lexical_conflict` surface intentionally calls the penalized action

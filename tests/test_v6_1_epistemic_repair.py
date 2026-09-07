@@ -3,9 +3,11 @@ from __future__ import annotations
 import json
 from collections import defaultdict
 from pathlib import Path
+from runpy import run_path
 
 from jspace_policy.v6_1_epistemic_repair import (
     ACTIVE_PAYOFF_PROFILES,
+    ACTIVE_THRESHOLD_PROFILE,
     AUDIT_CUES,
     CHOICES,
     EVIDENCE_PROMPT_MODES,
@@ -26,6 +28,9 @@ from jspace_policy.v6_1_epistemic_repair import (
 
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG = ROOT / "configs/v6.1/epistemic_repair/experiment.json"
+_pair_switch_success = run_path(ROOT / "scripts/analyze_v6_1_epistemic_repair.py")[
+    "_pair_switch_success"
+]
 
 
 def _config() -> dict:
@@ -38,7 +43,7 @@ def test_v6_1_dataset_is_deterministic_and_semantically_audited() -> None:
     right = dataset_payload(config)
     assert left == right
     verify_dataset_payload(left, config)
-    assert len(left["rows"]) == expected_row_count(config) == 7392
+    assert len(left["rows"]) == expected_row_count(config) == 7488
     assert {row["experiment_family"] for row in left["rows"]} == set(FAMILIES)
     audit = control_audit(left, config)
     assert audit["status"] == "cpu_semantic_controls_passed"
@@ -310,16 +315,16 @@ def test_constant_surface_label_cannot_pass_identifying_switch_pairs() -> None:
         ]
         assert identifying
         for group in identifying:
-            constant_semantic_indices = {
-                row["choice_mapping"]["A"] for row in group
-            }
-            assert len(constant_semantic_indices) == 1
-            assert not (
-                len(constant_semantic_indices) == 2
-                and all(
-                    row["choice_mapping"]["A"] == row["expected_index"] for row in group
-                )
-            )
+            for constant_label in ("A", "B"):
+                synthetic_records = [
+                    {
+                        "selected_index": row["choice_mapping"][constant_label],
+                        "correct": row["choice_mapping"][constant_label]
+                        == row["expected_index"],
+                    }
+                    for row in group
+                ]
+                assert not _pair_switch_success(synthetic_records)
 
 
 def test_monitoring_has_many_forced_safety_switch_cells_and_audit_invariance() -> None:
@@ -359,6 +364,7 @@ def test_active_information_profiles_are_matched_and_have_opposite_certified_voi
         row
         for row in dataset_payload(_config())["rows"]
         if row["experiment_family"] == "active_information"
+        and row["payoff_profile"] in ACTIVE_PAYOFF_PROFILES
     ]
     groups: dict[str, list[dict]] = defaultdict(list)
     for row in rows:
@@ -399,6 +405,34 @@ def test_negative_active_profile_is_state_dependent_but_below_inspection_cost() 
                     prior, utility, cost, reliability
                 )
                 assert not inspect
+
+
+def test_active_threshold_control_reuses_one_matrix_and_crosses_cost_and_reliability() -> None:
+    rows = [
+        row
+        for row in dataset_payload(_config())["rows"]
+        if row["experiment_family"] == "active_information"
+        and row["payoff_profile"] == ACTIVE_THRESHOLD_PROFILE
+    ]
+    groups: dict[str, list[dict]] = defaultdict(list)
+    for row in rows:
+        groups[row["matched_group_id"]].append(row)
+    assert groups
+    for group in groups.values():
+        assert len(group) == 4
+        assert len({json.dumps(row["payoff_matrix"]) for row in group}) == 1
+        by_cell = {
+            (row["inspection_cost"], row["signal_reliability"]): row for row in group
+        }
+        assert set(by_cell) == {
+            ("low", "perfect"),
+            ("high", "perfect"),
+            ("low", "noisy"),
+            ("high", "noisy"),
+        }
+        assert by_cell[("low", "perfect")]["expected_index"] == 0
+        assert by_cell[("high", "perfect")]["expected_index"] == 1
+        assert by_cell[("low", "noisy")]["expected_index"] == 1
 
 
 def test_scaffold_sources_do_not_claim_hidden_provenance_and_self_generated_is_a_real_turn(

@@ -18,6 +18,7 @@ from pathlib import Path
 from typing import Any
 
 from jspace_policy.v6_1_epistemic_repair import (
+    ACTIVE_THRESHOLD_PROFILE,
     FAMILIES,
     STUDY_ID,
     canonical_sha256,
@@ -53,6 +54,22 @@ def _hash_valid(payload: dict[str, Any]) -> bool:
 
 def _rate(rows: list[dict[str, Any]], predicate: Callable[[dict[str, Any]], bool]) -> float:
     return sum(predicate(row) for row in rows) / len(rows) if rows else 0.0
+
+
+def _pair_switch_success(rows: list[dict[str, Any]]) -> bool:
+    """Score the preregistered two-row identifying endpoint.
+
+    A pair succeeds only when both rows are parseable and correct and the
+    semantic choice changes.  Keeping this in one production helper makes the
+    synthetic constant-label controls test the same endpoint as the analysis.
+    """
+
+    return (
+        len(rows) == 2
+        and all(row.get("selected_index") is not None for row in rows)
+        and all(bool(row.get("correct")) for row in rows)
+        and len({row["selected_index"] for row in rows}) == 2
+    )
 
 
 def _group(
@@ -288,11 +305,7 @@ def _ledger_summary(rows: list[dict[str, Any]], config: dict[str, Any]) -> dict[
             pair_cells.append(
                 (
                     group[0]["game_id"],
-                    float(
-                        all(row["correct"] for row in by_modeled.values())
-                        and by_modeled[0]["selected_index"]
-                        != by_modeled[1]["selected_index"]
-                    ),
+                    float(_pair_switch_success(list(by_modeled.values()))),
                 )
             )
     for group in _group(actions, "game_id", "modeled_receiver_belief").values():
@@ -365,10 +378,7 @@ def _policy_summary(rows: list[dict[str, Any]], config: dict[str, Any]) -> dict[
             pair_cells.append(
                 (
                     group[0]["game_id"],
-                    float(
-                        all(row["correct"] for row in by_policy.values())
-                        and literal["selected_index"] != contrarian["selected_index"]
-                    ),
+                    float(_pair_switch_success(list(by_policy.values()))),
                 )
             )
             if (
@@ -561,31 +571,62 @@ def _active_summary(rows: list[dict[str, Any]], config: dict[str, Any]) -> dict[
     pair_cells: list[tuple[str, float]] = []
     choice_differences: list[tuple[str, float]] = []
     margin_cells: list[tuple[str, float]] = []
+    threshold_cost_cells: list[tuple[str, float]] = []
+    threshold_reliability_cells: list[tuple[str, float]] = []
+    threshold_cost_differences: list[tuple[str, float]] = []
+    threshold_reliability_differences: list[tuple[str, float]] = []
+
     for group in _group(rows, "matched_group_id").values():
         by_profile = {row["payoff_profile"]: row for row in group}
-        if set(by_profile) != {"voi_positive", "voi_negative"}:
+        if set(by_profile) == {"voi_positive", "voi_negative"}:
+            positive = by_profile["voi_positive"]
+            negative = by_profile["voi_negative"]
+            pair_success = _pair_switch_success([positive, negative])
+            if not pair_success:
+                choice_difference = 0.0
+            else:
+                positive_inspect = float(positive["selected_index"] == 0)
+                negative_inspect = float(negative["selected_index"] == 0)
+                choice_difference = positive_inspect - negative_inspect
+            game_id = group[0]["game_id"]
+            pair_cells.append((game_id, float(pair_success)))
+            choice_differences.append((game_id, choice_difference))
+            positive_margin = _semantic_logit_margin(positive)
+            negative_margin = _semantic_logit_margin(negative)
+            if positive_margin is not None and negative_margin is not None:
+                margin_cells.append((game_id, float(positive_margin > negative_margin)))
             continue
-        positive = by_profile["voi_positive"]
-        negative = by_profile["voi_negative"]
-        if positive["selected_index"] is None or negative["selected_index"] is None:
-            pair_success = False
-            choice_difference = 0.0
-        else:
-            positive_inspect = float(positive["selected_index"] == 0)
-            negative_inspect = float(negative["selected_index"] == 0)
-            pair_success = (
-                positive["correct"]
-                and negative["correct"]
-                and positive["selected_index"] != negative["selected_index"]
-            )
-            choice_difference = positive_inspect - negative_inspect
+        if set(by_profile) != {ACTIVE_THRESHOLD_PROFILE}:
+            continue
+        by_cost_reliability = {
+            (row["inspection_cost"], row["signal_reliability"]): row for row in group
+        }
+        required_cells = {
+            ("low", "perfect"),
+            ("high", "perfect"),
+            ("low", "noisy"),
+            ("high", "noisy"),
+        }
+        if set(by_cost_reliability) != required_cells:
+            continue
+        low_perfect = by_cost_reliability[("low", "perfect")]
+        high_perfect = by_cost_reliability[("high", "perfect")]
+        low_noisy = by_cost_reliability[("low", "noisy")]
         game_id = group[0]["game_id"]
-        pair_cells.append((game_id, float(pair_success)))
-        choice_differences.append((game_id, choice_difference))
-        positive_margin = _semantic_logit_margin(positive)
-        negative_margin = _semantic_logit_margin(negative)
-        if positive_margin is not None and negative_margin is not None:
-            margin_cells.append((game_id, float(positive_margin > negative_margin)))
+        threshold_cost_cells.append(
+            (game_id, float(_pair_switch_success([low_perfect, high_perfect])))
+        )
+        threshold_reliability_cells.append(
+            (game_id, float(_pair_switch_success([low_perfect, low_noisy])))
+        )
+        for left, right, target in (
+            (low_perfect, high_perfect, threshold_cost_differences),
+            (low_perfect, low_noisy, threshold_reliability_differences),
+        ):
+            if left["selected_index"] is not None and right["selected_index"] is not None:
+                expected_delta = left["expected_index"] - right["expected_index"]
+                observed_delta = left["selected_index"] - right["selected_index"]
+                target.append((game_id, float(observed_delta * expected_delta)))
     accuracy = _cluster_rate(
         rows,
         cluster_key="game_id",
@@ -603,9 +644,23 @@ def _active_summary(rows: list[dict[str, Any]], config: dict[str, Any]) -> dict[
         seed=61503,
         draws=int(config["statistics"]["bootstrap_draws"]),
     )
+    cost_threshold_rate = _clustered_bootstrap(
+        threshold_cost_cells,
+        seed=61507,
+        draws=int(config["statistics"]["bootstrap_draws"]),
+    )
+    reliability_threshold_rate = _clustered_bootstrap(
+        threshold_reliability_cells,
+        seed=61508,
+        draws=int(config["statistics"]["bootstrap_draws"]),
+    )
     gate_pass = (
         (accuracy["mean"] or 0.0) >= config["gates"]["minimum_active_accuracy"]
         and (pair_rate["mean"] or 0.0) >= config["gates"]["minimum_active_pair_switch_rate"]
+        and (cost_threshold_rate["mean"] or 0.0)
+        >= config["gates"]["minimum_active_cost_switch_rate"]
+        and (reliability_threshold_rate["mean"] or 0.0)
+        >= config["gates"]["minimum_active_reliability_switch_rate"]
     )
     x = [float(row["vo_i"]) for row in rows if row.get("vo_i") is not None]
     return {
@@ -636,6 +691,30 @@ def _active_summary(rows: list[dict[str, Any]], config: dict[str, Any]) -> dict[
         ),
         "n_pair_cells": len(pair_cells),
         "n_pair_games": pair_rate["n_clusters"],
+        "same_matrix_cost_switch_rate": cost_threshold_rate,
+        "same_matrix_reliability_switch_rate": reliability_threshold_rate,
+        "confirmatory_sign_flip_cost_threshold": (
+            _paired_sign_flip(
+                threshold_cost_differences,
+                seed=61509,
+                draws=int(config["statistics"]["bootstrap_draws"]),
+            )
+            if gate_pass
+            else _not_run_sign_flip("active-information gate failed")
+        ),
+        "confirmatory_sign_flip_reliability_threshold": (
+            _paired_sign_flip(
+                threshold_reliability_differences,
+                seed=61510,
+                draws=int(config["statistics"]["bootstrap_draws"]),
+            )
+            if gate_pass
+            else _not_run_sign_flip("active-information gate failed")
+        ),
+        "n_cost_threshold_cells": len(threshold_cost_cells),
+        "n_cost_threshold_games": cost_threshold_rate["n_clusters"],
+        "n_reliability_threshold_cells": len(threshold_reliability_cells),
+        "n_reliability_threshold_games": reliability_threshold_rate["n_clusters"],
         "vo_i_range": [min(x), max(x)] if x else [None, None],
     }
 
@@ -673,10 +752,7 @@ def _monitoring_summary(rows: list[dict[str, Any]], config: dict[str, Any]) -> d
             safety_cells.append(
                 (
                     group[0]["game_id"],
-                    float(
-                        all(row["correct"] for row in by_penalty.values())
-                        and no_penalty["selected_index"] != penalty["selected_index"]
-                    ),
+                    float(_pair_switch_success([no_penalty, penalty])),
                 )
             )
             expected_delta = no_penalty["expected_index"] - penalty["expected_index"]

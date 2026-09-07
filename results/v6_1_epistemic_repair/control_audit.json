@@ -1,8 +1,8 @@
 {
-  "config_sha256": "948bcb3674ad8c5dc6f6363174b9d2e93b59062c813717457c857d9fb1ee7df6",
-  "dataset_sha256": "d4f8e70035d9c7504d0f1e0be3319c0c57b12c08aa2304c7c864a51fb674b3a4",
+  "config_sha256": "c2c272a2fb7f3feeceb3651b85b334bfcd9177b05353fb1ee5e86c9b0ff1b9a5",
+  "dataset_sha256": "14aea862bd5f195b11ebe77f97fb6be857717bd10c47375e9c11cd773214d77a",
   "family_counts": {
-    "active_information": 768,
+    "active_information": 864,
     "evidence_update": 4320,
     "ledger_binding": 480,
     "monitoring_goal": 1152,
@@ -16,6 +16,7 @@
       "choice_mapping_invariance": true,
       "factorial_cells_complete": true,
       "gate_pass": true,
+      "same_matrix_threshold_cells_complete": true,
       "stop_if_failed": "do not infer value-of-information sensitivity",
       "within_pair_voi_switches_present": true
     },
@@ -251,12 +252,12 @@
     "target_removal_failures": [],
     "visible_derivability_failures": []
   },
-  "row_count": 7392,
+  "row_count": 7488,
   "schema_version": 1,
   "split_counts": {
-    "discovery": 2464,
-    "locked": 2464,
-    "validation": 2464
+    "discovery": 2496,
+    "locked": 2496,
+    "validation": 2496
   },
   "status": "cpu_semantic_controls_passed",
   "study_id": "V6.1-ES-2"

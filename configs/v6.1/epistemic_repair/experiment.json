@@ -37,7 +37,9 @@
     "evidence_prompt_modes": ["explicit_rule", "provenance_only"],
     "provenance_only_rule": "visible binary log-odds model with unique provenance_id as one conditionally independent sensor event and repeated rows as records of that event",
     "active_payoff_profiles": ["voi_positive", "voi_negative"],
-    "active_profile_note": "both profiles have state-dependent optimal actions; positive net VOI is above zero because gross information value exceeds cost, while negative information value stays below the minimum inspection cost",
+    "active_threshold_profile": "voi_threshold",
+    "active_threshold_cell": "uncertain/low; one payoff matrix crossed over inspection cost and signal reliability",
+    "active_profile_note": "both regular profiles have state-dependent optimal actions; positive net VOI is above zero because gross information value exceeds cost, while negative information value stays below the minimum inspection cost; a separate same-matrix threshold control crosses net VOI over cost and reliability",
     "monitoring_surface_note": "lexical_conflict intentionally names the penalized action protective and the unpenalized action hazardous"
   },
   "behavior": {
@@ -95,9 +97,9 @@
       "cluster_unit": "game_id"
     },
     "H5_active_information": {
-      "claim": "The model seeks information when expected value of information exceeds inspection cost, not merely when a prompt contains uncertainty, stake, or cost words.",
-      "primary_endpoint": "locked accuracy plus within-pair switch rate for matched positive-VOI versus negative-VOI payoff profiles; logit margin versus signed VOI is secondary",
-      "falsification_gate": "if accuracy or the matched within-pair switch gate fails, no active epistemic-policy claim; a superficial uncertainty/stake/cost heuristic is not an accepted explanation",
+      "claim": "The model seeks information when net expected value of information exceeds inspection cost, not merely when a prompt contains uncertainty, stake, or cost words; this includes same-matrix cost and reliability threshold crossings.",
+      "primary_endpoint": "locked accuracy, matched positive-VOI versus negative-VOI inspect/act switch rate, and same-matrix cost and reliability threshold switch rates; logit margin versus signed VOI is secondary",
+      "falsification_gate": "if accuracy, the matched profile switch, or either same-matrix threshold switch gate fails, no active epistemic-policy claim; a superficial payoff-magnitude heuristic is not an accepted explanation",
       "threshold": 0.75,
       "cluster_unit": "game_id"
     },
@@ -127,6 +129,8 @@
     "minimum_recursive_sequence_rate": 0.75,
     "minimum_active_accuracy": 0.75,
     "minimum_active_pair_switch_rate": 0.75,
+    "minimum_active_cost_switch_rate": 0.75,
+    "minimum_active_reliability_switch_rate": 0.75,
     "minimum_monitoring_accuracy": 0.80,
     "maximum_audit_cue_discordance": 0.10,
     "minimum_monitoring_switch_cells": 24,

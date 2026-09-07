@@ -280,30 +280,51 @@ def _load_model(spec: dict[str, Any]) -> tuple[Any, Any, dict[str, Any]]:
     return model, tokenizer, metadata
 
 
+def _preceding_assistant_content(result: dict[str, Any], *, mode: str) -> str:
+    """Return the assistant turn that a trajectory should actually contain."""
+
+    if mode == "blackbox" and "generated_text" in result:
+        # Preserve the complete sampled response, including explanations or an
+        # unparseable answer.  Black-box trajectories must not collapse into a
+        # parsed-label intervention.
+        generated_text = result["generated_text"]
+        return "" if generated_text is None else str(generated_text)
+    label = result.get("legal_choice")
+    return str(label) if label in CHOICES else ""
+
+
 def _report_materialization(
     row: dict[str, Any],
     report_outputs: dict[str, dict[str, Any]],
     row_by_id: dict[str, dict[str, Any]],
+    *,
+    mode: str,
 ) -> tuple[str, dict[str, Any]]:
     report_id = str(row["scaffold_report_id"])
     report_row = row_by_id[report_id]
     report_result = report_outputs[report_id]
     label = report_result.get("legal_choice")
-    if label not in CHOICES:
-        raise RuntimeError(f"self-generated scaffold report was not legal: {report_id}")
-    value = report_row["choice_mapping"][label]
-    concept = report_row["game_certificate"]["concepts"][value]
+    value = report_row["choice_mapping"].get(label) if label in CHOICES else None
+    concept = (
+        report_row["game_certificate"]["concepts"][value]
+        if value is not None
+        else "[unparseable prior report]"
+    )
+    label_text = label if label in CHOICES else "[unparseable prior report]"
     prompt = (
         row["prompt"]
-        .replace("{SELF_REPORT_LABEL}", label)
+        .replace("{SELF_REPORT_LABEL}", label_text)
         .replace("{SELF_REPORT_CONCEPT}", concept)
     )
+    assistant_content = _preceding_assistant_content(report_result, mode=mode)
     return prompt, {
         "source_report_id": report_id,
         "source_report_prompt": report_row["prompt"],
         "source_report_label": label,
         "source_report_value": value,
         "source_report_correct": label == report_row["expected_choice"],
+        "source_report_parseable": label in CHOICES,
+        "source_report_assistant_content": assistant_content,
     }
 
 
@@ -350,25 +371,29 @@ def _query_rows(
         if condition_id not in dynamic_ids:
             continue
         if row.get("scaffold_source") == "self_generated":
-            prompt, materialization = _report_materialization(row, static_outputs, row_by_id)
+            prompt, materialization = _report_materialization(
+                row, static_outputs, row_by_id, mode=mode
+            )
             report_row = row_by_id[str(row["scaffold_report_id"])]
             messages = trajectory_messages(
                 row,
-                first_answer=str(materialization["source_report_label"]),
+                first_answer=materialization["source_report_assistant_content"],
                 materialized_prompt=prompt,
                 preceding_prompt=report_row["prompt"],
             )
         else:
             action_row = row_by_id[str(row["trajectory_action_row_id"])]
             action_output = static_outputs[action_row["condition_id"]]
-            action_label = action_output.get("legal_choice", "A")
+            action_content = _preceding_assistant_content(action_output, mode=mode)
             materialization = {
                 "preceding_action_id": action_row["condition_id"],
-                "preceding_action_label": action_label,
+                "preceding_action_label": action_output.get("legal_choice"),
+                "preceding_action_parseable": action_output.get("legal_choice") in CHOICES,
+                "preceding_action_assistant_content": action_content,
             }
             messages = trajectory_messages(
                 row,
-                first_answer=action_label,
+                first_answer=action_content,
                 preceding_prompt=action_row["prompt"],
             )
         query = _prepare_query(

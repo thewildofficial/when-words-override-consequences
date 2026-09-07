@@ -8,6 +8,7 @@ _ANALYSIS = run_path(
 )
 _clustered_bootstrap = _ANALYSIS["_clustered_bootstrap"]
 _paired_sign_flip = _ANALYSIS["_paired_sign_flip"]
+_pair_switch_success = _ANALYSIS["_pair_switch_success"]
 
 
 def test_clustered_bootstrap_aggregates_cells_before_resampling() -> None:
@@ -29,3 +30,24 @@ def test_sign_flip_aggregates_paired_contrasts_by_game() -> None:
     )
     assert result["n_clusters"] == 2
     assert result["observed_mean"] == 0.5
+
+
+def test_pair_scorer_rejects_constant_surface_labels() -> None:
+    assert not _pair_switch_success(
+        [
+            {"selected_index": 0, "correct": True},
+            {"selected_index": 0, "correct": False},
+        ]
+    )
+    assert not _pair_switch_success(
+        [
+            {"selected_index": 1, "correct": True},
+            {"selected_index": 1, "correct": True},
+        ]
+    )
+    assert _pair_switch_success(
+        [
+            {"selected_index": 0, "correct": True},
+            {"selected_index": 1, "correct": True},
+        ]
+    )

@@ -78,6 +78,8 @@ STAKE_LEVELS = ("low", "high")
 COST_LEVELS = ("low", "high")
 RELIABILITY_LEVELS = ("perfect", "noisy")
 ACTIVE_PAYOFF_PROFILES = ("voi_positive", "voi_negative")
+ACTIVE_THRESHOLD_PROFILE = "voi_threshold"
+ACTIVE_THRESHOLD_CELL = ("uncertain", "low")
 
 CONCEPT_PAIRS = (
     ("KITE", "MOSS"),
@@ -386,6 +388,7 @@ def _make_row(
     scaffold_value: int | None = None,
     scaffold_report_id: str | None = None,
     vo_i: float | None = None,
+    payoff_matrix: tuple[tuple[int, int], tuple[int, int]] | None = None,
 ) -> dict[str, Any]:
     _require(
         swapped == _stable_label_swap(game.game_id, label_mapping_namespace),
@@ -415,6 +418,9 @@ def _make_row(
         "scaffold_value": scaffold_value,
         "scaffold_report_id": scaffold_report_id,
         "vo_i": vo_i,
+        "payoff_matrix": (
+            [list(values) for values in payoff_matrix] if payoff_matrix is not None else None
+        ),
         "actual_receiver_belief": game.actual_receiver_belief,
         "modeled_receiver_belief": game.modeled_receiver_belief,
         "receiver_policy": game.receiver_policy,
@@ -893,7 +899,16 @@ def _active_payoff_matrix(
     """
 
     _require(stake in STAKE_LEVELS, f"unknown stake level {stake}")
-    _require(profile in ACTIVE_PAYOFF_PROFILES, f"unknown active payoff profile {profile}")
+    _require(
+        profile in (*ACTIVE_PAYOFF_PROFILES, ACTIVE_THRESHOLD_PROFILE),
+        f"unknown active payoff profile {profile}",
+    )
+    if profile == ACTIVE_THRESHOLD_PROFILE:
+        # A single matrix is reused across the 2x2 cost/reliability cell at
+        # p=.5.  Perfect information is worth 2 gross points; a 70%-reliable
+        # signal is worth .8.  Thus cost=1 crosses only on reliability, and
+        # perfect-signal cost=1 versus cost=5 crosses only on cost.
+        return ((2004, 996), (2000, 1000))
     if profile == "voi_negative":
         # The optimal action changes with the state, but the value of perfect
         # information is at most 0.5 points at p=.5 and .2 at p=.8.  It is
@@ -945,12 +960,11 @@ def _active_rows(config: dict[str, Any]) -> list[dict[str, Any]]:
                 utility=((0, 1), (1, 0)),
                 hazard_action=0,
             )
-            for uncertainty, stake, cost_level, reliability_level, profile in product(
+            for uncertainty, stake, cost_level, reliability_level in product(
                 UNCERTAINTY_LEVELS,
                 STAKE_LEVELS,
                 COST_LEVELS,
                 RELIABILITY_LEVELS,
-                ACTIVE_PAYOFF_PROFILES,
             ):
                 # ``certain`` means a skewed prior, not literal certainty.  It
                 # remains visibly probabilistic so the model cannot shortcut
@@ -958,55 +972,57 @@ def _active_rows(config: dict[str, Any]) -> list[dict[str, Any]]:
                 p = 0.5 if uncertainty == "uncertain" else 0.8
                 cost = 1.0 if cost_level == "low" else 5.0
                 reliability = 1.0 if reliability_level == "perfect" else 0.7
-                used_utility = _active_payoff_matrix(
-                    p_state_one=p,
-                    cost=cost,
-                    reliability=reliability,
-                    stake=stake,
-                    profile=profile,
-                )
-                expected_query, ev_inspect, ev_act = _expected_query(
-                    p, used_utility, cost, reliability
-                )
-                factors = {
-                    "uncertainty": uncertainty,
-                    "stake": stake,
-                    "inspection_cost": cost_level,
-                    "signal_reliability": reliability_level,
-                    "payoff_profile": profile,
-                }
-                swapped = _stable_label_swap(game.game_id, "active_query")
-                query_options = _options(("inspect first", "act now"), swapped)
-                prompt = (
-                    "You may inspect before choosing an action. Inspection reveals a "
-                    "noisy signal about the hidden state and costs points; if you do "
-                    "not inspect, choose an action immediately. The question is only "
-                    "whether to inspect.\n"
-                    f"The hidden state is STATE_ONE with probability {p:.1%} and STATE_ZERO "
-                    f"otherwise.\nYour action payoffs (rows are actions, columns are "
-                    f"STATE_ZERO/STATE_ONE) are {used_utility}.\n"
-                    f"The inspection cost is {cost:g} points and its signal is correct "
-                    f"with probability {reliability:.0%}. After inspection you may choose "
-                    "the action with the higher expected payoff.\n"
-                    "Choose the option with the higher expected final payoff, breaking "
-                    "an exact tie in favor of acting now.\n"
-                    f"Options: {query_options}. "
-                    "Return only A or B.\nAnswer:"
-                )
-                expected_index = 0 if expected_query else 1
-                rows.append(
-                    _make_row(
-                        family="active_information",
-                        game=game,
-                        task_kind="query",
-                        factors=factors,
-                        prompt=prompt,
-                        expected_index=expected_index,
-                        expected_value=int(expected_query),
-                        expected_semantic=("inspect first" if expected_query else "act now"),
-                        swapped=swapped,
-                        label_mapping_namespace="active_query",
-                        matched_group_id=_stable_id(
+                profiles = ACTIVE_PAYOFF_PROFILES
+                if (uncertainty, stake) == ACTIVE_THRESHOLD_CELL:
+                    profiles = (*profiles, ACTIVE_THRESHOLD_PROFILE)
+                for profile in profiles:
+                    used_utility = _active_payoff_matrix(
+                        p_state_one=p,
+                        cost=cost,
+                        reliability=reliability,
+                        stake=stake,
+                        profile=profile,
+                    )
+                    expected_query, ev_inspect, ev_act = _expected_query(
+                        p, used_utility, cost, reliability
+                    )
+                    factors = {
+                        "uncertainty": uncertainty,
+                        "stake": stake,
+                        "inspection_cost": cost_level,
+                        "signal_reliability": reliability_level,
+                        "payoff_profile": profile,
+                    }
+                    swapped = _stable_label_swap(game.game_id, "active_query")
+                    query_options = _options(("inspect first", "act now"), swapped)
+                    prompt = (
+                        "You may inspect before choosing an action. Inspection reveals a "
+                        "noisy signal about the hidden state and costs points; if you do "
+                        "not inspect, choose an action immediately. The question is only "
+                        "whether to inspect.\n"
+                        f"The hidden state is STATE_ONE with probability {p:.1%} and "
+                        f"STATE_ZERO otherwise.\nYour action payoffs "
+                        f"(rows are actions, columns are "
+                        f"STATE_ZERO/STATE_ONE) are {used_utility}.\n"
+                        f"The inspection cost is {cost:g} points and its signal is correct "
+                        f"with probability {reliability:.0%}. After inspection you may choose "
+                        "the action with the higher expected payoff.\n"
+                        "Choose the option with the higher expected final payoff, breaking "
+                        "an exact tie in favor of acting now.\n"
+                        f"Options: {query_options}. "
+                        "Return only A or B.\nAnswer:"
+                    )
+                    expected_index = 0 if expected_query else 1
+                    matched_group_id = (
+                        _stable_id(
+                            STUDY_ID,
+                            "active_threshold",
+                            game.game_id,
+                            uncertainty,
+                            stake,
+                        )
+                        if profile == ACTIVE_THRESHOLD_PROFILE
+                        else _stable_id(
                             STUDY_ID,
                             "active",
                             game.game_id,
@@ -1014,10 +1030,27 @@ def _active_rows(config: dict[str, Any]) -> list[dict[str, Any]]:
                             stake,
                             cost_level,
                             reliability_level,
-                        ),
-                        vo_i=ev_inspect - ev_act,
+                        )
                     )
-                )
+                    rows.append(
+                        _make_row(
+                            family="active_information",
+                            game=game,
+                            task_kind="query",
+                            factors=factors,
+                            prompt=prompt,
+                            expected_index=expected_index,
+                            expected_value=int(expected_query),
+                            expected_semantic=(
+                                "inspect first" if expected_query else "act now"
+                            ),
+                            swapped=swapped,
+                            label_mapping_namespace="active_query",
+                            matched_group_id=matched_group_id,
+                            vo_i=ev_inspect - ev_act,
+                            payoff_matrix=used_utility,
+                        )
+                    )
     return rows
 
 
@@ -1255,6 +1288,9 @@ def expected_row_count(config: dict[str, Any]) -> int:
         * 2
         * 2
         * len(ACTIVE_PAYOFF_PROFILES)
+        + int(settings["active_games_per_split"])
+        * len(COST_LEVELS)
+        * len(RELIABILITY_LEVELS)
         + int(settings["monitoring_games_per_split"]) * 2 * 2 * 2 * 2 * 2
         + int(settings["scaffold_games_per_split"]) * 2 * (2 + len(SCAFFOLD_SOURCES))
     )
@@ -1685,7 +1721,12 @@ def _prompt_contract_audit(rows: list[dict[str, Any]]) -> dict[str, Any]:
     ):
         target_latent_failures.append("recursive_strategy.depth")
     active_groups = _groups(
-        [row for row in rows if row["experiment_family"] == "active_information"],
+        [
+            row
+            for row in rows
+            if row["experiment_family"] == "active_information"
+            and row["payoff_profile"] in ACTIVE_PAYOFF_PROFILES
+        ],
         "matched_group_id",
     )
     if not all(
@@ -1695,6 +1736,28 @@ def _prompt_contract_audit(rows: list[dict[str, Any]]) -> dict[str, Any]:
         for group in active_groups.values()
     ):
         target_latent_failures.append("active_information.voi_profile")
+    threshold_groups = _groups(
+        [
+            row
+            for row in rows
+            if row["experiment_family"] == "active_information"
+            and row["payoff_profile"] == ACTIVE_THRESHOLD_PROFILE
+        ],
+        "matched_group_id",
+    )
+    if not all(
+        len(group) == len(COST_LEVELS) * len(RELIABILITY_LEVELS)
+        and len({tuple(tuple(values) for values in row["payoff_matrix"]) for row in group})
+        == 1
+        and {
+            (row["inspection_cost"], row["signal_reliability"])
+            for row in group
+        }
+        == set(product(COST_LEVELS, RELIABILITY_LEVELS))
+        and {row["expected_index"] for row in group} == {0, 1}
+        for group in threshold_groups.values()
+    ):
+        target_latent_failures.append("active_information.cost_reliability_thresholds")
     monitoring_groups = _groups(
         [row for row in rows if row["experiment_family"] == "monitoring_goal"],
         "game_id",
@@ -1956,8 +2019,24 @@ def control_audit(payload: dict[str, Any], config: dict[str, Any]) -> dict[str, 
         * len(COST_LEVELS)
         * len(RELIABILITY_LEVELS)
         * len(ACTIVE_PAYOFF_PROFILES)
+        + len(COST_LEVELS) * len(RELIABILITY_LEVELS)
         for group in active_groups.values()
     )
+    active_threshold_groups = _groups(
+        [row for row in active_rows if row["payoff_profile"] == ACTIVE_THRESHOLD_PROFILE],
+        "matched_group_id",
+    )
+    active_threshold_complete = all(
+        len(group) == len(COST_LEVELS) * len(RELIABILITY_LEVELS)
+        and len(
+            {
+                tuple(tuple(values) for values in row["payoff_matrix"])
+                for row in group
+            }
+        )
+        == 1
+        for group in active_threshold_groups.values()
+    ) and bool(active_threshold_groups)
     monitoring_switch_cells = sum(
         len({row["expected_index"] for row in group}) > 1
         for group in _groups(
@@ -2044,6 +2123,7 @@ def control_audit(payload: dict[str, Any], config: dict[str, Any]) -> dict[str, 
         },
         "active_information": {
             "factorial_cells_complete": active_complete,
+            "same_matrix_threshold_cells_complete": active_threshold_complete,
             "both_query_outcomes_exist": len({row["expected_index"] for row in active_rows})
             == 2,
             "within_pair_voi_switches_present": family_audit["active_information"][
@@ -2155,6 +2235,14 @@ def result_summary(records: list[dict[str, Any]], config: dict[str, Any]) -> dic
     def rate(items: list[dict[str, Any]], key: str = "correct") -> float:
         return sum(bool(item.get(key, False)) for item in items) / len(items) if items else 0.0
 
+    def pair_switch(items: list[dict[str, Any]]) -> bool:
+        return (
+            len(items) == 2
+            and all(item.get("selected_index") is not None for item in items)
+            and all(bool(item.get("correct")) for item in items)
+            and len({item["selected_index"] for item in items}) == 2
+        )
+
     summary: dict[str, Any] = {
         "n_records": len(records),
         "accuracy": rate(records),
@@ -2186,10 +2274,7 @@ def result_summary(records: list[dict[str, Any]], config: dict[str, Any]) -> dic
             ledger_summary.append(
                 {
                     "group": list(key),
-                    "action_switch_correct": (
-                        all(r["correct"] for r in by_modeled.values())
-                        and by_modeled[0]["selected_index"] != by_modeled[1]["selected_index"]
-                    ),
+                    "action_switch_correct": pair_switch(list(by_modeled.values())),
                 }
             )
     summary["hypotheses"]["ledger_binding"] = {
@@ -2206,11 +2291,7 @@ def result_summary(records: list[dict[str, Any]], config: dict[str, Any]) -> dic
             policy_switch.append(
                 {
                     "group": list(key),
-                    "both_correct_and_switch": (
-                        all(r["correct"] for r in by_policy.values())
-                        and by_policy["literal"]["selected_index"]
-                        != by_policy["contrarian"]["selected_index"]
-                    ),
+                    "both_correct_and_switch": pair_switch(list(by_policy.values())),
                 }
             )
     summary["hypotheses"]["policy_composition"] = {
@@ -2282,24 +2363,47 @@ def result_summary(records: list[dict[str, Any]], config: dict[str, Any]) -> dic
 
     active = by_family.get("active_information", [])
     active_pairs = []
+    active_threshold_pairs = []
     for group in _groups(active, "matched_group_id").values():
         by_profile = {r.get("payoff_profile"): r for r in group}
         if set(by_profile) == set(ACTIVE_PAYOFF_PROFILES):
             positive = by_profile["voi_positive"]
             negative = by_profile["voi_negative"]
-            active_pairs.append(
-                positive.get("selected_index") is not None
-                and negative.get("selected_index") is not None
-                and positive.get("correct", False)
-                and negative.get("correct", False)
-                and positive["selected_index"] != negative["selected_index"]
-            )
+            active_pairs.append(pair_switch([positive, negative]))
+        elif set(by_profile) == {ACTIVE_THRESHOLD_PROFILE}:
+            by_cell = {
+                (r.get("inspection_cost"), r.get("signal_reliability")): r
+                for r in group
+            }
+            required_cells = {
+                ("low", "perfect"),
+                ("high", "perfect"),
+                ("low", "noisy"),
+                ("high", "noisy"),
+            }
+            if set(by_cell) == required_cells:
+                low_perfect = by_cell[("low", "perfect")]
+                active_threshold_pairs.append(
+                    {
+                        "cost_switch": pair_switch(
+                            [low_perfect, by_cell[("high", "perfect")]]
+                        ),
+                        "reliability_switch": pair_switch(
+                            [low_perfect, by_cell[("low", "noisy")]]
+                        ),
+                    }
+                )
     summary["hypotheses"]["active_information"] = {
         "accuracy": rate(active),
         "within_pair_voi_switch_rate": sum(active_pairs) / len(active_pairs)
         if active_pairs
         else 0.0,
         "n_within_pair_voi_cells": len(active_pairs),
+        "same_matrix_cost_switch_rate": rate(active_threshold_pairs, "cost_switch"),
+        "same_matrix_reliability_switch_rate": rate(
+            active_threshold_pairs, "reliability_switch"
+        ),
+        "n_same_matrix_threshold_cells": len(active_threshold_pairs),
         "inspect_accuracy": rate(
             [r for r in active if r["expected_semantic"] == "inspect first"]
         ),
