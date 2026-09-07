@@ -1,0 +1,135 @@
+name: V6.2 reasoning capability control
+
+on:
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: One manually authorized stage to run
+        required: true
+        default: local-controls
+        type: choice
+        options:
+          - local-controls
+          - preflight-qwen38
+          - qwen38-direct
+          - qwen38-thinking-pilot
+          - qwen38-thinking-diagnostic
+      prior_run_id:
+        description: Prior Actions run ID whose V6.2 artifact restores the cumulative ledger
+        required: false
+        default: ''
+        type: string
+      prior_stage:
+        description: Stage represented by prior_run_id
+        required: false
+        default: local-controls
+        type: choice
+        options:
+          - local-controls
+          - preflight-qwen38
+          - qwen38-direct
+          - qwen38-thinking-pilot
+          - qwen38-thinking-diagnostic
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: v6-2-reasoning-capability-control-${{ inputs.stage || 'local-controls' }}
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    env:
+      MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
+      MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
+      UV_CACHE_DIR: /tmp/jspace-uv-cache
+      V62_STAGE: ${{ inputs.stage || 'local-controls' }}
+      V62_PRIOR_RUN_ID: ${{ inputs.prior_run_id || '' }}
+      V62_PRIOR_STAGE: ${{ inputs.prior_stage || 'local-controls' }}
+
+    steps:
+      - name: Check out the dispatched branch commit
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Run the full local test suite
+        run: uv run --extra dev --extra modal pytest -q
+
+      - name: Freeze and verify CPU-only V6.2 controls
+        run: uv run python scripts/run_v6_2_reasoning_controls.py --freeze-subsets
+
+      - name: Stop after local controls
+        if: ${{ env.V62_STAGE == 'local-controls' }}
+        run: echo "CPU controls passed; no tokenizer or model execution requested."
+
+      - name: Require a prior artifact for every remote stage
+        if: ${{ env.V62_STAGE != 'local-controls' }}
+        shell: bash
+        run: |
+          test -n "$V62_PRIOR_RUN_ID"
+          test -n "$MODAL_TOKEN_ID"
+          test -n "$MODAL_TOKEN_SECRET"
+
+      - name: Restore the prior V6.2 artifact and cumulative ledger
+        if: ${{ env.V62_STAGE != 'local-controls' }}
+        uses: actions/download-artifact@v6
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ env.V62_PRIOR_RUN_ID }}
+          name: v6-2-reasoning-capability-control-${{ env.V62_PRIOR_STAGE }}-${{ env.V62_PRIOR_RUN_ID }}
+          path: /tmp/v62-prior
+
+      - name: Install restored V6.2 state
+        if: ${{ env.V62_STAGE != 'local-controls' }}
+        shell: bash
+        run: |
+          mkdir -p results/v6_2_reasoning_capability_control
+          if test -d /tmp/v62-prior/results/v6_2_reasoning_capability_control; then
+            cp -a /tmp/v62-prior/results/v6_2_reasoning_capability_control/. results/v6_2_reasoning_capability_control/
+          else
+            cp -a /tmp/v62-prior/. results/v6_2_reasoning_capability_control/
+          fi
+          test -s results/v6_2_reasoning_capability_control/cost_ledger.jsonl || touch results/v6_2_reasoning_capability_control/cost_ledger.jsonl
+
+      - name: Run Qwen3.8 tokenizer and chat-template preflight
+        if: ${{ env.V62_STAGE == 'preflight-qwen38' }}
+        run: uv run --extra modal modal run modal_v6_2_reasoning_capability.py::preflight_qwen38
+
+      - name: Run full locked Qwen3.8 direct replication
+        if: ${{ env.V62_STAGE == 'qwen38-direct' }}
+        run: uv run --extra modal modal run modal_v6_2_reasoning_capability.py::qwen38_direct
+
+      - name: Run Qwen3.8 native-reasoning pilot
+        if: ${{ env.V62_STAGE == 'qwen38-thinking-pilot' }}
+        run: uv run --extra modal modal run modal_v6_2_reasoning_capability.py::qwen38_thinking_pilot
+
+      - name: Run Qwen3.8 native-reasoning diagnostic subset
+        if: ${{ env.V62_STAGE == 'qwen38-thinking-diagnostic' }}
+        run: uv run --extra modal modal run modal_v6_2_reasoning_capability.py::qwen38_thinking_diagnostic
+
+      - name: Analyze available V6.2 model artifacts
+        if: ${{ always() && (env.V62_STAGE == 'qwen38-direct' || env.V62_STAGE == 'qwen38-thinking-pilot' || env.V62_STAGE == 'qwen38-thinking-diagnostic') }}
+        shell: bash
+        run: |
+          if find results/v6_2_reasoning_capability_control/raw -maxdepth 1 -type f -name 'qwen38_*.json' -print -quit | grep -q .; then
+            uv run python scripts/analyze_v6_2_reasoning_capability.py --results results/v6_2_reasoning_capability_control
+          else
+            echo "No complete V6.2 model artifact is present; retaining the stage artifact."
+          fi
+
+      - name: Upload immutable V6.2 outputs
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: v6-2-reasoning-capability-control-${{ env.V62_STAGE }}-${{ github.run_id }}
+          path: results/v6_2_reasoning_capability_control
+          if-no-files-found: warn
+          retention-days: 30

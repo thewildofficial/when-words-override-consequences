@@ -1,0 +1,151 @@
+{
+  "schema_version": 1,
+  "study_id": "V6.2-RCC-1",
+  "status": "preregistered_before_qwen38_execution",
+  "name": "reasoning_capability_control",
+  "parent_study": "V6.1-ES-2",
+  "source": {
+    "study_id": "V6.1-ES-2",
+    "config_path": "configs/v6.1/epistemic_repair/experiment.json",
+    "dataset_manifest_path": "configs/v6.1/epistemic_repair/dataset_manifest.json",
+    "config_sha256": "c2c272a2fb7f3feeceb3651b85b334bfcd9177b05353fb1ee5e86c9b0ff1b9a5",
+    "dataset_sha256": "14aea862bd5f195b11ebe77f97fb6be857717bd10c47375e9c11cd773214d77a",
+    "row_count": 7488,
+    "locked_row_count": 2496,
+    "base_commit": "1012195f99ebc7e49d1bd7e81b506b20e2cd9560"
+  },
+  "model": {
+    "id": "Qwen/Qwen3.8-27B",
+    "revision": "1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0",
+    "dtype": "bfloat16"
+  },
+  "conditions": {
+    "qwen38_direct": {
+      "thinking": false,
+      "measurement": "candidate_token_logits",
+      "selection": "direct",
+      "reference": "V6.1 Qwen3.6-27B direct result"
+    },
+    "qwen38_thinking": {
+      "thinking": true,
+      "measurement": "final_line_after_native_reasoning",
+      "selection_pilot": "pilot",
+      "selection_diagnostic": "diagnostic",
+      "reasoning_effort": null
+    }
+  },
+  "subset": {
+    "locked_split": "locked",
+    "diagnostic_families": [
+      "ledger_binding",
+      "policy_composition",
+      "evidence_update",
+      "active_information"
+    ],
+    "diagnostic_selection_rule": "All locked ledger rows; all locked policy-composition rows; all locked evidence report rows with evidence_count=4, evidence_direction=prior, an independent/copy expected-value contrast, and both prompt modes; all locked active-information rows in positive/negative VOI matched groups and same-matrix threshold groups. The rule is evaluated before any Qwen3.8 output exists.",
+    "pilot_selection_rule": "The first locked ledger game in condition_id order; the first locked policy game; the first identifying evidence pair in each prompt mode; the first positive/negative VOI pair; and the first complete same-matrix threshold cell.",
+    "selection_sort": "condition_id ascending"
+  },
+  "behavior": {
+    "batch_size": 4,
+    "direct_max_new_tokens": 1,
+    "thinking_max_new_tokens": 1536,
+    "thinking_temperature": 0.0,
+    "thinking_top_p": 1.0,
+    "thinking_final_format": "exactly one line matching ^\\s*FINAL\\s*:\\s*[AB]\\s*$",
+    "unparseable_is_failure": true,
+    "retain_complete_generation": true
+  },
+  "endpoints": {
+    "H1_ledger_binding": {
+      "report": "report accuracy by named ledger target",
+      "action_pair": "both modeled-belief rows correct and selected semantic action switches",
+      "actual_belief_control": "selected action invariant across actual-belief nuisance rows"
+    },
+    "H2_policy_composition": {
+      "action_pair": "literal and contrarian rows both correct and selected semantic action switches"
+    },
+    "H3_evidence_independence": {
+      "action": "not scored in diagnostic subset",
+      "report_pair": "independent and copied rows both parse and selected label changes in each prompt mode"
+    },
+    "H5_active_information": {
+      "voi_pair": "positive and negative VOI rows both correct and inspect/act choice switches",
+      "cost_threshold": "same matrix, low-cost versus high-cost choices both correct and switch",
+      "reliability_threshold": "same matrix, perfect versus noisy choices both correct and switch"
+    }
+  },
+  "gates": {
+    "minimum_accuracy": 0.75,
+    "minimum_h1_report_accuracy": 0.75,
+    "minimum_h1_action_pair_rate": 0.75,
+    "minimum_h1_actual_belief_invariance": 0.75,
+    "minimum_h2_policy_pair_rate": 0.75,
+    "minimum_h3_prompt_mode_pair_rate": 0.75,
+    "minimum_h5_voi_pair_rate": 0.75,
+    "minimum_h5_cost_threshold_rate": 0.75,
+    "minimum_h5_reliability_threshold_rate": 0.75,
+    "all_primary_pairs_require_correct_and_switch": true,
+    "do_not_pool_failed_families": true,
+    "do_not_use_reasoning_text_as_primary_signal": true
+  },
+  "statistics": {
+    "primary_split": "locked",
+    "bootstrap_unit": "game_id",
+    "bootstrap_draws": 5000,
+    "interval": "percentile_95",
+    "paired_test": "paired_cluster_sign_flip_after_family_gate",
+    "missing_or_unparseable": "retain raw text and score as failure"
+  },
+  "execution": {
+    "gpu": "A100-80GB",
+    "authorization_usd": 8.0,
+    "uncertainty_fraction": 0.2,
+    "stage_limits": {
+      "preflight-qwen38": {
+        "timeout_seconds": 900,
+        "gpu": null,
+        "cpu_cores": 2,
+        "memory_gib": 8
+      },
+      "qwen38-direct": {
+        "timeout_seconds": 1800,
+        "gpu": "A100-80GB",
+        "cpu_cores": 8,
+        "memory_gib": 32
+      },
+      "qwen38-thinking-pilot": {
+        "timeout_seconds": 1200,
+        "gpu": "A100-80GB",
+        "cpu_cores": 8,
+        "memory_gib": 32
+      },
+      "qwen38-thinking-diagnostic": {
+        "timeout_seconds": 2400,
+        "gpu": "A100-80GB",
+        "cpu_cores": 8,
+        "memory_gib": 32
+      }
+    },
+    "remote_compute_policy": "CPU controls locally; Qwen3.8 tokenizer preflight and model stages only through manual GitHub Actions; no automatic stage chaining",
+    "refuse_result_overwrite": true,
+    "activation_collection": false,
+    "no_multi_gpu_models": true
+  },
+  "artifact_policy": {
+    "content_hashed": true,
+    "actions_retention_days": 30,
+    "retention_note": "GitHub Actions artifacts are not permanent archival storage; copy raw outputs to durable storage before expiry",
+    "required": [
+      "exact config",
+      "subset manifest",
+      "tokenizer preflight",
+      "raw direct behavior",
+      "raw thinking generations",
+      "machine-readable analysis",
+      "compact result summary",
+      "cost ledger",
+      "model-run manifest"
+    ]
+  }
+}

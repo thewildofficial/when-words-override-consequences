@@ -1,0 +1,31 @@
+{
+  "base_commit": "1012195f99ebc7e49d1bd7e81b506b20e2cd9560",
+  "choice_mapping_pair_failures": [],
+  "config_sha256": "9a6ff8dad840df2019ac4059fd2d94bc2ff1787af132963e69e17815e6dfc5b7",
+  "constant_label_pair_failures": {
+    "active": 0,
+    "evidence": 0,
+    "ledger": 0,
+    "policy": 0
+  },
+  "content_sha256": "4d918477a473a2f4c756f1c762021240bdfa287c4159a24e7ffe5fac0d62a6a8",
+  "diagnostic_rows": 640,
+  "endpoint_coverage_passed": true,
+  "gpu_stages_ran": false,
+  "head_commit": "local-uncommitted",
+  "interpretation": "No model forwards have occurred on this branch yet.",
+  "model_forwards": 0,
+  "parser_passed": true,
+  "schema_version": 1,
+  "selected_families": [
+    "ledger_binding",
+    "policy_composition",
+    "evidence_update",
+    "active_information"
+  ],
+  "source_dataset_sha256": "14aea862bd5f195b11ebe77f97fb6be857717bd10c47375e9c11cd773214d77a",
+  "source_locked_rows": 2496,
+  "status": "cpu_semantic_controls_passed_no_model_execution",
+  "study_id": "V6.2-RCC-1",
+  "subset_manifest_sha256": "5cf20f492b72a13320640856a14a545eb2534b1997e882821c888ec114157b9a"
+}
