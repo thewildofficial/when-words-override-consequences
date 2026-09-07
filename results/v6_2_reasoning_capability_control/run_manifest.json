@@ -1,16 +1,17 @@
 {
-  "base_commit": "1012195f99ebc7e49d1bd7e81b506b20e2cd9560",
+  "base_commit": "8169dadd96260041e2b1c43ad9cadf18e83612b0",
   "branch": "research/v6-2-reasoning-capability-control",
   "compute": {
     "executor": "local_cpu",
     "gpu_seconds": 0,
     "model_forward_passes": 0
   },
-  "config_sha256": "9a6ff8dad840df2019ac4059fd2d94bc2ff1787af132963e69e17815e6dfc5b7",
-  "content_sha256": "f3a59e0def0d45480ae76ff521f3f434cc6a896a765a2bb912df85192f9da1c9",
+  "config_sha256": "e3c1206dc8adb87b4c498f1947bffc5831512967b237a6e25da8b227ecfb3b2c",
+  "content_sha256": "6156a7a027fdd81b53f10932d495d759f87b8c90f1e54973c64a60df6cb23abe",
   "gpu_stages_ran": false,
-  "head_commit": "local-uncommitted",
+  "head_commit": "a0e60935d5cad9bafb793999bd7a1bc9cc7d933f",
   "interpretation": "No model forwards have occurred on this branch yet.",
+  "protocol_commit_sha": "a0e60935d5cad9bafb793999bd7a1bc9cc7d933f",
   "row_counts": {
     "diagnostic": 640,
     "direct": 2496,
@@ -20,5 +21,5 @@
   "source_dataset_sha256": "14aea862bd5f195b11ebe77f97fb6be857717bd10c47375e9c11cd773214d77a",
   "status": "local_cpu_controls_complete_no_model_run",
   "study_id": "V6.2-RCC-1",
-  "subset_manifest_sha256": "5cf20f492b72a13320640856a14a545eb2534b1997e882821c888ec114157b9a"
+  "subset_manifest_sha256": "5f788d4fdcb55e0af3ec773a1580c38717bf5b3d07ddf37fc73341606f94c855"
 }
