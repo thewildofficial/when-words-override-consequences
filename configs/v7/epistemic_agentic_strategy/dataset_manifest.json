@@ -1,0 +1,9 @@
+{
+  "config_sha256": "ebc3411d1030d854c3bb1b02d1e7e8b414f73959b0fb70a0f50fa52cd634f9b2",
+  "dataset_sha256": "e740d56a672bf08e0223a177ac954ddce246123263b711f572452219855948e7",
+  "locked_row_count": 1440,
+  "row_count": 4320,
+  "schema_version": 1,
+  "status": "frozen_after_cpu_semantic_audit_before_model_execution",
+  "study_id": "V7-EAS-1"
+}

@@ -31,3 +31,8 @@ configs/v6.1/epistemic_repair/dataset.json
 # out of the protocol tree.
 results/v6_2_reasoning_capability_control/config.json
 results/v6_2_reasoning_capability_control/subset_manifest.json
+
+# V7's generated row table is deterministic output of the committed
+# generator. The CPU control step regenerates it and records its hash in the
+# lightweight manifest before any Modal stage.
+configs/v7/epistemic_agentic_strategy/dataset.json

@@ -21,6 +21,8 @@ analysis code, not new experiment definitions.
 | [`generate_dataset.py`](generate_dataset.py) | Creates deterministic experiment data from the configured prompt families. |
 | [`modal_v2.py`](../modal_v2.py) | Runs the original V2 GPU workflow, including the H0 gate. |
 | [`modal_h0r.py`](../modal_h0r.py) | Runs the H0R diagnostic and prospective GPU workflows. |
+| [`run_v7_epistemic_agentic_strategy_controls.py`](run_v7_epistemic_agentic_strategy_controls.py) | Generates, freezes, and semantically audits the V7-EAS-1 CPU dataset before any model call. |
+| [`analyze_v7_epistemic_agentic_strategy.py`](analyze_v7_epistemic_agentic_strategy.py) | Analyzes locked V7 direct-logit outputs by family and matched epistemic pair. |
 
 The two most important regeneration commands are shown in the [root README](../README.md#reproduce-the-local-checks).
 

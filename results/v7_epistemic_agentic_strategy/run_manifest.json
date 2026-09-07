@@ -1,0 +1,27 @@
+{
+  "audit_sha256": "f2e5d119fa10c8f527726d1100d4dca44ff3201f67664390e7f4ec97753456ef",
+  "budget": {
+    "buffered_ceiling_usd": 1.5657119999999998,
+    "hard_cost_limit_usd": 2.5,
+    "modal_timeout_seconds": 1500
+  },
+  "compute": {
+    "executor": "local_cpu",
+    "gpu_actions_run": false,
+    "gpu_seconds": 0,
+    "model_forward_passes": 0
+  },
+  "config_sha256": "ebc3411d1030d854c3bb1b02d1e7e8b414f73959b0fb70a0f50fa52cd634f9b2",
+  "dataset_sha256": "e740d56a672bf08e0223a177ac954ddce246123263b711f572452219855948e7",
+  "model": {
+    "dtype": "bfloat16",
+    "id": "Qwen/Qwen3.8-27B",
+    "revision": "1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0",
+    "role": "primary_direct_behavioral_screen",
+    "thinking": false
+  },
+  "row_count": 4320,
+  "schema_version": 1,
+  "status": "local_cpu_controls_complete_no_model_run",
+  "study_id": "V7-EAS-1"
+}

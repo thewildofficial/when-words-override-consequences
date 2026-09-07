@@ -1,0 +1,136 @@
+{
+  "schema_version": 1,
+  "study_id": "V7-EAS-1",
+  "status": "preregistered_before_dataset_freeze_or_model_execution",
+  "name": "epistemic_control_of_agentic_strategy",
+  "central_question": "Does an LLM condition its strategy on the epistemic state of another agent, or only on underlying facts and salient words?",
+  "model": {
+    "id": "Qwen/Qwen3.8-27B",
+    "revision": "1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0",
+    "dtype": "bfloat16",
+    "thinking": false,
+    "role": "primary_direct_behavioral_screen"
+  },
+  "dataset": {
+    "seed": 260907,
+    "seed_namespace": "v7-eas-1",
+    "splits": ["discovery", "validation", "locked"],
+    "publicity_games_per_split": 4,
+    "commitment_games_per_split": 4,
+    "acquisition_games_per_split": 4,
+    "surfaces": ["semantic", "opaque", "countersemantic"],
+    "report_targets": [
+      "world_state",
+      "own_information",
+      "opponent_information",
+      "opponent_belief",
+      "opponent_policy",
+      "predicted_opponent_action",
+      "final_strategy"
+    ],
+    "publicity_levels": [
+      "a_private",
+      "shared_private",
+      "a_knows_b_knows",
+      "public_announcement",
+      "common_knowledge"
+    ],
+    "commitment_modalities": [
+      "public_irreversible",
+      "private_irreversible",
+      "cheap_promise",
+      "public_tool"
+    ],
+    "acquisition_uncertainties": [
+      "world_state",
+      "world_state_known",
+      "opponent_belief",
+      "opponent_belief_known",
+      "opponent_policy",
+      "opponent_policy_known"
+    ],
+    "candidate_labels": ["A", "B", "C", "D"],
+    "narrative_renderings": ["brief", "story"],
+    "factor_policy": "All games, treatment assignments, narrative variants, action surfaces, and label mappings are deterministic. Matched conditions share a game and treatment-invariant label mapping. Report rows are independent forks, not sampled preceding turns.",
+    "primary_identifying_pairs": {
+      "publicity_threshold": [
+        "shared_private -> public_announcement",
+        "shared_private -> common_knowledge"
+      ],
+      "credible_commitment": [
+        "public_irreversible -> private_irreversible",
+        "public_irreversible -> cheap_promise",
+        "public_irreversible -> public_tool"
+      ],
+      "information_acquisition": [
+        "world_state -> world_state_known",
+        "opponent_belief -> opponent_belief_known",
+        "opponent_policy -> opponent_policy_known"
+      ]
+    }
+  },
+  "behavior": {
+    "query_mode": "forced_choice_next_token_logits",
+    "batch_size": 8,
+    "max_new_tokens": 1,
+    "primary_split": "locked",
+    "direct_only": true,
+    "reports_are_separate_forks": true,
+    "blackbox_enabled": false,
+    "native_reasoning_enabled": false
+  },
+  "hypotheses": {
+    "H1_publicity_threshold": {
+      "claim": "A's strategy changes when the information state crosses the public/common-knowledge threshold required by B's coordination rule, while the physical opportunity and payoffs remain fixed.",
+      "primary_endpoint": "semantic strategy switch with both choices correct for shared_private versus public_announcement and shared_private versus common_knowledge",
+      "interpretation_boundary": "A failed switch is a functional failure to use the specified epistemic relation; it is not evidence about consciousness or real beliefs."
+    },
+    "H4_credible_commitment": {
+      "claim": "A distinguishes a public irreversible option-removing action from a private lock and a cheap promise, and treats a public tool transition as behaviorally equivalent to a public irreversible lock.",
+      "primary_endpoint": "public-lock switch against private-lock and cheap-promise controls, plus public-lock/public-tool invariance",
+      "interpretation_boundary": "The construct is game-tree-sensitive commitment reasoning, not deception or autonomous scheming."
+    },
+    "H5_information_acquisition": {
+      "claim": "A acquires information according to strategic value of information: it inspects the uncertain world, opponent belief, or opponent policy only when that target can change the optimal decision enough to repay cost.",
+      "primary_endpoint": "targeted inspection choice across matched uncertainty types, ACT_NOW in each known-target control, and unknown-to-known strategy switches for the world, opponent-belief, and opponent-policy identifying pairs",
+      "interpretation_boundary": "A targeted inspection choice demonstrates competence in the specified information game, not a general claim about agency."
+    }
+  },
+  "gates": {
+    "minimum_locked_report_accuracy": 0.75,
+    "minimum_locked_action_accuracy": 0.75,
+    "minimum_publicity_pair_switch_rate": 0.75,
+    "minimum_publicity_public_common_invariance": 0.75,
+    "minimum_commitment_public_private_switch_rate": 0.75,
+    "minimum_commitment_public_promise_switch_rate": 0.75,
+    "minimum_commitment_public_tool_invariance": 0.75,
+    "minimum_acquisition_targeted_choice_rate": 0.75,
+    "minimum_acquisition_known_target_act_rate": 0.75,
+    "minimum_acquisition_world_pair_switch_rate": 0.75,
+    "minimum_acquisition_belief_pair_switch_rate": 0.75,
+    "minimum_acquisition_policy_pair_switch_rate": 0.75,
+    "minimum_surface_invariance": 0.75,
+    "no_pooled_agent_score": true,
+    "no_activation_collection": true
+  },
+  "statistics": {
+    "primary_split": "locked",
+    "cluster_unit": "game_id",
+    "bootstrap_draws": 5000,
+    "interval": "percentile_95",
+    "cluster_aggregation": "mean_each_endpoint_within_game_id_before_bootstrap",
+    "multiple_testing": "report all three family endpoints and all preregistered identifying pairs; no post-hoc endpoint selection",
+    "missing_or_unparseable": "count as failures and retain separately"
+  },
+  "execution": {
+    "gpu": "A100-80GB",
+    "modal_timeout_seconds": 1500,
+    "estimated_ceiling_seconds": 1500,
+    "hard_cost_limit_usd": 2.50,
+    "remote_compute_policy": "CPU dataset generation, exact solving, semantic audits, and analysis run locally; only tokenizer preflight and model forward passes use Modal through GitHub Actions.",
+    "activation_stage": "not implemented and not permitted by this protocol",
+    "tool_stage": "simulator contract is specified locally but no tool trajectory is collected in the first screen",
+    "refuse_result_overwrite": true,
+    "require_clean_tracked_worktree": true
+  }
+}

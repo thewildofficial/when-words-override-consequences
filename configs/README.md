@@ -12,6 +12,7 @@ inspectable instead of hiding them inside a runner.
 | [`v3/jspace_interventions/`](v3/jspace_interventions/experiment.json) | V3-JI1 intervention-replication configuration and candidate pools. |
 | [`v4/strategic_epistemic_search/`](v4/strategic_epistemic_search/experiment.json) | V4 rationale-interference datasets and frozen analyses. |
 | [`v5/`](v5/mechanistic_decomposition/experiment.json) | V5 revealed-belief, inverse-evidence, and mechanistic-decomposition configurations. |
+| [`v7/epistemic_agentic_strategy/`](v7/epistemic_agentic_strategy/experiment.json) | V7-EAS-1 frozen behavior-first epistemic strategy screen and dataset manifest. |
 
 ## A note about locked files
 
