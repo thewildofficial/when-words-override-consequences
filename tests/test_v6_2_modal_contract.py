@@ -65,11 +65,21 @@ def test_direct_and_thinking_query_contracts_share_task_semantics() -> None:
     thinking, _ = MODAL["_query_rows"](tokenizer, subset, thinking=True)
     direct_contract = MODAL["_query_contract"](direct, semantic=True)
     thinking_contract = MODAL["_query_contract"](thinking, semantic=True)
-    assert direct_contract["query_ids_sha256"] == thinking_contract["query_ids_sha256"]
-    assert direct_contract["messages_sha256"] == thinking_contract["messages_sha256"]
-    assert direct_contract["candidate_labels_sha256"] == thinking_contract[
-        "candidate_labels_sha256"
-    ]
+    assert direct_contract == thinking_contract
+    assert set(direct_contract) == {
+        "query_count",
+        "query_ids_sha256",
+        "messages_sha256",
+        "candidate_labels_sha256",
+    }
+
+    direct_full = MODAL["_query_contract"](direct, semantic=False)
+    thinking_full = MODAL["_query_contract"](thinking, semantic=False)
+    assert direct_full["rendered_sha256"] != thinking_full["rendered_sha256"]
+    assert direct_full["prompt_token_ids_sha256"] != thinking_full["prompt_token_ids_sha256"]
+
+    preflight_contract = MODAL["_preflight_contract"](direct, thinking)
+    assert preflight_contract["semantic_match"] is True
 
 
 def test_thinking_generation_parser_is_not_used_for_direct_logits() -> None:

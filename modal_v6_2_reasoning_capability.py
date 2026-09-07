@@ -579,6 +579,14 @@ def _load_model(spec: dict[str, Any]) -> tuple[Any, Any, dict[str, Any]]:
 
 
 def _query_contract(queries: list[dict[str, Any]], *, semantic: bool) -> dict[str, Any]:
+    """Return either the full execution or invariant semantic query contract.
+
+    Native thinking intentionally changes the chat-template rendering and the
+    resulting prompt token IDs.  Those mode-specific hashes remain part of the
+    full contract, but must not participate in the direct/thinking semantic
+    equivalence check.
+    """
+
     ordered = sorted(queries, key=lambda query: query["query_id"])
     if semantic:
 
@@ -605,20 +613,26 @@ def _query_contract(queries: list[dict[str, Any]], *, semantic: bool) -> dict[st
             (query["query_id"], query["messages"], query["candidate_labels"])
             for query in ordered
         ]
-    return {
+    contract = {
         "query_count": len(ordered),
         "query_ids_sha256": canonical_sha256([query["query_id"] for query in ordered]),
         "messages_sha256": canonical_sha256(messages),
         "candidate_labels_sha256": canonical_sha256(
             [(query["query_id"], query["candidate_labels"]) for query in ordered]
         ),
-        "rendered_sha256": canonical_sha256(
-            [(query["query_id"], query["rendered"]) for query in ordered]
-        ),
-        "prompt_token_ids_sha256": canonical_sha256(
-            [(query["query_id"], query["prompt_token_ids"]) for query in ordered]
-        ),
     }
+    if not semantic:
+        contract.update(
+            {
+                "rendered_sha256": canonical_sha256(
+                    [(query["query_id"], query["rendered"]) for query in ordered]
+                ),
+                "prompt_token_ids_sha256": canonical_sha256(
+                    [(query["query_id"], query["prompt_token_ids"]) for query in ordered]
+                ),
+            }
+        )
+    return contract
 
 
 def _preflight_contract(
