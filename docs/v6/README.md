@@ -29,13 +29,21 @@ The CPU-only generator produces 1,740 rows across three splits:
 | `provenance` | 1,440 | Does source, truth status, time, or surface alter a report of the same claim? |
 | `strategy_pressure` | 96 | Does safety reweighting change action while audit framing alone does not? |
 
-The local result is protocol validation only, not a model result:
+The CPU protocol result is:
 
 - dataset SHA256: `e5192e32126fcdfe5a606708a98a8264753092871bce3f427de8d5254d681995`
 - config SHA256: `8eed1a0c09ad37f329137e119f6ac7a973a86592a618b1de074d1d7553cb3706`
 - all four family structural gates: passed
 - GPU seconds: `0`
 - model forward passes: `0`
+
+The primary Qwen3.6 model run is now retained in
+[`../../results/v6_epistemic_strategic/`](../../results/v6_epistemic_strategic/).
+Black-box and forced-choice behavior were both highly format-compliant, but
+the preregistered family gate failed for `core_tom`, `higher_order`, and
+`strategy_pressure`; `provenance` passed. Therefore activation discovery was
+not run. This is a heterogeneous behavioral result, not evidence for a single
+pooled capability.
 
 See [`epistemic-strategic-preregistration.md`](epistemic-strategic-preregistration.md)
 for hypotheses and promotion thresholds, [`controls-and-interpretation.md`](controls-and-interpretation.md)
@@ -54,9 +62,9 @@ The branch keeps three evidence levels separate:
 | `activation_discovery` | residual stream at the decision position | observational readability on held-out splits |
 | `activation_locked` | currently sealed | only after a fresh natural counterfactual patch protocol is frozen |
 
-The black-box path and logit path should be run on the same locked rows, but
-their outputs must be reported separately. Neither path can establish that a
-decoded belief is causally used.
+The black-box path and logit path used the same locked rows, but their outputs
+are reported separately. Neither path can establish that a decoded belief is
+causally used.
 
 ## Commands
 

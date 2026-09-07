@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "study_id": "V6-ES-1",
+  "status": "primary_model_runs_complete_behavior_gated_mechanistic_stop",
+  "model_key": "primary",
+  "model_id": "Qwen/Qwen3.6-27B",
+  "model_revision": "6a9e13bd6fc8f0983b9b99948120bc37f49c13e9",
+  "source_config_sha256": "8eed1a0c09ad37f329137e119f6ac7a973a86592a618b1de074d1d7553cb3706",
+  "source_dataset_sha256": "e5192e32126fcdfe5a606708a98a8264753092871bce3f427de8d5254d681995",
+  "github_actions_runs": {
+    "preflight": {
+      "run": 34075189639,
+      "url": "https://github.com/thewildofficial/when-words-override-consequences/actions/runs/34075189639",
+      "status": "success",
+      "content_sha256": "8720a21ff8342fe44c1b7bedaa1c85f1a1d62cf6d483da875a72be8307a7b23e"
+    },
+    "blackbox": {
+      "run": 34073605587,
+      "url": "https://github.com/thewildofficial/when-words-override-consequences/actions/runs/34073605587",
+      "status": "success",
+      "modal_run_id": "19d4c30a5a7045a5a0cf8ab392884888",
+      "content_sha256": "fdb2d380be90d10cafbe0f524d673b03ac205fae75f2d26ce397adcb8e17a454"
+    },
+    "behavior": {
+      "run": 34073895460,
+      "url": "https://github.com/thewildofficial/when-words-override-consequences/actions/runs/34073895460",
+      "status": "success",
+      "modal_run_id": "1f3f973268894511a39de3a66e39a868",
+      "content_sha256": "3b23b2ec6813d0c19ba4ede812363a1e47888f6ac679342c80bda93ded5fe223"
+    },
+    "trajectory": {
+      "run": 34074258696,
+      "url": "https://github.com/thewildofficial/when-words-override-consequences/actions/runs/34074258696",
+      "status": "success",
+      "modal_run_id": "c271062f5e6f4d83bf53888d07b86760",
+      "content_sha256": "ce42e0b1be6dbc5f82c13a4e76ba6657c96dfd9de36b0b4254b868629c9ed9a8"
+    }
+  },
+  "behavior_summary": {
+    "n_records": 1740,
+    "accuracy": 0.9454022988505747,
+    "gate_pass": false,
+    "family_gates": {
+      "core_tom": {
+        "gate_pass": false,
+        "accuracy": 0.8125,
+        "pair_identification_accuracy": 0.625,
+        "actual_hidden_state_invariance": 1.0
+      },
+      "higher_order": {
+        "gate_pass": false,
+        "accuracy": 0.4537037037037037,
+        "accuracy_by_split": {
+          "discovery": 0.6111111111111112,
+          "validation": 0.3888888888888888889,
+          "locked": 0.3611111111111111
+        }
+      },
+      "provenance": {
+        "gate_pass": true,
+        "accuracy": 1.0,
+        "claim_content_invariance": 1.0
+      },
+      "strategy_pressure": {
+        "gate_pass": false,
+        "accuracy": 0.8125,
+        "evaluation_framing_discordance": 0.0,
+        "risk_reweighting_pair_accuracy": 0.42857142857142855
+      }
+    }
+  },
+  "blackbox_summary": {
+    "n_records": 580,
+    "parse_rate": 1.0,
+    "accuracy": 0.9310344827586207,
+    "accuracy_by_family": {
+      "core_tom": 0.6875,
+      "higher_order": 0.3333333333333333,
+      "provenance": 1.0,
+      "strategy_pressure": 0.8125
+    }
+  },
+  "trajectory_summary": {
+    "n_records": 32,
+    "direct_action_accuracy": 0.6875,
+    "direct_report_accuracy": 0.375,
+    "action_then_report_accuracy": 1.0,
+    "report_then_action_accuracy": 0.90625,
+    "report_changes_after_action": 20,
+    "action_changes_after_report": 11
+  },
+  "measured_gpu_seconds": 495.853419753,
+  "measured_gpu_stage_subtotal_usd": 0.4313131386379495,
+  "mechanistic_status": "not_run_behavior_family_gate_failed",
+  "qwen38_status": {
+    "preflight_run": 34074986246,
+    "status": "stopped_exact_cross_model_parity",
+    "candidate_token_ids_match": true,
+    "rendered_prompts_match": false,
+    "prompt_token_ids_match": false,
+    "paid_stage_authorized": false
+  }
+}

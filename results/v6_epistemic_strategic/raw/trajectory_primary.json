@@ -1,0 +1,1466 @@
+{
+  "content_sha256": "ce42e0b1be6dbc5f82c13a4e76ba6657c96dfd9de36b0b4254b868629c9ed9a8",
+  "metadata": {
+    "config_sha256": "8eed1a0c09ad37f329137e119f6ac7a973a86592a618b1de074d1d7553cb3706",
+    "created_at": "2026-09-07T01:52:05.157672+00:00",
+    "dtype": "bfloat16",
+    "elapsed_seconds": 72.107793324,
+    "gpu_actual": "NVIDIA A100-SXM4-80GB",
+    "model_id": "Qwen/Qwen3.6-27B",
+    "model_key": "primary",
+    "model_loader": "AutoModelForImageTextToText",
+    "model_revision_requested": "6a9e13bd6fc8f0983b9b99948120bc37f49c13e9",
+    "model_revision_resolved": "6a9e13bd6fc8f0983b9b99948120bc37f49c13e9",
+    "run_id": "c271062f5e6f4d83bf53888d07b86760",
+    "source_dataset_sha256": "e5192e32126fcdfe5a606708a98a8264753092871bce3f427de8d5254d681995",
+    "thinking": false,
+    "tokenizer_loader": "AutoTokenizer",
+    "torch_version": "2.13.0+cu130",
+    "transformers_version": "5.16.1"
+  },
+  "records": [
+    {
+      "action_then_report": {
+        "formatting_compliant": true,
+        "legal_choice": "Y",
+        "legal_logits": {
+          "X": 19.5,
+          "Y": 29.625
+        },
+        "top1_text": "Y",
+        "top1_token_id": 56
+      },
+      "condition_id": "04cf8f700272a2b8",
+      "direct_action": {
+        "formatting_compliant": true,
+        "legal_choice": "B",
+        "legal_logits": {
+          "A": 24.375,
+          "B": 25.75
+        },
+        "top1_text": "B",
+        "top1_token_id": 33
+      },
+      "direct_report": {
+        "formatting_compliant": true,
+        "legal_choice": "X",
+        "legal_logits": {
+          "X": 23.75,
+          "Y": 23.625
+        },
+        "top1_text": "X",
+        "top1_token_id": 55
+      },
+      "expected_action": "B",
+      "expected_report": "Y",
+      "report_then_action": {
+        "formatting_compliant": true,
+        "legal_choice": "B",
+        "legal_logits": {
+          "A": 23.0,
+          "B": 25.875
+        },
+        "top1_text": "B",
+        "top1_token_id": 33
+      }
+    },
+    {
+      "action_then_report": {
+        "formatting_compliant": true,
+        "legal_choice": "Y",
+        "legal_logits": {
+          "X": 18.625,
+          "Y": 29.375
+        },
+        "top1_text": "Y",
+        "top1_token_id": 56
+      },
+      "condition_id": "07ff8b85fd93a94b",
+      "direct_action": {
+        "formatting_compliant": true,
+        "legal_choice": "B",
+        "legal_logits": {
+          "A": 23.25,
+          "B": 26.125
+        },
+        "top1_text": "B",
+        "top1_token_id": 33
+      },
+      "direct_report": {
+        "formatting_compliant": true,
+        "legal_choice": "X",
+        "legal_logits": {
+          "X": 23.5,
+          "Y": 22.5
+        },
+        "top1_text": "X",
+        "top1_token_id": 55
+      },
+      "expected_action": "B",
+      "expected_report": "Y",
+      "report_then_action": {
+        "formatting_compliant": true,
+        "legal_choice": "B",
+        "legal_logits": {
+          "A": 21.5,
+          "B": 26.5
+        },
+        "top1_text": "B",
+        "top1_token_id": 33
+      }
+    },
+    {
+      "action_then_report": {
+        "formatting_compliant": true,
+        "legal_choice": "Y",
+        "legal_logits": {
+          "X": 19.25,
+          "Y": 29.125
+        },
+        "top1_text": "Y",
+        "top1_token_id": 56
+      },
+      "condition_id": "10f38a12501cca80",
+      "direct_action": {
+        "formatting_compliant": true,
+        "legal_choice": "A",
+        "legal_logits": {
+          "A": 24.5,
+          "B": 24.125
+        },
+        "top1_text": "A",
+        "top1_token_id": 32
+      },
+      "direct_report": {
+        "formatting_compliant": true,
+        "legal_choice": "X",
+        "legal_logits": {
+          "X": 23.625,
+          "Y": 23.25
+        },
+        "top1_text": "X",
+        "top1_token_id": 55
+      },
+      "expected_action": "B",
+      "expected_report": "Y",
+      "report_then_action": {
+        "formatting_compliant": true,
+        "legal_choice": "B",
+        "legal_logits": {
+          "A": 23.125,
+          "B": 24.375
+        },
+        "top1_text": "B",
+        "top1_token_id": 33
+      }
+    },
+    {
+      "action_then_report": {
+        "formatting_compliant": true,
+        "legal_choice": "X",
+        "legal_logits": {
+          "X": 28.75,
+          "Y": 20.875
+        },
+        "top1_text": "X",
+        "top1_token_id": 55
+      },
+      "condition_id": "196a749ec1cfae56",
+      "direct_action": {
+        "formatting_compliant": true,
+        "legal_choice": "B",
+        "legal_logits": {
+          "A": 25.0,
+          "B": 25.125
+        },
+        "top1_text": "B",
+        "top1_token_id": 33
+      },
+      "direct_report": {
+        "formatting_compliant": true,
+        "legal_choice": "X",
+        "legal_logits": {
+          "X": 24.125,
+          "Y": 23.5
+        },
+        "top1_text": "X",
+        "top1_token_id": 55
+      },
+      "expected_action": "A",
+      "expected_report": "X",
+      "report_then_action": {
+        "formatting_compliant": true,
+        "legal_choice": "A",
+        "legal_logits": {
+          "A": 24.25,
+          "B": 24.0
+        },
+        "top1_text": "A",
+        "top1_token_id": 32
+      }
+    },
+    {
+      "action_then_report": {
+        "formatting_compliant": true,
+        "legal_choice": "X",
+        "legal_logits": {
+          "X": 29.125,
+          "Y": 20.5
+        },
+        "top1_text": "X",
+        "top1_token_id": 55
+      },
+      "condition_id": "1bc76f85df831e9c",
+      "direct_action": {
+        "formatting_compliant": true,
+        "legal_choice": "B",
+        "legal_logits": {
+          "A": 25.125,
+          "B": 26.125
+        },
+        "top1_text": "B",
+        "top1_token_id": 33
+      },
+      "direct_report": {
+        "formatting_compliant": true,
+        "legal_choice": "X",
+        "legal_logits": {
+          "X": 23.625,
+          "Y": 22.625
+        },
+        "top1_text": "X",
+        "top1_token_id": 55
+      },
+      "expected_action": "B",
+      "expected_report": "X",
+      "report_then_action": {
+        "formatting_compliant": true,
+        "legal_choice": "B",
+        "legal_logits": {
+          "A": 23.0,
+          "B": 25.125
+        },
+        "top1_text": "B",
+        "top1_token_id": 33
+      }
+    },
+    {
+      "action_then_report": {
+        "formatting_compliant": true,
+        "legal_choice": "Y",
+        "legal_logits": {
+          "X": 19.125,
+          "Y": 29.875
+        },
+        "top1_text": "Y",
+        "top1_token_id": 56
+      },
+      "condition_id": "275d3a2209f04b2d",
+      "direct_action": {
+        "formatting_compliant": true,
+        "legal_choice": "B",
+        "legal_logits": {
+          "A": 25.0,
+          "B": 25.125
+        },
+        "top1_text": "B",
+        "top1_token_id": 33
+      },
+      "direct_report": {
+        "formatting_compliant": true,
+        "legal_choice": "X",
+        "legal_logits": {
+          "X": 23.75,
+          "Y": 23.25
+        },
+        "top1_text": "X",
+        "top1_token_id": 55
+      },
+      "expected_action": "A",
+      "expected_report": "Y",
+      "report_then_action": {
+        "formatting_compliant": true,
+        "legal_choice": "B",
+        "legal_logits": {
+          "A": 24.125,
+          "B": 24.375
+        },
+        "top1_text": "B",
+        "top1_token_id": 33
+      }
+    },
+    {
+      "action_then_report": {
+        "formatting_compliant": true,
+        "legal_choice": "X",
+        "legal_logits": {
+          "X": 28.75,
+          "Y": 20.75
+        },
+        "top1_text": "X",
+        "top1_token_id": 55
+      },
+      "condition_id": "2f3da11ed8dcb72c",
+      "direct_action": {
+        "formatting_compliant": true,
+        "legal_choice": "B",
+        "legal_logits": {
+          "A": 24.875,
+          "B": 26.125
+        },
+        "top1_text": "B",
+        "top1_token_id": 33
+      },
+      "direct_report": {
+        "formatting_compliant": true,
+        "legal_choice": "X",
+        "legal_logits": {
+          "X": 23.75,
+          "Y": 23.625
+        },
+        "top1_text": "X",
+        "top1_token_id": 55
+      },
+      "expected_action": "A",
+      "expected_report": "X",
+      "report_then_action": {
+        "formatting_compliant": true,
+        "legal_choice": "A",
+        "legal_logits": {
+          "A": 25.875,
+          "B": 24.125
+        },
+        "top1_text": "A",
+        "top1_token_id": 32
+      }
+    },
+    {
+      "action_then_report": {
+        "formatting_compliant": true,
+        "legal_choice": "Y",
+        "legal_logits": {
+          "X": 18.625,
+          "Y": 29.375
+        },
+        "top1_text": "Y",
+        "top1_token_id": 56
+      },
+      "condition_id": "3f4911c38bbaec0f",
+      "direct_action": {
+        "formatting_compliant": true,
+        "legal_choice": "B",
+        "legal_logits": {
+          "A": 23.25,
+          "B": 26.125
+        },
+        "top1_text": "B",
+        "top1_token_id": 33
+      },
+      "direct_report": {
+        "formatting_compliant": true,
+        "legal_choice": "X",
+        "legal_logits": {
+          "X": 23.5,
+          "Y": 22.5
+        },
+        "top1_text": "X",
+        "top1_token_id": 55
+      },
+      "expected_action": "B",
+      "expected_report": "Y",
+      "report_then_action": {
+        "formatting_compliant": true,
+        "legal_choice": "B",
+        "legal_logits": {
+          "A": 21.5,
+          "B": 26.5
+        },
+        "top1_text": "B",
+        "top1_token_id": 33
+      }
+    },
+    {
+      "action_then_report": {
+        "formatting_compliant": true,
+        "legal_choice": "X",
+        "legal_logits": {
+          "X": 28.75,
+          "Y": 19.25
+        },
+        "top1_text": "X",
+        "top1_token_id": 55
+      },
+      "condition_id": "4062a5b8b8cb15c9",
+      "direct_action": {
+        "formatting_compliant": true,
+        "legal_choice": "A",
+        "legal_logits": {
+          "A": 25.375,
+          "B": 23.875
+        },
+        "top1_text": "A",
+        "top1_token_id": 32
+      },
+      "direct_report": {
+        "formatting_compliant": true,
+        "legal_choice": "Y",
+        "legal_logits": {
+          "X": 23.625,
+          "Y": 23.75
+        },
+        "top1_text": "Y",
+        "top1_token_id": 56
+      },
+      "expected_action": "A",
+      "expected_report": "X",
+      "report_then_action": {
+        "formatting_compliant": true,
+        "legal_choice": "B",
+        "legal_logits": {
+          "A": 23.25,
+          "B": 24.125
+        },
+        "top1_text": "B",
+        "top1_token_id": 33
+      }
+    },
+    {
+      "action_then_report": {
+        "formatting_compliant": true,
+        "legal_choice": "Y",
+        "legal_logits": {
+          "X": 19.25,
+          "Y": 29.125
+        },
+        "top1_text": "Y",
+        "top1_token_id": 56
+      },
+      "condition_id": "4c4a56431037f8b6",
+      "direct_action": {
+        "formatting_compliant": true,
+        "legal_choice": "A",
+        "legal_logits": {
+          "A": 24.5,
+          "B": 24.125
+        },
+        "top1_text": "A",
+        "top1_token_id": 32
+      },
+      "direct_report": {
+        "formatting_compliant": true,
+        "legal_choice": "X",
+        "legal_logits": {
+          "X": 23.625,
+          "Y": 23.25
+        },
+        "top1_text": "X",
+        "top1_token_id": 55
+      },
+      "expected_action": "B",
+      "expected_report": "Y",
+      "report_then_action": {
+        "formatting_compliant": true,
+        "legal_choice": "B",
+        "legal_logits": {
+          "A": 23.125,
+          "B": 24.375
+        },
+        "top1_text": "B",
+        "top1_token_id": 33
+      }
+    },
+    {
+      "action_then_report": {
+        "formatting_compliant": true,
+        "legal_choice": "Y",
+        "legal_logits": {
+          "X": 19.875,
+          "Y": 29.25
+        },
+        "top1_text": "Y",
+        "top1_token_id": 56
+      },
+      "condition_id": "51ffc89411333a6a",
+      "direct_action": {
+        "formatting_compliant": true,
+        "legal_choice": "B",
+        "legal_logits": {
+          "A": 23.625,
+          "B": 23.875
+        },
+        "top1_text": "B",
+        "top1_token_id": 33
+      },
+      "direct_report": {
+        "formatting_compliant": true,
+        "legal_choice": "X",
+        "legal_logits": {
+          "X": 23.375,
+          "Y": 23.25
+        },
+        "top1_text": "X",
+        "top1_token_id": 55
+      },
+      "expected_action": "A",
+      "expected_report": "Y",
+      "report_then_action": {
+        "formatting_compliant": true,
+        "legal_choice": "A",
+        "legal_logits": {
+          "A": 24.0,
+          "B": 23.875
+        },
+        "top1_text": "A",
+        "top1_token_id": 32
+      }
+    },
+    {
+      "action_then_report": {
+        "formatting_compliant": true,
+        "legal_choice": "X",
+        "legal_logits": {
+          "X": 29.125,
+          "Y": 19.25
+        },
+        "top1_text": "X",
+        "top1_token_id": 55
+      },
+      "condition_id": "523bfed250bf3df7",
+      "direct_action": {
+        "formatting_compliant": true,
+        "legal_choice": "B",
+        "legal_logits": {
+          "A": 24.5,
+          "B": 26.625
+        },
+        "top1_text": "B",
+        "top1_token_id": 33
+      },
+      "direct_report": {
+        "formatting_compliant": true,
+        "legal_choice": "X",
+        "legal_logits": {
+          "X": 23.375,
+          "Y": 23.125
+        },
+        "top1_text": "X",
+        "top1_token_id": 55
+      },
+      "expected_action": "B",
+      "expected_report": "X",
+      "report_then_action": {
+        "formatting_compliant": true,
+        "legal_choice": "B",
+        "legal_logits": {
+          "A": 23.25,
+          "B": 25.125
+        },
+        "top1_text": "B",
+        "top1_token_id": 33
+      }
+    },
+    {
+      "action_then_report": {
+        "formatting_compliant": true,
+        "legal_choice": "X",
+        "legal_logits": {
+          "X": 28.625,
+          "Y": 19.625
+        },
+        "top1_text": "X",
+        "top1_token_id": 55
+      },
+      "condition_id": "5f2518979f1cfd88",
+      "direct_action": {
+        "formatting_compliant": true,
+        "legal_choice": "B",
+        "legal_logits": {
+          "A": 23.125,
+          "B": 25.375
+        },
+        "top1_text": "B",
+        "top1_token_id": 33
+      },
+      "direct_report": {
+        "formatting_compliant": true,
+        "legal_choice": "X",
+        "legal_logits": {
+          "X": 23.5,
+          "Y": 23.25
+        },
+        "top1_text": "X",
+        "top1_token_id": 55
+      },
+      "expected_action": "B",
+      "expected_report": "X",
+      "report_then_action": {
+        "formatting_compliant": true,
+        "legal_choice": "B",
+        "legal_logits": {
+          "A": 20.25,
+          "B": 26.625
+        },
+        "top1_text": "B",
+        "top1_token_id": 33
+      }
+    },
+    {
+      "action_then_report": {
+        "formatting_compliant": true,
+        "legal_choice": "Y",
+        "legal_logits": {
+          "X": 18.75,
+          "Y": 30.0
+        },
+        "top1_text": "Y",
+        "top1_token_id": 56
+      },
+      "condition_id": "61e2db285340aa0e",
+      "direct_action": {
+        "formatting_compliant": true,
+        "legal_choice": "B",
+        "legal_logits": {
+          "A": 23.75,
+          "B": 25.625
+        },
+        "top1_text": "B",
+        "top1_token_id": 33
+      },
+      "direct_report": {
+        "formatting_compliant": true,
+        "legal_choice": "X",
+        "legal_logits": {
+          "X": 24.125,
+          "Y": 23.5
+        },
+        "top1_text": "X",
+        "top1_token_id": 55
+      },
+      "expected_action": "B",
+      "expected_report": "Y",
+      "report_then_action": {
+        "formatting_compliant": true,
+        "legal_choice": "B",
+        "legal_logits": {
+          "A": 21.875,
+          "B": 25.25
+        },
+        "top1_text": "B",
+        "top1_token_id": 33
+      }
+    },
+    {
+      "action_then_report": {
+        "formatting_compliant": true,
+        "legal_choice": "Y",
+        "legal_logits": {
+          "X": 19.5,
+          "Y": 30.0
+        },
+        "top1_text": "Y",
+        "top1_token_id": 56
+      },
+      "condition_id": "6272e14a062fa7a9",
+      "direct_action": {
+        "formatting_compliant": true,
+        "legal_choice": "B",
+        "legal_logits": {
+          "A": 25.125,
+          "B": 26.125
+        },
+        "top1_text": "B",
+        "top1_token_id": 33
+      },
+      "direct_report": {
+        "formatting_compliant": true,
+        "legal_choice": "X",
+        "legal_logits": {
+          "X": 23.875,
+          "Y": 22.125
+        },
+        "top1_text": "X",
+        "top1_token_id": 55
+      },
+      "expected_action": "B",
+      "expected_report": "Y",
+      "report_then_action": {
+        "formatting_compliant": true,
+        "legal_choice": "B",
+        "legal_logits": {
+          "A": 22.625,
+          "B": 25.625
+        },
+        "top1_text": "B",
+        "top1_token_id": 33
+      }
+    },
+    {
+      "action_then_report": {
+        "formatting_compliant": true,
+        "legal_choice": "Y",
+        "legal_logits": {
+          "X": 19.25,
+          "Y": 29.625
+        },
+        "top1_text": "Y",
+        "top1_token_id": 56
+      },
+      "condition_id": "68154ec4a1767879",
+      "direct_action": {
+        "formatting_compliant": true,
+        "legal_choice": "B",
+        "legal_logits": {
+          "A": 25.375,
+          "B": 26.375
+        },
+        "top1_text": "B",
+        "top1_token_id": 33
+      },
+      "direct_report": {
+        "formatting_compliant": true,
+        "legal_choice": "X",
+        "legal_logits": {
+          "X": 23.375,
+          "Y": 23.125
+        },
+        "top1_text": "X",
+        "top1_token_id": 55
+      },
+      "expected_action": "A",
+      "expected_report": "Y",
+      "report_then_action": {
+        "formatting_compliant": true,
+        "legal_choice": "A",
+        "legal_logits": {
+          "A": 25.75,
+          "B": 23.0
+        },
+        "top1_text": "A",
+        "top1_token_id": 32
+      }
+    },
+    {
+      "action_then_report": {
+        "formatting_compliant": true,
+        "legal_choice": "Y",
+        "legal_logits": {
+          "X": 20.75,
+          "Y": 28.875
+        },
+        "top1_text": "Y",
+        "top1_token_id": 56
+      },
+      "condition_id": "8295939b6353a0af",
+      "direct_action": {
+        "formatting_compliant": true,
+        "legal_choice": "B",
+        "legal_logits": {
+          "A": 19.125,
+          "B": 26.75
+        },
+        "top1_text": "B",
+        "top1_token_id": 33
+      },
+      "direct_report": {
+        "formatting_compliant": true,
+        "legal_choice": "X",
+        "legal_logits": {
+          "X": 23.5,
+          "Y": 22.75
+        },
+        "top1_text": "X",
+        "top1_token_id": 55
+      },
+      "expected_action": "B",
+      "expected_report": "Y",
+      "report_then_action": {
+        "formatting_compliant": true,
+        "legal_choice": "B",
+        "legal_logits": {
+          "A": 20.0,
+          "B": 26.75
+        },
+        "top1_text": "B",
+        "top1_token_id": 33
+      }
+    },
+    {
+      "action_then_report": {
+        "formatting_compliant": true,
+        "legal_choice": "Y",
+        "legal_logits": {
+          "X": 18.75,
+          "Y": 28.875
+        },
+        "top1_text": "Y",
+        "top1_token_id": 56
+      },
+      "condition_id": "85c47d6673508604",
+      "direct_action": {
+        "formatting_compliant": true,
+        "legal_choice": "A",
+        "legal_logits": {
+          "A": 25.5,
+          "B": 24.25
+        },
+        "top1_text": "A",
+        "top1_token_id": 32
+      },
+      "direct_report": {
+        "formatting_compliant": true,
+        "legal_choice": "X",
+        "legal_logits": {
+          "X": 23.625,
+          "Y": 22.625
+        },
+        "top1_text": "X",
+        "top1_token_id": 55
+      },
+      "expected_action": "A",
+      "expected_report": "Y",
+      "report_then_action": {
+        "formatting_compliant": true,
+        "legal_choice": "A",
+        "legal_logits": {
+          "A": 25.875,
+          "B": 24.125
+        },
+        "top1_text": "A",
+        "top1_token_id": 32
+      }
+    },
+    {
+      "action_then_report": {
+        "formatting_compliant": true,
+        "legal_choice": "X",
+        "legal_logits": {
+          "X": 28.625,
+          "Y": 20.5
+        },
+        "top1_text": "X",
+        "top1_token_id": 55
+      },
+      "condition_id": "96d802f770f4e2e6",
+      "direct_action": {
+        "formatting_compliant": true,
+        "legal_choice": "A",
+        "legal_logits": {
+          "A": 27.0,
+          "B": 24.625
+        },
+        "top1_text": "A",
+        "top1_token_id": 32
+      },
+      "direct_report": {
+        "formatting_compliant": true,
+        "legal_choice": "X",
+        "legal_logits": {
+          "X": 23.625,
+          "Y": 23.25
+        },
+        "top1_text": "X",
+        "top1_token_id": 55
+      },
+      "expected_action": "A",
+      "expected_report": "X",
+      "report_then_action": {
+        "formatting_compliant": true,
+        "legal_choice": "A",
+        "legal_logits": {
+          "A": 26.875,
+          "B": 24.125
+        },
+        "top1_text": "A",
+        "top1_token_id": 32
+      }
+    },
+    {
+      "action_then_report": {
+        "formatting_compliant": true,
+        "legal_choice": "X",
+        "legal_logits": {
+          "X": 28.625,
+          "Y": 20.5
+        },
+        "top1_text": "X",
+        "top1_token_id": 55
+      },
+      "condition_id": "99892b3380bbea82",
+      "direct_action": {
+        "formatting_compliant": true,
+        "legal_choice": "A",
+        "legal_logits": {
+          "A": 27.0,
+          "B": 24.625
+        },
+        "top1_text": "A",
+        "top1_token_id": 32
+      },
+      "direct_report": {
+        "formatting_compliant": true,
+        "legal_choice": "X",
+        "legal_logits": {
+          "X": 23.625,
+          "Y": 23.375
+        },
+        "top1_text": "X",
+        "top1_token_id": 55
+      },
+      "expected_action": "A",
+      "expected_report": "X",
+      "report_then_action": {
+        "formatting_compliant": true,
+        "legal_choice": "A",
+        "legal_logits": {
+          "A": 26.875,
+          "B": 24.125
+        },
+        "top1_text": "A",
+        "top1_token_id": 32
+      }
+    },
+    {
+      "action_then_report": {
+        "formatting_compliant": true,
+        "legal_choice": "X",
+        "legal_logits": {
+          "X": 28.125,
+          "Y": 19.0
+        },
+        "top1_text": "X",
+        "top1_token_id": 55
+      },
+      "condition_id": "9b1d8edbddb4357b",
+      "direct_action": {
+        "formatting_compliant": true,
+        "legal_choice": "A",
+        "legal_logits": {
+          "A": 24.75,
+          "B": 24.0
+        },
+        "top1_text": "A",
+        "top1_token_id": 32
+      },
+      "direct_report": {
+        "formatting_compliant": true,
+        "legal_choice": "X",
+        "legal_logits": {
+          "X": 23.625,
+          "Y": 22.75
+        },
+        "top1_text": "X",
+        "top1_token_id": 55
+      },
+      "expected_action": "A",
+      "expected_report": "X",
+      "report_then_action": {
+        "formatting_compliant": true,
+        "legal_choice": "A",
+        "legal_logits": {
+          "A": 24.375,
+          "B": 24.125
+        },
+        "top1_text": "A",
+        "top1_token_id": 32
+      }
+    },
+    {
+      "action_then_report": {
+        "formatting_compliant": true,
+        "legal_choice": "X",
+        "legal_logits": {
+          "X": 28.375,
+          "Y": 19.875
+        },
+        "top1_text": "X",
+        "top1_token_id": 55
+      },
+      "condition_id": "aba13b10c4330df0",
+      "direct_action": {
+        "formatting_compliant": true,
+        "legal_choice": "B",
+        "legal_logits": {
+          "A": 25.375,
+          "B": 26.375
+        },
+        "top1_text": "B",
+        "top1_token_id": 33
+      },
+      "direct_report": {
+        "formatting_compliant": true,
+        "legal_choice": "Y",
+        "legal_logits": {
+          "X": 23.5,
+          "Y": 23.75
+        },
+        "top1_text": "Y",
+        "top1_token_id": 56
+      },
+      "expected_action": "A",
+      "expected_report": "X",
+      "report_then_action": {
+        "formatting_compliant": true,
+        "legal_choice": "A",
+        "legal_logits": {
+          "A": 26.25,
+          "B": 23.25
+        },
+        "top1_text": "A",
+        "top1_token_id": 32
+      }
+    },
+    {
+      "action_then_report": {
+        "formatting_compliant": true,
+        "legal_choice": "Y",
+        "legal_logits": {
+          "X": 18.75,
+          "Y": 28.875
+        },
+        "top1_text": "Y",
+        "top1_token_id": 56
+      },
+      "condition_id": "b16dd21e27def752",
+      "direct_action": {
+        "formatting_compliant": true,
+        "legal_choice": "A",
+        "legal_logits": {
+          "A": 25.5,
+          "B": 24.25
+        },
+        "top1_text": "A",
+        "top1_token_id": 32
+      },
+      "direct_report": {
+        "formatting_compliant": true,
+        "legal_choice": "X",
+        "legal_logits": {
+          "X": 23.5,
+          "Y": 22.625
+        },
+        "top1_text": "X",
+        "top1_token_id": 55
+      },
+      "expected_action": "A",
+      "expected_report": "Y",
+      "report_then_action": {
+        "formatting_compliant": true,
+        "legal_choice": "A",
+        "legal_logits": {
+          "A": 25.875,
+          "B": 24.125
+        },
+        "top1_text": "A",
+        "top1_token_id": 32
+      }
+    },
+    {
+      "action_then_report": {
+        "formatting_compliant": true,
+        "legal_choice": "Y",
+        "legal_logits": {
+          "X": 18.25,
+          "Y": 29.625
+        },
+        "top1_text": "Y",
+        "top1_token_id": 56
+      },
+      "condition_id": "cad864ba784edb54",
+      "direct_action": {
+        "formatting_compliant": true,
+        "legal_choice": "B",
+        "legal_logits": {
+          "A": 24.5,
+          "B": 26.625
+        },
+        "top1_text": "B",
+        "top1_token_id": 33
+      },
+      "direct_report": {
+        "formatting_compliant": true,
+        "legal_choice": "Y",
+        "legal_logits": {
+          "X": 23.5,
+          "Y": 23.75
+        },
+        "top1_text": "Y",
+        "top1_token_id": 56
+      },
+      "expected_action": "B",
+      "expected_report": "Y",
+      "report_then_action": {
+        "formatting_compliant": true,
+        "legal_choice": "B",
+        "legal_logits": {
+          "A": 23.5,
+          "B": 25.875
+        },
+        "top1_text": "B",
+        "top1_token_id": 33
+      }
+    },
+    {
+      "action_then_report": {
+        "formatting_compliant": true,
+        "legal_choice": "X",
+        "legal_logits": {
+          "X": 28.125,
+          "Y": 19.0
+        },
+        "top1_text": "X",
+        "top1_token_id": 55
+      },
+      "condition_id": "d4e9487f6ef61cc7",
+      "direct_action": {
+        "formatting_compliant": true,
+        "legal_choice": "A",
+        "legal_logits": {
+          "A": 24.75,
+          "B": 24.0
+        },
+        "top1_text": "A",
+        "top1_token_id": 32
+      },
+      "direct_report": {
+        "formatting_compliant": true,
+        "legal_choice": "X",
+        "legal_logits": {
+          "X": 23.625,
+          "Y": 22.75
+        },
+        "top1_text": "X",
+        "top1_token_id": 55
+      },
+      "expected_action": "A",
+      "expected_report": "X",
+      "report_then_action": {
+        "formatting_compliant": true,
+        "legal_choice": "A",
+        "legal_logits": {
+          "A": 24.375,
+          "B": 24.125
+        },
+        "top1_text": "A",
+        "top1_token_id": 32
+      }
+    },
+    {
+      "action_then_report": {
+        "formatting_compliant": true,
+        "legal_choice": "Y",
+        "legal_logits": {
+          "X": 18.75,
+          "Y": 30.0
+        },
+        "top1_text": "Y",
+        "top1_token_id": 56
+      },
+      "condition_id": "da1a742b14e8d9d0",
+      "direct_action": {
+        "formatting_compliant": true,
+        "legal_choice": "B",
+        "legal_logits": {
+          "A": 23.75,
+          "B": 25.625
+        },
+        "top1_text": "B",
+        "top1_token_id": 33
+      },
+      "direct_report": {
+        "formatting_compliant": true,
+        "legal_choice": "X",
+        "legal_logits": {
+          "X": 24.125,
+          "Y": 23.5
+        },
+        "top1_text": "X",
+        "top1_token_id": 55
+      },
+      "expected_action": "B",
+      "expected_report": "Y",
+      "report_then_action": {
+        "formatting_compliant": true,
+        "legal_choice": "B",
+        "legal_logits": {
+          "A": 21.875,
+          "B": 25.25
+        },
+        "top1_text": "B",
+        "top1_token_id": 33
+      }
+    },
+    {
+      "action_then_report": {
+        "formatting_compliant": true,
+        "legal_choice": "Y",
+        "legal_logits": {
+          "X": 19.875,
+          "Y": 29.25
+        },
+        "top1_text": "Y",
+        "top1_token_id": 56
+      },
+      "condition_id": "dea8a83b93bc0efc",
+      "direct_action": {
+        "formatting_compliant": true,
+        "legal_choice": "B",
+        "legal_logits": {
+          "A": 23.625,
+          "B": 23.875
+        },
+        "top1_text": "B",
+        "top1_token_id": 33
+      },
+      "direct_report": {
+        "formatting_compliant": true,
+        "legal_choice": "X",
+        "legal_logits": {
+          "X": 23.25,
+          "Y": 23.0
+        },
+        "top1_text": "X",
+        "top1_token_id": 55
+      },
+      "expected_action": "A",
+      "expected_report": "Y",
+      "report_then_action": {
+        "formatting_compliant": true,
+        "legal_choice": "A",
+        "legal_logits": {
+          "A": 24.0,
+          "B": 23.875
+        },
+        "top1_text": "A",
+        "top1_token_id": 32
+      }
+    },
+    {
+      "action_then_report": {
+        "formatting_compliant": true,
+        "legal_choice": "X",
+        "legal_logits": {
+          "X": 28.75,
+          "Y": 19.25
+        },
+        "top1_text": "X",
+        "top1_token_id": 55
+      },
+      "condition_id": "e2706e0139ac4887",
+      "direct_action": {
+        "formatting_compliant": true,
+        "legal_choice": "A",
+        "legal_logits": {
+          "A": 25.375,
+          "B": 23.875
+        },
+        "top1_text": "A",
+        "top1_token_id": 32
+      },
+      "direct_report": {
+        "formatting_compliant": true,
+        "legal_choice": "Y",
+        "legal_logits": {
+          "X": 23.625,
+          "Y": 23.75
+        },
+        "top1_text": "Y",
+        "top1_token_id": 56
+      },
+      "expected_action": "A",
+      "expected_report": "X",
+      "report_then_action": {
+        "formatting_compliant": true,
+        "legal_choice": "B",
+        "legal_logits": {
+          "A": 23.25,
+          "B": 24.125
+        },
+        "top1_text": "B",
+        "top1_token_id": 33
+      }
+    },
+    {
+      "action_then_report": {
+        "formatting_compliant": true,
+        "legal_choice": "Y",
+        "legal_logits": {
+          "X": 19.5,
+          "Y": 29.625
+        },
+        "top1_text": "Y",
+        "top1_token_id": 56
+      },
+      "condition_id": "e34c689dd107cb00",
+      "direct_action": {
+        "formatting_compliant": true,
+        "legal_choice": "B",
+        "legal_logits": {
+          "A": 24.375,
+          "B": 25.75
+        },
+        "top1_text": "B",
+        "top1_token_id": 33
+      },
+      "direct_report": {
+        "formatting_compliant": true,
+        "legal_choice": "X",
+        "legal_logits": {
+          "X": 23.875,
+          "Y": 23.75
+        },
+        "top1_text": "X",
+        "top1_token_id": 55
+      },
+      "expected_action": "B",
+      "expected_report": "Y",
+      "report_then_action": {
+        "formatting_compliant": true,
+        "legal_choice": "B",
+        "legal_logits": {
+          "A": 23.0,
+          "B": 25.875
+        },
+        "top1_text": "B",
+        "top1_token_id": 33
+      }
+    },
+    {
+      "action_then_report": {
+        "formatting_compliant": true,
+        "legal_choice": "X",
+        "legal_logits": {
+          "X": 28.875,
+          "Y": 20.75
+        },
+        "top1_text": "X",
+        "top1_token_id": 55
+      },
+      "condition_id": "e5bc709b4b4e0d3e",
+      "direct_action": {
+        "formatting_compliant": true,
+        "legal_choice": "B",
+        "legal_logits": {
+          "A": 24.875,
+          "B": 26.125
+        },
+        "top1_text": "B",
+        "top1_token_id": 33
+      },
+      "direct_report": {
+        "formatting_compliant": true,
+        "legal_choice": "X",
+        "legal_logits": {
+          "X": 23.875,
+          "Y": 23.75
+        },
+        "top1_text": "X",
+        "top1_token_id": 55
+      },
+      "expected_action": "A",
+      "expected_report": "X",
+      "report_then_action": {
+        "formatting_compliant": true,
+        "legal_choice": "A",
+        "legal_logits": {
+          "A": 25.875,
+          "B": 24.0
+        },
+        "top1_text": "A",
+        "top1_token_id": 32
+      }
+    },
+    {
+      "action_then_report": {
+        "formatting_compliant": true,
+        "legal_choice": "X",
+        "legal_logits": {
+          "X": 28.625,
+          "Y": 19.625
+        },
+        "top1_text": "X",
+        "top1_token_id": 55
+      },
+      "condition_id": "e68cdb2d120542fe",
+      "direct_action": {
+        "formatting_compliant": true,
+        "legal_choice": "B",
+        "legal_logits": {
+          "A": 23.125,
+          "B": 25.375
+        },
+        "top1_text": "B",
+        "top1_token_id": 33
+      },
+      "direct_report": {
+        "formatting_compliant": true,
+        "legal_choice": "X",
+        "legal_logits": {
+          "X": 23.5,
+          "Y": 23.25
+        },
+        "top1_text": "X",
+        "top1_token_id": 55
+      },
+      "expected_action": "B",
+      "expected_report": "X",
+      "report_then_action": {
+        "formatting_compliant": true,
+        "legal_choice": "B",
+        "legal_logits": {
+          "A": 20.25,
+          "B": 26.625
+        },
+        "top1_text": "B",
+        "top1_token_id": 33
+      }
+    },
+    {
+      "action_then_report": {
+        "formatting_compliant": true,
+        "legal_choice": "Y",
+        "legal_logits": {
+          "X": 20.75,
+          "Y": 28.875
+        },
+        "top1_text": "Y",
+        "top1_token_id": 56
+      },
+      "condition_id": "fc2613e4086e5ff1",
+      "direct_action": {
+        "formatting_compliant": true,
+        "legal_choice": "B",
+        "legal_logits": {
+          "A": 19.125,
+          "B": 26.75
+        },
+        "top1_text": "B",
+        "top1_token_id": 33
+      },
+      "direct_report": {
+        "formatting_compliant": true,
+        "legal_choice": "X",
+        "legal_logits": {
+          "X": 23.5,
+          "Y": 22.75
+        },
+        "top1_text": "X",
+        "top1_token_id": 55
+      },
+      "expected_action": "B",
+      "expected_report": "Y",
+      "report_then_action": {
+        "formatting_compliant": true,
+        "legal_choice": "B",
+        "legal_logits": {
+          "A": 20.125,
+          "B": 26.875
+        },
+        "top1_text": "B",
+        "top1_token_id": 33
+      }
+    }
+  ],
+  "schema_version": 1,
+  "status": "matched_trajectory_controls_complete",
+  "study_id": "V6-ES-1"
+}

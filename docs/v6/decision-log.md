@@ -48,3 +48,13 @@ Append-only. New decisions are added at the bottom with a date and a reason.
 - Because that framing/tokenization difference is a replication confound, no
   Qwen3.8 paid stage is authorized. A future Qwen3.8 study needs its own
   preregistered prompt protocol and separate gates rather than a pooled result.
+
+## 2026-09-07 — primary Qwen3.6 execution
+
+- Tokenizer preflight, black-box generation, forced-choice logits, and matched
+  trajectory controls completed through GitHub Actions/Modal.
+- The forced-choice family gate passed only for `provenance`; `core_tom`,
+  `higher_order`, and `strategy_pressure` failed their preregistered gates.
+- Activation discovery was therefore not run. The negative and heterogeneous
+  result is retained in `results/v6_epistemic_strategic/raw/` with its measured
+  cost ledger; no causal claim is made.

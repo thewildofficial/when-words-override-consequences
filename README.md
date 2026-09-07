@@ -52,7 +52,8 @@ Next up is a proposed ~$30 follow-up asking whether reports *reveal* or *change*
 The next clean research branch is [V6-ES-1](docs/v6/README.md): a separate,
 factorial study of agent-indexed epistemic states, higher-order theory of mind,
 provenance, strategic safety reweighting, and evaluation-context sensitivity.
-Its CPU audit is complete; model execution is not yet run.
+Its CPU audit and primary Qwen3.6 execution are complete; the family gates
+closed mechanistic follow-up. See the retained [run record](results/v6_epistemic_strategic/README.md).
 
 ## Go deeper
 

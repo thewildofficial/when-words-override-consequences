@@ -1,7 +1,7 @@
-# V6-ES-1 local control audit
+# V6-ES-1 run record
 
-This directory records the CPU-only protocol freeze. It contains no model
-result. The generated dataset is frozen under
+This directory records the CPU-only protocol freeze and the primary
+Qwen3.6-27B execution artifacts. The generated dataset is frozen under
 [`configs/v6/epistemic_strategic/`](../../configs/v6/epistemic_strategic/).
 
 The audit verified:
@@ -14,6 +14,28 @@ The audit verified:
 - provenance source/truth/time/surface cells;
 - safety-frame identification cells and evaluation-framing invariance.
 
-Model execution is deliberately absent. Run the Modal stages described in
-[`../../docs/v6/README.md`](../../docs/v6/README.md) only after reviewing the
-family-specific gates in `control_audit.json`.
+The CPU audit is immutable. The primary model outputs below are also immutable
+and should be interpreted only through the family-specific gates in
+`control_audit.json` and the preregistration.
+
+## Primary run outcome
+
+The pinned `Qwen/Qwen3.6-27B` tokenizer preflight, black-box generation,
+forced-choice logits, and matched trajectory controls completed successfully.
+The behavior artifact is retained under `raw/behavior_primary.json`; its
+family-level gate is **false** despite 0.945 overall accuracy:
+
+- `core_tom`: gate false; pair identification `0.625`;
+- `higher_order`: gate false; accuracy `0.454`;
+- `provenance`: gate true; accuracy and claim-content invariance `1.000`;
+- `strategy_pressure`: gate false; risk-pair accuracy `0.429`.
+
+Because the preregistered behavior gate failed, observational activation
+discovery and causal activation interchange were not run. The black-box and
+trajectory outputs remain separate evidence levels. See
+[`model_run_manifest_primary.json`](model_run_manifest_primary.json) for
+workflow IDs, hashes, measured cost, and compact summaries.
+
+Qwen3.8 remains unpaid and locked: its preflight matched candidate token IDs
+but not Qwen3.6's rendered prompts or prompt-token IDs. That is a replication
+confound, not a pooled model result.
