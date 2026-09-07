@@ -25,3 +25,9 @@ docs/compute-budget.md
 # generator. The CPU control step regenerates it, verifies the manifest hash,
 # and freezes it before any Modal stage.
 configs/v6.1/epistemic_repair/dataset.json
+
+# V6.2 copies these canonical inputs into each Actions artifact; the committed
+# subset manifest remains under configs/ and the generated result copies stay
+# out of the protocol tree.
+results/v6_2_reasoning_capability_control/config.json
+results/v6_2_reasoning_capability_control/subset_manifest.json
