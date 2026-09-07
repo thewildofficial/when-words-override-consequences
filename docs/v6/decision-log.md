@@ -38,3 +38,13 @@ Append-only. New decisions are added at the bottom with a date and a reason.
 - This is recorded as an infrastructure failure, not as a Qwen3.8 parity or
   model finding. The image now declares those dependencies; the preflight must
   be rerun before any Qwen3.8 paid stage can be considered.
+
+## 2026-09-07 — Qwen3.8 exact parity stop
+
+- The corrected preflight completed the processor load and one-token checks,
+  then failed the exact cross-model contract in run `34074986246`.
+- Qwen3.8 matched Qwen3.6 on candidate labels and candidate token IDs, but did
+  not match rendered chat prompts or prompt-token IDs.
+- Because that framing/tokenization difference is a replication confound, no
+  Qwen3.8 paid stage is authorized. A future Qwen3.8 study needs its own
+  preregistered prompt protocol and separate gates rather than a pooled result.
