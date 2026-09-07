@@ -49,7 +49,8 @@ See [`epistemic-strategic-preregistration.md`](epistemic-strategic-preregistrati
 for hypotheses and promotion thresholds, [`controls-and-interpretation.md`](controls-and-interpretation.md)
 for confounds and alternative explanations, and
 [`../../results/v6_epistemic_strategic/control_audit.json`](../../results/v6_epistemic_strategic/control_audit.json)
-for the machine-readable audit.
+for the machine-readable audit. The descriptive primary findings and next
+experiments are in [`primary-findings.md`](primary-findings.md).
 
 ## Measurement modes
 
