@@ -7,11 +7,11 @@
     "model_forward_passes": 0
   },
   "config_sha256": "e3c1206dc8adb87b4c498f1947bffc5831512967b237a6e25da8b227ecfb3b2c",
-  "content_sha256": "6156a7a027fdd81b53f10932d495d759f87b8c90f1e54973c64a60df6cb23abe",
+  "content_sha256": "f8861db94603fa2585468cd8fd6f89bdd4bbfe52230f92772f30ca65b48e5b1c",
   "gpu_stages_ran": false,
-  "head_commit": "a0e60935d5cad9bafb793999bd7a1bc9cc7d933f",
+  "head_commit": "ba4087131e36190b6c8c527b73d524ef1300bdf6",
   "interpretation": "No model forwards have occurred on this branch yet.",
-  "protocol_commit_sha": "a0e60935d5cad9bafb793999bd7a1bc9cc7d933f",
+  "protocol_commit_sha": "ba4087131e36190b6c8c527b73d524ef1300bdf6",
   "row_counts": {
     "diagnostic": 640,
     "direct": 2496,

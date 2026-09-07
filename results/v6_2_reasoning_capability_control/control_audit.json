@@ -8,15 +8,15 @@
     "ledger": 0,
     "policy": 0
   },
-  "content_sha256": "5d4d939a9f0926235892b662e273cc015be5ad943839155f570cfde8a1c1bd62",
+  "content_sha256": "27d3445234097b42cad15abb186222dd52a7761b4d477d75f8e69feac971a8fe",
   "diagnostic_rows": 640,
   "endpoint_coverage_passed": true,
   "gpu_stages_ran": false,
-  "head_commit": "a0e60935d5cad9bafb793999bd7a1bc9cc7d933f",
+  "head_commit": "ba4087131e36190b6c8c527b73d524ef1300bdf6",
   "interpretation": "No model forwards have occurred on this branch yet.",
   "model_forwards": 0,
   "parser_passed": true,
-  "protocol_commit_sha": "a0e60935d5cad9bafb793999bd7a1bc9cc7d933f",
+  "protocol_commit_sha": "ba4087131e36190b6c8c527b73d524ef1300bdf6",
   "schema_version": 1,
   "selected_families": [
     "ledger_binding",
