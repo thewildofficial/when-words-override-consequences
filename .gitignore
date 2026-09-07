@@ -25,3 +25,7 @@ docs/compute-budget.md
 # generator. The CPU control step regenerates it, verifies the manifest hash,
 # and freezes it before any Modal stage.
 configs/v6.1/epistemic_repair/dataset.json
+# V7's generated row table is deterministic output of the committed
+# generator. The CPU control step regenerates it and records its hash in the
+# lightweight manifest before any Modal stage.
+configs/v7/epistemic_agentic_strategy/dataset.json

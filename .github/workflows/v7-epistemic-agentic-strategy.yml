@@ -1,0 +1,96 @@
+name: V7 epistemic agentic strategy
+
+on:
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: Stage to run
+        required: true
+        default: local-controls
+        type: choice
+        options:
+          - local-controls
+          - preflight
+          - behavior
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v7-eas-1-${{ inputs.stage || 'local-controls' }}
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
+      MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
+      UV_CACHE_DIR: /tmp/wwoc-v7-uv-cache
+      V7_STAGE: ${{ inputs.stage || 'local-controls' }}
+
+    steps:
+      - name: Check out the frozen protocol
+        uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Run the full local test suite
+        run: uv run --extra dev pytest -q
+
+      - name: Freeze and audit the CPU-only dataset
+        run: uv run python scripts/run_v7_epistemic_agentic_strategy_controls.py --freeze-dataset
+
+      - name: Verify the frozen dataset and budget contract
+        run: |
+          uv run python - <<'PY'
+          import json
+          from pathlib import Path
+          from jspace_policy.budget import estimate_cost
+          from jspace_policy.v7_epistemic_agentic_strategy import control_audit, verify_dataset_payload
+          config = json.loads(Path("configs/v7/epistemic_agentic_strategy/experiment.json").read_text())
+          dataset = json.loads(Path("configs/v7/epistemic_agentic_strategy/dataset.json").read_text())
+          verify_dataset_payload(dataset, config)
+          audit = control_audit(dataset, config)
+          assert audit["passed"], audit
+          estimate = estimate_cost(config["execution"]["gpu"], config["execution"]["estimated_ceiling_seconds"], cpu_cores=8, memory_gib=32)
+          assert estimate.buffered_usd <= config["execution"]["hard_cost_limit_usd"], estimate
+          assert config["execution"]["modal_timeout_seconds"] == config["execution"]["estimated_ceiling_seconds"]
+          print(json.dumps({"rows": len(dataset["rows"]), "audit": audit, "buffered_ceiling_usd": estimate.buffered_usd}, indent=2, sort_keys=True))
+          PY
+
+      - name: Stop after local controls
+        if: ${{ env.V7_STAGE == 'local-controls' }}
+        run: echo "CPU controls passed; no remote compute requested."
+
+      - name: Refuse missing Modal credentials for remote stages
+        if: ${{ env.V7_STAGE != 'local-controls' }}
+        run: |
+          test -n "$MODAL_TOKEN_ID"
+          test -n "$MODAL_TOKEN_SECRET"
+
+      - name: Run tokenizer preflight
+        if: ${{ env.V7_STAGE == 'preflight' || env.V7_STAGE == 'behavior' }}
+        run: uv run --extra modal modal run modal_v7_epistemic_agentic_strategy.py::preflight
+
+      - name: Run direct forced-choice behavior
+        if: ${{ env.V7_STAGE == 'behavior' }}
+        run: uv run --extra modal modal run modal_v7_epistemic_agentic_strategy.py::behavior
+
+      - name: Analyze the locked direct behavior
+        if: ${{ env.V7_STAGE == 'behavior' && success() }}
+        run: |
+          uv run python scripts/analyze_v7_epistemic_agentic_strategy.py \
+            results/v7_epistemic_agentic_strategy/raw/behavior.json \
+            --output results/v7_epistemic_agentic_strategy/analysis/behavior.json
+
+      - name: Upload immutable V7 outputs
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: v7-eas-1-${{ env.V7_STAGE }}-${{ github.run_id }}
+          path: results/v7_epistemic_agentic_strategy
+          if-no-files-found: warn
+          retention-days: 30

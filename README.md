@@ -58,6 +58,11 @@ the [erratum](docs/v6/erratum-prompt-completeness.md). The corrective
 the active research branch; its model stages are dispatched manually through
 GitHub Actions.
 
+The separate [V7-EAS-1 protocol](docs/v7/README.md) tests whether an agent
+uses another agent's epistemic state in coordination, commitment, and
+information-acquisition decisions. Its CPU preflight is frozen and passed; no
+model forwards have occurred on that branch yet.
+
 ## Go deeper
 
 | You want... | Go here |
@@ -71,6 +76,7 @@ GitHub Actions.
 | Why this matters for tool-using agents | [safety note](docs/v5/literature-positioning.md) |
 | V6-ES-1 audit and retained run | [V6 documentation](docs/v6/README.md) · [erratum](docs/v6/erratum-prompt-completeness.md) |
 | New epistemic/ToM/strategy branch | [V6.1-ES-2 protocol](docs/v6.1/README.md) |
+| V7 epistemic agentic strategy | [V7-EAS-1 protocol](docs/v7/README.md) · [preflight record](results/v7_epistemic_agentic_strategy/README.md) |
 
 Reproduce the lightweight checks (committed GPU outputs are immutable; these verify everything else):
 

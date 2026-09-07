@@ -51,6 +51,7 @@ while V2 is the second protocol generation.
 | V4 | Test rationale-induced relational-report interference behaviorally. | [`v4/README.md`](v4/README.md) |
 | V5 | Test action/report dissociation, inverse evidence, and its natural-interchange mechanism in contrarian games. | [`v5/README.md`](v5/README.md) |
 | V6 | Test agent-indexed epistemic state use, higher-order ToM, provenance, and strategic safety/evaluation controls. | [`v6/README.md`](v6/README.md) |
+| V7 | Test functional strategic use of public knowledge, credible commitment, and opponent-relevant information value. | [`v7/README.md`](v7/README.md) |
 
 V4 and V5 are later behavioral follow-ons. They do not reopen the failed V2
 causal-instrument branch and do not count as formally completed Stage 2 or

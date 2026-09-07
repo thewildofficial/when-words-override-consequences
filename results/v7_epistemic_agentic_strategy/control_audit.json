@@ -1,0 +1,14 @@
+{
+  "expected_row_count": 3744,
+  "failure_count": 0,
+  "failures": [],
+  "gates": {
+    "dataset_hash": true,
+    "semantic_prompt_contract": true,
+    "static_diagnostic_forks": true,
+    "surface_controls": true
+  },
+  "passed": true,
+  "row_count": 3744,
+  "status": "cpu_semantic_controls_passed"
+}

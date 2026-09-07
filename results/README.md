@@ -44,6 +44,7 @@ RBG-6 counts/uncertainty and RBG-5B J-lens interpretation are qualified there.
 | **Report-reactivity — ask-first ceiling & poisoned self-talk** | On fresh nonce games, do consequence reports rescue action — or can lied transcripts steer the press? | Direct/self/control at ceiling (rescue unidentifiable); swapped accuracy ~0.83, worst under wordy opposed strategic framing. | [`report_reactivity/`](report_reactivity/README.md) |
 | **Report-reactivity — harder games null** | Do redundant correct demos break the Direct ceiling so ask-first rescue becomes measurable? | No: Direct stayed at 1.0; swapped still leaked (~0.79). | [`report_reactivity/`](report_reactivity/README.md) |
 | **Report-reactivity — mid-trajectory ask** | Does a mid-game consequence question change the next press, or only elicit a report? | Asking does nothing (self−control contrast 0.0); a lied mid-answer rewrites ~60% of second presses (flip 0.59375). C19–C21. | [`report_reactivity/`](report_reactivity/README.md) |
+| **V7-EAS-1 — epistemic control of agentic strategy** | Does an agent use public knowledge, real commitment, and opponent-relevant information value in strategy? | CPU preflight passed; 3,744 rows frozen; no model forwards yet. | [`v7_epistemic_agentic_strategy/`](v7_epistemic_agentic_strategy/README.md) |
 
 ## How to read a result
 
