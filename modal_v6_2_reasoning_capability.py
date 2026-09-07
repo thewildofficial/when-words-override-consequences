@@ -185,7 +185,7 @@ def _render(
             messages,
             tokenize=False,
             add_generation_prompt=True,
-            **template_kwargs,
+            chat_template_kwargs=template_kwargs,
         )
     except TypeError:
         try:
@@ -193,7 +193,7 @@ def _render(
                 messages,
                 tokenize=False,
                 add_generation_prompt=True,
-                chat_template_kwargs=template_kwargs,
+                **template_kwargs,
             )
         except TypeError:
             if thinking:

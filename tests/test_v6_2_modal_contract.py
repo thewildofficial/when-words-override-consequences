@@ -26,12 +26,16 @@ class _ContractTokenizer:
         self,
         messages,
         *,
-        enable_thinking=False,
+        enable_thinking=None,
         chat_template_kwargs=None,
         **_kwargs,
     ):
-        if chat_template_kwargs:
-            enable_thinking = chat_template_kwargs.get("enable_thinking", enable_thinking)
+        # Qwen3.8 reads these controls from chat_template_kwargs.  Ignore
+        # top-level values here so the test catches the real failure mode.
+        if chat_template_kwargs is None:
+            enable_thinking = True
+        else:
+            enable_thinking = chat_template_kwargs.get("enable_thinking", True)
         prefix = "<think>\n" if enable_thinking else ""
         return prefix + json.dumps(messages, sort_keys=True)
 
