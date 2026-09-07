@@ -57,6 +57,9 @@ jobs:
         with:
           ref: ${{ github.sha }}
 
+      - name: Require the checkout to match the dispatched protocol commit
+        run: test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+
       - name: Install uv
         uses: astral-sh/setup-uv@v7
 
@@ -64,7 +67,7 @@ jobs:
         run: uv run --extra dev --extra modal pytest -q
 
       - name: Freeze and verify CPU-only V6.2 controls
-        run: uv run python scripts/run_v6_2_reasoning_controls.py --freeze-subsets
+        run: uv run python scripts/run_v6_2_reasoning_controls.py --freeze-subsets --refresh-generated
 
       - name: Stop after local controls
         if: ${{ env.V62_STAGE == 'local-controls' }}
@@ -77,6 +80,16 @@ jobs:
           test -n "$V62_PRIOR_RUN_ID"
           test -n "$MODAL_TOKEN_ID"
           test -n "$MODAL_TOKEN_SECRET"
+          case "$V62_STAGE:$V62_PRIOR_STAGE" in
+            preflight-qwen38:local-controls) ;;
+            qwen38-direct:preflight-qwen38) ;;
+            qwen38-thinking-pilot:qwen38-direct) ;;
+            qwen38-thinking-diagnostic:qwen38-thinking-pilot) ;;
+            *)
+              echo "invalid staged predecessor: $V62_STAGE requires $V62_PRIOR_STAGE" >&2
+              exit 1
+              ;;
+          esac
 
       - name: Restore the prior V6.2 artifact and cumulative ledger
         if: ${{ env.V62_STAGE != 'local-controls' }}
@@ -120,7 +133,9 @@ jobs:
         shell: bash
         run: |
           if find results/v6_2_reasoning_capability_control/raw -maxdepth 1 -type f -name 'qwen38_*.json' -print -quit | grep -q .; then
-            uv run python scripts/analyze_v6_2_reasoning_capability.py --results results/v6_2_reasoning_capability_control
+            uv run python scripts/analyze_v6_2_reasoning_capability.py \
+              --results results/v6_2_reasoning_capability_control \
+              --stage "$V62_STAGE"
           else
             echo "No complete V6.2 model artifact is present; retaining the stage artifact."
           fi

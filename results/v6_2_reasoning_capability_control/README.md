@@ -11,6 +11,7 @@ invariance, budget authorization, and zero GPU/model-forward counts. Paid
 artifacts are added only by the separately dispatched GitHub Actions stages.
 
 Required result files after paid execution are content-hashed raw artifacts
-under `raw/`, `analysis.json`, compact model-run manifests, and the persistent
+under `raw/`, immutable per-stage `analysis_*.json` files, derived
+`analysis_cumulative.json`, compact model-run manifests, and the persistent
 `cost_ledger.jsonl`. GitHub Actions artifacts are retained for 30 days and are
 not archival storage.

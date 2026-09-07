@@ -36,6 +36,9 @@ def test_source_hashes_and_selection_sizes_are_frozen() -> None:
     assert len(select_rows(source, "direct")) == 2496
     assert len(select_rows(source, "pilot")) == 34
     assert len(select_rows(source, "diagnostic")) == 640
+    assert {row["split"] for row in select_rows(source, "direct")} == {"locked"}
+    assert {row["split"] for row in select_rows(source, "diagnostic")} == {"locked"}
+    assert {row["split"] for row in select_rows(source, "pilot")} == {"validation"}
 
 
 def test_manifest_is_deterministic_and_explicitly_cpu_only() -> None:
@@ -48,6 +51,8 @@ def test_manifest_is_deterministic_and_explicitly_cpu_only() -> None:
     assert manifest["subsets"]["direct"]["row_count"] == 2496
     assert manifest["subsets"]["pilot"]["row_count"] == 34
     assert manifest["subsets"]["diagnostic"]["row_count"] == 640
+    assert manifest["subsets"]["pilot"]["split_counts"] == {"validation": 34}
+    assert manifest["subsets"]["direct"]["split_counts"] == {"locked": 2496}
     assert manifest["semantic_parity"]["direct_thinking_match_on_diagnostic"] is True
     assert manifest["endpoint_coverage"]["passed"] is True
     assert manifest["parser_contract"]["passed"] is True

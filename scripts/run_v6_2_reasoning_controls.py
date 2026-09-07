@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import subprocess
 from pathlib import Path
 from typing import Any
 
@@ -49,6 +50,20 @@ def _artifact(body: dict[str, Any]) -> dict[str, Any]:
     return {**body, "content_sha256": canonical_sha256(body)}
 
 
+def _git_sha() -> str:
+    supplied = os.environ.get("GITHUB_SHA")
+    if supplied:
+        return supplied
+    try:
+        return subprocess.check_output(
+            ["git", "rev-parse", "HEAD"],
+            text=True,
+            stderr=subprocess.DEVNULL,
+        ).strip()
+    except (OSError, subprocess.CalledProcessError) as exc:
+        raise RuntimeError("could not determine the reviewed protocol commit") from exc
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
@@ -65,6 +80,7 @@ def main() -> None:
         help="replace only generated control artifacts after a code fix",
     )
     args = parser.parse_args()
+    protocol_commit_sha = _git_sha()
 
     config = _read_json(args.config)
     if config.get("status") != "preregistered_before_qwen38_execution":
@@ -72,8 +88,11 @@ def main() -> None:
     manifest = build_manifest(config)
     if args.manifest.exists():
         existing = _read_json(args.manifest)
-        verify_manifest(existing, config)
-        manifest = existing
+        if args.refresh_generated:
+            _write_once(args.manifest, manifest, replace=True)
+        else:
+            verify_manifest(existing, config)
+            manifest = existing
     elif args.freeze_subsets:
         _write_once(args.manifest, manifest, replace=args.refresh_generated)
     else:
@@ -101,7 +120,8 @@ def main() -> None:
             "model_forwards": 0,
             "gpu_stages_ran": False,
             "base_commit": config["source"]["base_commit"],
-            "head_commit": os.environ.get("GITHUB_SHA", "local-uncommitted"),
+            "head_commit": protocol_commit_sha,
+            "protocol_commit_sha": protocol_commit_sha,
         }
     )
     _write_once(results / "control_audit.json", control, replace=args.refresh_generated)
@@ -122,7 +142,8 @@ def main() -> None:
             "gpu_stages_ran": False,
             "branch": "research/v6-2-reasoning-capability-control",
             "base_commit": config["source"]["base_commit"],
-            "head_commit": os.environ.get("GITHUB_SHA", "local-uncommitted"),
+            "head_commit": protocol_commit_sha,
+            "protocol_commit_sha": protocol_commit_sha,
         }
     )
     _write_once(results / "run_manifest.json", run_manifest, replace=args.refresh_generated)

@@ -5,12 +5,15 @@ or edits the V6.1 protocol.  Instead, it loads the V6.1 generator, verifies its
 content hash, and constructs three immutable views of the locked split:
 
 * ``direct``: every locked V6.1 row, for Qwen3.8 forced-choice logits;
-* ``pilot``: a small deterministic reasoning-mode smoke set; and
+* ``pilot``: a small deterministic reasoning-mode smoke set from the V6.1
+  validation split; and
 * ``diagnostic``: all H1/H2/H3/H5 identifying rows needed to distinguish
   generic reasoning failure from information-to-action failure.
 
 This module is deliberately model-free.  The control command can therefore be
-run in CI before any tokenizer, model, or Modal function is called.
+run in CI before any tokenizer, model, or Modal function is called.  The
+thinking pilot is drawn from V6.1's validation split; only the direct and
+diagnostic views touch the locked split.
 """
 
 from __future__ import annotations
@@ -29,6 +32,12 @@ SCHEMA_VERSION = 1
 SOURCE_STUDY_ID = v61.STUDY_ID
 CHOICES = v61.CHOICES
 LOCKED_SPLIT = "locked"
+VALIDATION_SPLIT = "validation"
+SELECTION_SPLITS = {
+    "direct": LOCKED_SPLIT,
+    "diagnostic": LOCKED_SPLIT,
+    "pilot": VALIDATION_SPLIT,
+}
 DIAGNOSTIC_FAMILIES = (
     "ledger_binding",
     "policy_composition",
@@ -214,6 +223,10 @@ def _locked(source: dict[str, Any]) -> list[dict[str, Any]]:
     return [row for row in source["rows"] if row["split"] == LOCKED_SPLIT]
 
 
+def _validation(source: dict[str, Any]) -> list[dict[str, Any]]:
+    return [row for row in source["rows"] if row["split"] == VALIDATION_SPLIT]
+
+
 def _h3_identifying_groups(rows: list[dict[str, Any]]) -> list[list[dict[str, Any]]]:
     candidates = [
         row
@@ -274,21 +287,27 @@ def select_rows(source: dict[str, Any], selection: str) -> list[dict[str, Any]]:
     if selection == "pilot":
         # One complete ledger game, one policy game, one independent/copy pair
         # in each prompt mode, one positive/negative VOI pair, and one full
-        # same-matrix threshold cell.  The sort order is part of the protocol.
+        # same-matrix threshold cell, drawn from validation rather than locked.
+        # The sort order is part of the protocol.
         selected = []
-        ledger = [row for row in locked if row["experiment_family"] == "ledger_binding"]
+        validation = _validation(source)
+        ledger = [
+            row for row in validation if row["experiment_family"] == "ledger_binding"
+        ]
         first_ledger_game = min(row["game_id"] for row in ledger)
         selected.extend(row for row in ledger if row["game_id"] == first_ledger_game)
-        policy = [row for row in locked if row["experiment_family"] == "policy_composition"]
+        policy = [
+            row for row in validation if row["experiment_family"] == "policy_composition"
+        ]
         first_policy_game = min(row["game_id"] for row in policy)
         selected.extend(row for row in policy if row["game_id"] == first_policy_game)
-        h3_groups = _h3_identifying_groups(locked)
+        h3_groups = _h3_identifying_groups(validation)
         for prompt_mode in v61.EVIDENCE_PROMPT_MODES:
             group = next(
                 group for group in h3_groups if group[0]["evidence_prompt_mode"] == prompt_mode
             )
             selected.extend(group)
-        profile_groups, threshold_groups = _h5_groups(locked)
+        profile_groups, threshold_groups = _h5_groups(validation)
         selected.extend(profile_groups[0])
         selected.extend(threshold_groups[0])
         return sorted(
@@ -302,11 +321,15 @@ def subset_payload(
     source: dict[str, Any], config: dict[str, Any], selection: str
 ) -> dict[str, Any]:
     rows = select_rows(source, selection)
+    expected_split = SELECTION_SPLITS.get(selection)
+    if expected_split is None:
+        raise ValueError(f"unknown selection: {selection}")
     body = {
         "schema_version": SCHEMA_VERSION,
         "study_id": STUDY_ID,
         "status": "frozen_before_model_execution",
         "selection": selection,
+        "split": expected_split,
         "source_study_id": SOURCE_STUDY_ID,
         "source_dataset_sha256": source["content_sha256"],
         "config_sha256": canonical_sha256(config),
@@ -331,11 +354,17 @@ def verify_subset_payload(
     expected = subset_payload(source, config, str(payload.get("selection")))
     if payload.get("content_sha256") != expected["content_sha256"]:
         raise RuntimeError("subset does not match the deterministic selection rule")
+    selection = str(payload.get("selection"))
+    expected_split = SELECTION_SPLITS.get(selection)
+    if expected_split is None:
+        raise RuntimeError("subset has an unknown selection")
     rows = payload.get("rows")
     if not isinstance(rows, list) or not rows:
         raise RuntimeError("subset rows are missing")
-    if any(row.get("split") != LOCKED_SPLIT for row in rows):
-        raise RuntimeError("subset contains a non-locked row")
+    if any(row.get("split") != expected_split for row in rows):
+        raise RuntimeError(f"{selection} subset contains a row outside {expected_split}")
+    if payload.get("split") != expected_split:
+        raise RuntimeError(f"{selection} subset split metadata is inconsistent")
     if len({row["condition_id"] for row in rows}) != len(rows):
         raise RuntimeError("subset contains duplicate condition IDs")
 
@@ -556,7 +585,10 @@ def build_manifest(config: dict[str, Any]) -> dict[str, Any]:
             "condition_ids": _row_ids(rows),
             "condition_ids_sha256": canonical_sha256(_row_ids(rows)),
             "semantic_prompt_contract": semantic_prompt_contract(rows),
-            "split_counts": {LOCKED_SPLIT: len(rows)},
+            "split_counts": {
+                split: sum(row["split"] == split for row in rows)
+                for split in sorted({row["split"] for row in rows})
+            },
         }
     body = {
         "schema_version": SCHEMA_VERSION,
@@ -636,7 +668,13 @@ def model_record(
 
 
 def validate_records(
-    payload: dict[str, Any], subset: dict[str, Any], config: dict[str, Any], *, thinking: bool
+    payload: dict[str, Any],
+    subset: dict[str, Any],
+    config: dict[str, Any],
+    *,
+    thinking: bool,
+    protocol_commit_sha: str | None = None,
+    preflight_content_sha256: str | None = None,
 ) -> None:
     if not _hash_valid(payload):
         raise RuntimeError("model artifact content hash mismatch")
@@ -647,11 +685,40 @@ def validate_records(
         raise RuntimeError("model artifact subset hash mismatch")
     if payload.get("config_sha256") != canonical_sha256(config):
         raise RuntimeError("model artifact config hash mismatch")
+    if (
+        protocol_commit_sha is not None
+        and payload.get("protocol_commit_sha") != protocol_commit_sha
+    ):
+        raise RuntimeError("model artifact protocol commit mismatch")
+    if (
+        preflight_content_sha256 is not None
+        and payload.get("preflight_content_sha256") != preflight_content_sha256
+    ):
+        raise RuntimeError("model artifact preflight binding mismatch")
     if payload.get("thinking") is not thinking:
         raise RuntimeError("model artifact thinking flag mismatch")
     records = payload.get("records", [])
     if {record.get("condition_id") for record in records} != set(expected_rows):
         raise RuntimeError("model artifact rows do not match the frozen subset")
+    if not isinstance(payload.get("preflight_content_sha256"), str):
+        raise RuntimeError("model artifact is missing its preflight binding")
+    if thinking:
+        metadata = payload.get("metadata", {})
+        if metadata.get("reasoning_effort") != config["conditions"]["qwen38_thinking"][
+            "reasoning_effort"
+        ]:
+            raise RuntimeError("model artifact reasoning effort mismatch")
+        generation = metadata.get("generation_settings", {})
+        expected_generation = {
+            "do_sample": config["behavior"]["thinking_do_sample"],
+            "temperature": config["behavior"]["thinking_temperature"],
+            "top_p": config["behavior"]["thinking_top_p"],
+            "top_k": config["behavior"]["thinking_top_k"],
+            "repetition_penalty": config["behavior"]["thinking_repetition_penalty"],
+            "seed": config["behavior"]["thinking_seed"],
+        }
+        if any(generation.get(key) != value for key, value in expected_generation.items()):
+            raise RuntimeError("model artifact generation settings mismatch")
     for record in records:
         row = expected_rows[record["condition_id"]]
         if record.get("expected") != row["expected_choice"]:

@@ -26,7 +26,7 @@ committed manifest, and used only as an immutable source.
 |---|---|---|---|
 | Reference | Qwen3.6-27B | off | Existing V6.1 locked direct A/B logits |
 | Direct | Qwen3.8-27B, revision pinned in config | off | Candidate-token A/B logits over all 2,496 locked rows |
-| Thinking pilot | Qwen3.8-27B | native thinking on | Full generated text; exact `FINAL: A/B` parser |
+| Thinking pilot | Qwen3.8-27B | native thinking on, validation split only | Full generated text; exact `FINAL: A/B` parser |
 | Thinking diagnostic | Qwen3.8-27B | native thinking on | Full generated text; primary final-choice scoring |
 
 The Qwen3.8 thinking text is retained for later descriptive analysis only. It
@@ -50,10 +50,12 @@ selected before any Qwen3.8 output:
 - every locked H5 positive/negative VOI matched pair and every same-matrix
   cost/reliability threshold cell.
 
-This produces 640 diagnostic rows. The pilot is a separate deterministic
-subset: the first complete ledger game, first policy game, one identifying H3
-pair in each prompt mode, one positive/negative VOI pair, and one complete
-same-matrix threshold cell, all sorted by condition ID.
+This produces 640 locked diagnostic rows. The pilot is a separate deterministic
+engineering subset drawn from the V6.1 validation split: the first complete
+ledger game, first policy game, one identifying H3 pair in each prompt mode,
+one positive/negative VOI pair, and one complete same-matrix threshold cell,
+all sorted by condition ID. It contains 34 rows and is never part of a locked
+endpoint or direct-versus-thinking confirmatory comparison.
 
 The committed subset manifest records the explicit selected IDs and hashes.
 The config and source hashes are:
@@ -71,7 +73,9 @@ Before any paid model stage, the workflow runs the full test suite and CPU
 controls. The Qwen3.8 tokenizer preflight then records the exact tokenizer and
 resolved revision, validates that direct A/B labels are scoreable completions,
 and checks that thinking-on rendering contains the tokenizer's native thinking
-marker while thinking-off rendering does not.
+marker while thinking-off rendering does not. Thinking uses the frozen
+Qwen3.8 `reasoning_effort=xhigh` interface, `temperature=1.0`, `top_p=0.95`,
+`top_k=20`, sampling enabled, repetition penalty 1.0, and seed 3838.
 
 The direct and thinking prompts share the same task content, labels, game
 state, payoff table, and treatment. Only the answer interface changes from
@@ -110,8 +114,9 @@ action within each game and modeled-belief cell.
 ### H3 — Evidence independence
 
 The four-independent-observation and four-copied-observation reports must
-produce a selected-choice contrast in both explicit-rule and provenance-only
-prompt modes. Both-correct-and-switched values are reported separately.
+both be correct and produce a selected semantic-choice switch in both
+explicit-rule and provenance-only prompt modes. The raw selected-label change
+rate is retained descriptively and is not a support gate.
 
 ### H5 — Active information
 
@@ -121,7 +126,11 @@ reliability changes.
 
 All confirmatory summaries first aggregate within `game_id`; bootstrap draws
 resample games. Reasoning text is retained, but only the final parsed choice is
-used for thinking-mode primary behavior.
+used for thinking-mode primary behavior. When both direct and thinking locked
+artifacts are available, the declared paired cluster sign-flip comparison
+matches identical endpoint cells, averages differences within `game_id`, and
+reports the preregistered two-sided p-value only after both family gates pass.
+It never rescues a failed family gate.
 
 ## Interpretation matrix
 
@@ -140,15 +149,21 @@ approximately USD 25 Modal balance. The worst-case buffered ceiling of all
 registered stages is checked in code. Each stage estimates cost before launch,
 reads the persistent `cost_ledger.jsonl`, and refuses to launch if the
 authorization would be exceeded. Actual elapsed time and measured/buffered
-cost are recorded after completion.
+cost are recorded after completion. The executable Modal hard timeouts are
+the same values used by the ledger: 900 seconds for preflight, 1,800 for
+direct, 1,200 for the validation pilot, and 2,400 for the locked diagnostic.
 
 The workflow has separate `workflow_dispatch` choices for CPU controls,
-Qwen3.8 preflight, full direct behavior, thinking pilot, and thinking
-diagnostic. There is no automatic sequence. Every later Actions run restores
-the ledger from an explicitly supplied prior run ID. No multi-GPU or 100B+
-model is permitted.
+Qwen3.8 preflight, full locked direct behavior, validation thinking pilot, and
+locked thinking diagnostic. The required predecessor chain is explicit and
+there is no automatic sequence. Every later Actions run restores the ledger
+from an explicitly supplied prior run ID. The preflight records a
+`protocol_commit_sha`; every paid stage fails closed unless the current
+Actions commit, config, source dataset, all subset hashes, model revision, and
+preflight hash match it. No multi-GPU or 100B+ model is permitted.
 
 Artifacts are content-hashed and include the exact config, subset manifest,
-preflight, raw direct logits, raw thinking generations, machine-readable
-analysis, compact summaries, cost ledger, and model-run manifests. GitHub's
-30-day artifact window is not treated as permanent archival storage.
+preflight, raw direct logits, raw thinking generations, immutable per-stage
+analysis files, a derived cumulative analysis, compact summaries, cost ledger,
+and model-run manifests. GitHub's 30-day artifact window is not treated as
+permanent archival storage.

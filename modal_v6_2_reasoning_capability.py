@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import subprocess
 import time
 import uuid
@@ -44,6 +45,17 @@ LEDGER_PATH = RESULT_ROOT / "cost_ledger.jsonl"
 CONFIG_PATH = Path("configs/v6.2/reasoning_capability_control/experiment.json")
 SOURCE_CONFIG_PATH = DEFAULT_SOURCE_CONFIG
 SOURCE_MANIFEST_PATH = DEFAULT_SOURCE_MANIFEST
+
+# Keep these values adjacent to the Modal decorators below.  The CPU-side
+# config validator and tests compare the executable ceilings to the frozen
+# stage limits, so a budget change cannot silently leave a larger decorator
+# timeout behind.
+MODAL_HARD_TIMEOUTS = {
+    "preflight-qwen38": 900,
+    "qwen38-direct": 1800,
+    "qwen38-thinking-pilot": 1200,
+    "qwen38-thinking-diagnostic": 2400,
+}
 
 app = modal.App("jspace-v6-2-reasoning-capability-control")
 cache = modal.Volume.from_name("jspace-hf-cache", create_if_missing=True)
@@ -92,8 +104,23 @@ def _validate_config(config: dict[str, Any]) -> None:
         raise RuntimeError("direct condition must disable thinking")
     if config["conditions"]["qwen38_thinking"]["thinking"] is not True:
         raise RuntimeError("thinking condition must enable thinking")
+    if config["conditions"]["qwen38_thinking"].get("reasoning_effort") != "xhigh":
+        raise RuntimeError("thinking condition must explicitly use xhigh reasoning effort")
+    if config["conditions"]["qwen38_thinking"].get("preserve_thinking") is not True:
+        raise RuntimeError("thinking condition must explicitly preserve native reasoning")
     if config["behavior"]["unparseable_is_failure"] is not True:
         raise RuntimeError("unparseable generations must remain failures")
+    behavior = config["behavior"]
+    if behavior.get("thinking_do_sample") is not True:
+        raise RuntimeError("thinking generation must use the frozen sampling regime")
+    if float(behavior.get("thinking_temperature")) != 1.0:
+        raise RuntimeError("thinking temperature changed from the frozen Qwen3.8 regime")
+    if float(behavior.get("thinking_top_p")) != 0.95:
+        raise RuntimeError("thinking top-p changed from the frozen Qwen3.8 regime")
+    if int(behavior.get("thinking_top_k")) != 20:
+        raise RuntimeError("thinking top-k changed from the frozen Qwen3.8 regime")
+    if int(behavior.get("thinking_seed")) < 0:
+        raise RuntimeError("thinking seed must be non-negative")
     limits = config["execution"]["stage_limits"]
     expected_stages = {
         "preflight-qwen38",
@@ -103,6 +130,11 @@ def _validate_config(config: dict[str, Any]) -> None:
     }
     if set(limits) != expected_stages:
         raise RuntimeError("stage authorization set changed")
+    if {
+        stage: int(spec["timeout_seconds"])
+        for stage, spec in limits.items()
+    } != MODAL_HARD_TIMEOUTS:
+        raise RuntimeError("frozen stage limits do not equal the executable Modal timeouts")
     ceiling = 0.0
     for spec in limits.values():
         estimate = estimate_cost(
@@ -133,23 +165,47 @@ def _inputs() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
     return config, source, subsets
 
 
-def _render(tokenizer: Any, messages: list[dict[str, str]], *, thinking: bool) -> str:
-    kwargs = {"tokenize": False, "add_generation_prompt": True}
+def _render(
+    tokenizer: Any,
+    messages: list[dict[str, str]],
+    *,
+    thinking: bool,
+    reasoning_effort: str | None = "xhigh",
+) -> str:
+    template_kwargs: dict[str, Any] = {
+        "enable_thinking": thinking,
+        "preserve_thinking": thinking,
+    }
+    if thinking:
+        if reasoning_effort is None:
+            raise RuntimeError("thinking render requires an explicit reasoning_effort")
+        template_kwargs["reasoning_effort"] = reasoning_effort
     try:
-        return tokenizer.apply_chat_template(messages, enable_thinking=thinking, **kwargs)
+        return tokenizer.apply_chat_template(
+            messages,
+            tokenize=False,
+            add_generation_prompt=True,
+            **template_kwargs,
+        )
     except TypeError:
         try:
             return tokenizer.apply_chat_template(
                 messages,
-                chat_template_kwargs={"enable_thinking": thinking},
-                **kwargs,
+                tokenize=False,
+                add_generation_prompt=True,
+                chat_template_kwargs=template_kwargs,
             )
         except TypeError:
             if thinking:
                 raise RuntimeError(
-                    "Qwen3.8 tokenizer does not expose an explicit thinking switch"
+                    "Qwen3.8 tokenizer does not expose the frozen thinking/effort interface"
                 ) from None
-            return tokenizer.apply_chat_template(messages, **kwargs)
+            return tokenizer.apply_chat_template(
+                messages,
+                tokenize=False,
+                add_generation_prompt=True,
+                enable_thinking=False,
+            )
 
 
 def _load_tokenizer(spec: dict[str, Any]) -> tuple[Any, dict[str, Any]]:
@@ -188,9 +244,20 @@ def _continuation_id(tokenizer: Any, rendered: str, answer: str) -> int:
     raise ValueError(f"{answer!r} is not one token after the frozen prompt")
 
 
-def _prepare_query(tokenizer: Any, row: dict[str, Any], *, thinking: bool) -> dict[str, Any]:
+def _prepare_query(
+    tokenizer: Any,
+    row: dict[str, Any],
+    *,
+    thinking: bool,
+    reasoning_effort: str | None = "xhigh",
+) -> dict[str, Any]:
     messages = trajectory_messages(row, thinking=thinking)
-    rendered = _render(tokenizer, messages, thinking=thinking)
+    rendered = _render(
+        tokenizer,
+        messages,
+        thinking=thinking,
+        reasoning_effort=reasoning_effort,
+    )
     prompt_token_ids = list(map(int, tokenizer.encode(rendered, add_special_tokens=False)))
     query = {
         "query_id": row["condition_id"],
@@ -268,6 +335,7 @@ def _query_rows(
     subset: dict[str, Any],
     *,
     thinking: bool,
+    reasoning_effort: str | None = "xhigh",
     static_outputs: dict[str, dict[str, Any]] | None = None,
 ) -> tuple[list[dict[str, Any]], dict[str, dict[str, Any]]]:
     rows = subset["rows"]
@@ -278,7 +346,14 @@ def _query_rows(
     for row in rows:
         if row["condition_id"] in dynamic:
             continue
-        queries.append(_prepare_query(tokenizer, row, thinking=thinking))
+        queries.append(
+            _prepare_query(
+                tokenizer,
+                row,
+                thinking=thinking,
+                reasoning_effort=reasoning_effort,
+            )
+        )
         materialization[row["condition_id"]] = {"materialization": "static"}
     if static_outputs is None:
         placeholder = "FINAL: A" if thinking else "A"
@@ -319,9 +394,19 @@ def _query_rows(
                 first_answer=action_content,
                 preceding_prompt=action_row["prompt"],
             )
-        query = _prepare_query(tokenizer, row, thinking=thinking)
+        query = _prepare_query(
+            tokenizer,
+            row,
+            thinking=thinking,
+            reasoning_effort=reasoning_effort,
+        )
         query["messages"] = messages
-        query["rendered"] = _render(tokenizer, messages, thinking=thinking)
+        query["rendered"] = _render(
+            tokenizer,
+            messages,
+            thinking=thinking,
+            reasoning_effort=reasoning_effort,
+        )
         query["prompt_token_ids"] = list(
             map(int, tokenizer.encode(query["rendered"], add_special_tokens=False))
         )
@@ -400,6 +485,7 @@ def _generation_batch(
     rows: list[dict[str, Any]],
     *,
     max_new_tokens: int,
+    config: dict[str, Any],
 ) -> tuple[dict[str, dict[str, Any]], int]:
     import torch
 
@@ -408,9 +494,11 @@ def _generation_batch(
         generated = model.generate(
             input_ids=input_ids,
             attention_mask=attention,
-            do_sample=False,
-            max_new_tokens=max_new_tokens,
-            pad_token_id=tokenizer.pad_token_id,
+            **_thinking_generation_kwargs(
+                config,
+                max_new_tokens=max_new_tokens,
+                pad_token_id=tokenizer.pad_token_id,
+            ),
         )
     output: dict[str, dict[str, Any]] = {}
     for index, row in enumerate(rows):
@@ -424,6 +512,23 @@ def _generation_batch(
         }
     del input_ids, attention, generated
     return output, 1
+
+
+def _thinking_generation_kwargs(
+    config: dict[str, Any], *, max_new_tokens: int, pad_token_id: int
+) -> dict[str, Any]:
+    """Return the exact frozen Qwen3.8 native-thinking generation settings."""
+
+    behavior = config["behavior"]
+    return {
+        "do_sample": bool(behavior["thinking_do_sample"]),
+        "temperature": float(behavior["thinking_temperature"]),
+        "top_p": float(behavior["thinking_top_p"]),
+        "top_k": int(behavior["thinking_top_k"]),
+        "repetition_penalty": float(behavior["thinking_repetition_penalty"]),
+        "max_new_tokens": max_new_tokens,
+        "pad_token_id": pad_token_id,
+    }
 
 
 def _load_model(spec: dict[str, Any]) -> tuple[Any, Any, dict[str, Any]]:
@@ -534,9 +639,91 @@ def _preflight_contract(
     }
 
 
-def _preflight_sample(tokenizer: Any, row: dict[str, Any]) -> dict[str, Any]:
+def _validate_preflight_binding(
+    preflight: dict[str, Any],
+    source: dict[str, Any],
+    config: dict[str, Any],
+    subset: dict[str, Any],
+    *,
+    selection: str,
+    protocol_commit_sha: str,
+) -> None:
+    """Fail closed unless a stage is attached to the exact frozen preflight."""
+
+    if not _hash_valid(preflight):
+        raise RuntimeError("invalid Qwen3.8 preflight content hash")
+    if preflight.get("status") != "qwen38_tokenizer_preflight_passed":
+        raise RuntimeError("Qwen3.8 preflight did not pass")
+    expected_subsets = {
+        name: subset_payload(source, config, name)["content_sha256"]
+        for name in ("direct", "pilot", "diagnostic")
+    }
+    expected = {
+        "protocol_commit_sha": protocol_commit_sha,
+        "model_id": config["model"]["id"],
+        "model_revision_requested": config["model"]["revision"],
+        "source_dataset_sha256": source["content_sha256"],
+        "config_sha256": canonical_sha256(config),
+        "direct_subset_sha256": expected_subsets["direct"],
+        "pilot_subset_sha256": expected_subsets["pilot"],
+        "diagnostic_subset_sha256": expected_subsets["diagnostic"],
+    }
+    for key, value in expected.items():
+        if preflight.get(key) != value:
+            raise RuntimeError(f"preflight binding mismatch: {key}")
+    if subset.get("selection") != selection:
+        raise RuntimeError(f"stage received the wrong subset selection: {selection}")
+    if subset.get("content_sha256") != expected_subsets[selection]:
+        raise RuntimeError(f"stage subset hash mismatch: {selection}")
+    if preflight.get("tokenizer_revision_resolved") != config["model"]["revision"]:
+        raise RuntimeError("preflight tokenizer revision is not the frozen model revision")
+    contract = preflight.get("preflight_contract", {}).get(selection)
+    if not isinstance(contract, dict):
+        raise RuntimeError(f"preflight query contract is missing for {selection}")
+    if preflight.get("thinking_render_contract", {}).get("passed") is not True:
+        raise RuntimeError("preflight thinking render contract is not passed")
+
+
+def _validate_loaded_model_binding(
+    preflight: dict[str, Any], model_metadata: dict[str, Any]
+) -> None:
+    for key in (
+        "model_id",
+        "model_revision_requested",
+        "model_revision_resolved",
+        "tokenizer_revision_resolved",
+    ):
+        if model_metadata.get(key) != preflight.get(key):
+            raise RuntimeError(f"loaded model does not match preflight: {key}")
+
+
+def _validate_query_contract(
+    tokenizer: Any,
+    subset: dict[str, Any],
+    preflight: dict[str, Any],
+    *,
+    selection: str,
+    thinking: bool,
+    reasoning_effort: str,
+) -> list[dict[str, Any]]:
+    queries, _ = _query_rows(
+        tokenizer,
+        subset,
+        thinking=thinking,
+        reasoning_effort=reasoning_effort,
+    )
+    expected = preflight["preflight_contract"][selection]
+    contract_key = "thinking" if thinking else "direct"
+    if _query_contract(queries, semantic=False) != expected[contract_key]:
+        raise RuntimeError(f"{selection} query contract differs from preflight")
+    return queries
+
+
+def _preflight_sample(
+    tokenizer: Any, row: dict[str, Any], *, reasoning_effort: str = "xhigh"
+) -> dict[str, Any]:
     off = _prepare_query(tokenizer, row, thinking=False)
-    on = _prepare_query(tokenizer, row, thinking=True)
+    on = _prepare_query(tokenizer, row, thinking=True, reasoning_effort=reasoning_effort)
     off_markers = [marker for marker in THINKING_MARKERS if marker in off["rendered"]]
     on_markers = [marker for marker in THINKING_MARKERS if marker in on["rendered"]]
     if off_markers or not on_markers:
@@ -563,6 +750,10 @@ def _compact_summary(records: list[dict[str, Any]]) -> dict[str, Any]:
     return {
         "records_total": len(records),
         "locked_records": sum(record["split"] == "locked" for record in records),
+        "records_by_split": {
+            split: sum(record["split"] == split for record in records)
+            for split in sorted({record["split"] for record in records})
+        },
         "parse_rate": sum(record["parseable"] for record in records) / len(records)
         if records
         else 0.0,
@@ -590,6 +781,7 @@ def _remote_metadata(
     started: float,
     forward_calls: int,
     records: list[dict[str, Any]],
+    protocol_commit_sha: str,
 ) -> dict[str, Any]:
     import torch
 
@@ -602,7 +794,24 @@ def _remote_metadata(
         "elapsed_seconds": elapsed,
         "condition": condition,
         "thinking": thinking,
-        "reasoning_effort": config["conditions"]["qwen38_thinking"].get("reasoning_effort"),
+        "protocol_commit_sha": protocol_commit_sha,
+        "reasoning_effort": (
+            config["conditions"]["qwen38_thinking"].get("reasoning_effort")
+            if thinking
+            else None
+        ),
+        "generation_settings": (
+            {
+                "do_sample": config["behavior"].get("thinking_do_sample"),
+                "temperature": config["behavior"].get("thinking_temperature"),
+                "top_p": config["behavior"].get("thinking_top_p"),
+                "top_k": config["behavior"].get("thinking_top_k"),
+                "repetition_penalty": config["behavior"].get("thinking_repetition_penalty"),
+                "seed": config["behavior"].get("thinking_seed"),
+            }
+            if thinking
+            else None
+        ),
         "config_sha256": canonical_sha256(config),
         "source_dataset_sha256": subset["source_dataset_sha256"],
         "subset_sha256": subset["content_sha256"],
@@ -613,24 +822,74 @@ def _remote_metadata(
     }
 
 
-@app.function(image=image, volumes={"/cache": cache}, cpu=2, memory=8192, timeout=900)
+@app.function(
+    image=image,
+    volumes={"/cache": cache},
+    cpu=2,
+    memory=8192,
+    timeout=MODAL_HARD_TIMEOUTS["preflight-qwen38"],
+)
 def preflight_remote(
     source: dict[str, Any],
     direct_subset: dict[str, Any],
+    pilot_subset: dict[str, Any],
     diagnostic_subset: dict[str, Any],
     config: dict[str, Any],
+    protocol_commit_sha: str,
 ) -> str:
     _validate_config(config)
     verify_subset_payload(direct_subset, source, config)
+    verify_subset_payload(pilot_subset, source, config)
     verify_subset_payload(diagnostic_subset, source, config)
     started = time.perf_counter()
     tokenizer, tokenizer_metadata = _load_tokenizer(config["model"])
-    direct_queries, _ = _query_rows(tokenizer, direct_subset, thinking=False)
-    thinking_queries, _ = _query_rows(tokenizer, diagnostic_subset, thinking=True)
-    contract = _preflight_contract(direct_queries, thinking_queries)
-    if not contract["semantic_match"]:
+    effort = str(config["conditions"]["qwen38_thinking"]["reasoning_effort"])
+    direct_queries, _ = _query_rows(
+        tokenizer,
+        direct_subset,
+        thinking=False,
+        reasoning_effort=effort,
+    )
+    pilot_direct_queries, _ = _query_rows(
+        tokenizer,
+        pilot_subset,
+        thinking=False,
+        reasoning_effort=effort,
+    )
+    pilot_queries, _ = _query_rows(
+        tokenizer,
+        pilot_subset,
+        thinking=True,
+        reasoning_effort=effort,
+    )
+    diagnostic_direct_queries, _ = _query_rows(
+        tokenizer,
+        diagnostic_subset,
+        thinking=False,
+        reasoning_effort=effort,
+    )
+    diagnostic_queries, _ = _query_rows(
+        tokenizer,
+        diagnostic_subset,
+        thinking=True,
+        reasoning_effort=effort,
+    )
+    contracts = {
+        "direct": _query_contract(direct_queries, semantic=False),
+        "pilot": _preflight_contract(pilot_direct_queries, pilot_queries),
+        "diagnostic": _preflight_contract(
+            diagnostic_direct_queries, diagnostic_queries
+        ),
+    }
+    if not all(
+        contracts[name]["semantic_match"] for name in ("pilot", "diagnostic")
+    ):
         raise RuntimeError("Qwen3.8 thinking/direct semantic prompt contract failed")
-    sample = _preflight_sample(tokenizer, diagnostic_subset["rows"][0])
+    sample = _preflight_sample(
+        tokenizer,
+        pilot_subset["rows"][0],
+        reasoning_effort=effort,
+    )
     elapsed = time.perf_counter() - started
     payload = _artifact(
         {
@@ -639,8 +898,11 @@ def preflight_remote(
             "status": "qwen38_tokenizer_preflight_passed",
             "model_id": config["model"]["id"],
             "model_revision_requested": config["model"]["revision"],
+            "model_revision_resolved": tokenizer_metadata["tokenizer_revision_resolved"],
+            "protocol_commit_sha": protocol_commit_sha,
             "source_dataset_sha256": source["content_sha256"],
             "direct_subset_sha256": direct_subset["content_sha256"],
+            "pilot_subset_sha256": pilot_subset["content_sha256"],
             "diagnostic_subset_sha256": diagnostic_subset["content_sha256"],
             "config_sha256": canonical_sha256(config),
             "model_forwards": 0,
@@ -652,7 +914,7 @@ def preflight_remote(
                 "condition": "qwen38_preflight",
                 **tokenizer_metadata,
             },
-            "preflight_contract": contract,
+            "preflight_contract": contracts,
             "thinking_render_contract": sample,
             **tokenizer_metadata,
         }
@@ -662,19 +924,37 @@ def preflight_remote(
 
 
 def _run_direct(
-    subset: dict[str, Any], config: dict[str, Any], *, condition: str
+    subset: dict[str, Any],
+    config: dict[str, Any],
+    *,
+    condition: str,
+    protocol_commit_sha: str,
+    preflight: dict[str, Any],
 ) -> dict[str, Any]:
     started = time.perf_counter()
     model, tokenizer, model_metadata = _load_model(config["model"])
+    _validate_loaded_model_binding(preflight, model_metadata)
     rows = subset["rows"]
     dynamic = _dynamic_ids(rows)
-    static_queries, _ = _query_rows(tokenizer, subset, thinking=False)
+    all_queries = _validate_query_contract(
+        tokenizer,
+        subset,
+        preflight,
+        selection="direct",
+        thinking=False,
+        reasoning_effort=str(config["conditions"]["qwen38_thinking"]["reasoning_effort"]),
+    )
+    static_queries = all_queries
     static_queries = [query for query in static_queries if query["query_id"] not in dynamic]
     outputs, calls = _logit_query(
         model, tokenizer, static_queries, int(config["behavior"]["batch_size"])
     )
     dynamic_queries, materialization = _query_rows(
-        tokenizer, subset, thinking=False, static_outputs=outputs
+        tokenizer,
+        subset,
+        thinking=False,
+        reasoning_effort=str(config["conditions"]["qwen38_thinking"]["reasoning_effort"]),
+        static_outputs=outputs,
     )
     dynamic_queries = [query for query in dynamic_queries if query["query_id"] in dynamic]
     dynamic_outputs, dynamic_calls = _logit_query(
@@ -698,6 +978,7 @@ def _run_direct(
         started=started,
         forward_calls=calls + dynamic_calls,
         records=records,
+        protocol_commit_sha=protocol_commit_sha,
     )
     return _artifact(
         {
@@ -706,6 +987,8 @@ def _run_direct(
             "status": "qwen38_direct_behavior_complete",
             "condition": condition,
             "thinking": False,
+            "protocol_commit_sha": protocol_commit_sha,
+            "preflight_content_sha256": preflight["content_sha256"],
             "config_sha256": canonical_sha256(config),
             "source_dataset_sha256": subset["source_dataset_sha256"],
             "subset_sha256": subset["content_sha256"],
@@ -727,40 +1010,78 @@ def _run_direct(
     cpu=8,
     memory=32768,
     volumes={"/cache": cache},
-    timeout=2700,
+    timeout=MODAL_HARD_TIMEOUTS["qwen38-direct"],
 )
 def direct_remote(
-    source: dict[str, Any], subset: dict[str, Any], config: dict[str, Any]
+    source: dict[str, Any],
+    subset: dict[str, Any],
+    config: dict[str, Any],
+    preflight: dict[str, Any],
+    protocol_commit_sha: str,
 ) -> str:
     _validate_config(config)
     verify_subset_payload(subset, source, config)
-    payload = _run_direct(subset, config, condition="qwen38_direct")
+    _validate_preflight_binding(
+        preflight,
+        source,
+        config,
+        subset,
+        selection="direct",
+        protocol_commit_sha=protocol_commit_sha,
+    )
+    payload = _run_direct(
+        subset,
+        config,
+        condition="qwen38_direct",
+        protocol_commit_sha=protocol_commit_sha,
+        preflight=preflight,
+    )
     cache.commit()
     return json.dumps(payload, allow_nan=False, sort_keys=True)
 
 
-@app.function(
-    image=image,
-    gpu="A100-80GB",
-    cpu=8,
-    memory=32768,
-    volumes={"/cache": cache},
-    timeout=2700,
-)
-def thinking_remote(
-    source: dict[str, Any], subset: dict[str, Any], config: dict[str, Any], stage: str
+def _thinking_remote_impl(
+    source: dict[str, Any],
+    subset: dict[str, Any],
+    config: dict[str, Any],
+    stage: str,
+    protocol_commit_sha: str,
+    preflight: dict[str, Any],
 ) -> str:
     import torch
 
     _validate_config(config)
+    seed = int(config["behavior"]["thinking_seed"])
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
     verify_subset_payload(subset, source, config)
-    if subset["selection"] not in {"pilot", "diagnostic"}:
+    selection = str(subset["selection"])
+    if selection not in {"pilot", "diagnostic"}:
         raise RuntimeError("thinking stage received a non-thinking subset")
+    _validate_preflight_binding(
+        preflight,
+        source,
+        config,
+        subset,
+        selection=selection,
+        protocol_commit_sha=protocol_commit_sha,
+    )
     started = time.perf_counter()
     model, tokenizer, model_metadata = _load_model(config["model"])
+    _validate_loaded_model_binding(preflight, model_metadata)
     rows = subset["rows"]
     dynamic = _dynamic_ids(rows)
-    static_queries, _ = _query_rows(tokenizer, subset, thinking=True)
+    effort = str(config["conditions"]["qwen38_thinking"]["reasoning_effort"])
+    all_queries = _validate_query_contract(
+        tokenizer,
+        subset,
+        preflight,
+        selection=selection,
+        thinking=True,
+        reasoning_effort=effort,
+    )
+    static_queries = all_queries
     static_queries = [query for query in static_queries if query["query_id"] not in dynamic]
     outputs: dict[str, dict[str, Any]] = {}
     calls = 0
@@ -771,11 +1092,16 @@ def thinking_remote(
             tokenizer,
             static_queries[start : start + batch_size],
             max_new_tokens=int(config["behavior"]["thinking_max_new_tokens"]),
+            config=config,
         )
         outputs.update(batch_outputs)
         calls += batch_calls
     dynamic_queries, materialization = _query_rows(
-        tokenizer, subset, thinking=True, static_outputs=outputs
+        tokenizer,
+        subset,
+        thinking=True,
+        reasoning_effort=effort,
+        static_outputs=outputs,
     )
     dynamic_queries = [query for query in dynamic_queries if query["query_id"] in dynamic]
     for start in range(0, len(dynamic_queries), batch_size):
@@ -784,6 +1110,7 @@ def thinking_remote(
             tokenizer,
             dynamic_queries[start : start + batch_size],
             max_new_tokens=int(config["behavior"]["thinking_max_new_tokens"]),
+            config=config,
         )
         outputs.update(batch_outputs)
         calls += batch_calls
@@ -806,6 +1133,7 @@ def thinking_remote(
         started=started,
         forward_calls=calls,
         records=records,
+        protocol_commit_sha=protocol_commit_sha,
     )
     payload = _artifact(
         {
@@ -815,12 +1143,18 @@ def thinking_remote(
             "condition": "qwen38_thinking",
             "stage": stage,
             "thinking": True,
+            "protocol_commit_sha": protocol_commit_sha,
+            "preflight_content_sha256": preflight["content_sha256"],
             "config_sha256": canonical_sha256(config),
             "source_dataset_sha256": subset["source_dataset_sha256"],
             "subset_sha256": subset["content_sha256"],
             "records_total": len(records),
-            "locked_records": len(records),
-            "diagnostic_records": len(records),
+            "locked_records": sum(row["split"] == "locked" for row in rows),
+            "diagnostic_records": sum(
+                row["split"] == "locked"
+                and row["experiment_family"] in set(DIAGNOSTIC_FAMILIES)
+                for row in rows
+            ),
             "metadata": metadata,
             "summary": _compact_summary(records),
             "records": records,
@@ -828,6 +1162,60 @@ def thinking_remote(
     )
     cache.commit()
     return json.dumps(payload, allow_nan=False, sort_keys=True)
+
+
+@app.function(
+    image=image,
+    gpu="A100-80GB",
+    cpu=8,
+    memory=32768,
+    volumes={"/cache": cache},
+    timeout=MODAL_HARD_TIMEOUTS["qwen38-thinking-pilot"],
+)
+def thinking_pilot_remote(
+    source: dict[str, Any],
+    subset: dict[str, Any],
+    config: dict[str, Any],
+    preflight: dict[str, Any],
+    protocol_commit_sha: str,
+) -> str:
+    if subset.get("selection") != "pilot":
+        raise RuntimeError("thinking pilot received a non-pilot subset")
+    return _thinking_remote_impl(
+        source,
+        subset,
+        config,
+        "qwen38-thinking-pilot",
+        protocol_commit_sha,
+        preflight,
+    )
+
+
+@app.function(
+    image=image,
+    gpu="A100-80GB",
+    cpu=8,
+    memory=32768,
+    volumes={"/cache": cache},
+    timeout=MODAL_HARD_TIMEOUTS["qwen38-thinking-diagnostic"],
+)
+def thinking_diagnostic_remote(
+    source: dict[str, Any],
+    subset: dict[str, Any],
+    config: dict[str, Any],
+    preflight: dict[str, Any],
+    protocol_commit_sha: str,
+) -> str:
+    if subset.get("selection") != "diagnostic":
+        raise RuntimeError("thinking diagnostic received a non-diagnostic subset")
+    return _thinking_remote_impl(
+        source,
+        subset,
+        config,
+        "qwen38-thinking-diagnostic",
+        protocol_commit_sha,
+        preflight,
+    )
 
 
 def _hash_valid(payload: dict[str, Any]) -> bool:
@@ -882,13 +1270,17 @@ def _record_cost(config: dict[str, Any], stage: str, payload: dict[str, Any]) ->
 def _git_sha() -> str:
     supplied = os.environ.get("GITHUB_SHA")
     if supplied:
-        return supplied
-    try:
-        return subprocess.check_output(
-            ["git", "rev-parse", "HEAD"], text=True, stderr=subprocess.DEVNULL
-        ).strip()
-    except (OSError, subprocess.CalledProcessError):
-        return "unknown"
+        value = supplied
+    else:
+        try:
+            value = subprocess.check_output(
+                ["git", "rev-parse", "HEAD"], text=True, stderr=subprocess.DEVNULL
+            ).strip()
+        except (OSError, subprocess.CalledProcessError) as exc:
+            raise RuntimeError("could not determine the reviewed protocol commit") from exc
+    if not re.fullmatch(r"[0-9a-f]{40}", value):
+        raise RuntimeError("protocol commit must be a full lowercase Git SHA")
+    return value
 
 
 def _write_model_manifest(stage: str, payload: dict[str, Any], estimate: Any | None) -> None:
@@ -898,6 +1290,8 @@ def _write_model_manifest(stage: str, payload: dict[str, Any], estimate: Any | N
         "status": "model_run_manifest_complete",
         "stage": stage,
         "execution_commit_sha": _git_sha(),
+        "protocol_commit_sha": payload.get("protocol_commit_sha"),
+        "preflight_content_sha256": payload.get("preflight_content_sha256"),
         "actions_run_id": os.environ.get("GITHUB_RUN_ID"),
         "modal_run_id": payload.get("metadata", {}).get("run_id"),
         "model_id": payload.get("metadata", {}).get("model_id"),
@@ -908,6 +1302,7 @@ def _write_model_manifest(stage: str, payload: dict[str, Any], estimate: Any | N
         ),
         "thinking": payload.get("thinking"),
         "reasoning_effort": payload.get("metadata", {}).get("reasoning_effort"),
+        "generation_settings": payload.get("metadata", {}).get("generation_settings"),
         "source_dataset_sha256": payload.get("source_dataset_sha256"),
         "subset_sha256": payload.get("subset_sha256"),
         "config_sha256": payload.get("config_sha256"),
@@ -922,22 +1317,93 @@ def _write_model_manifest(stage: str, payload: dict[str, Any], estimate: Any | N
     _write_new(RESULT_ROOT / f"model_run_manifest_{stage}.json", _artifact(body))
 
 
-def _require_preflight() -> dict[str, Any]:
+def _require_cpu_controls(
+    config: dict[str, Any],
+    source: dict[str, Any],
+    subsets: dict[str, dict[str, Any]],
+    protocol_commit_sha: str,
+) -> dict[str, Any]:
+    path = RESULT_ROOT / "control_audit.json"
+    if not path.exists():
+        raise RuntimeError("run local-controls first")
+    payload = _read_json(path)
+    manifest = build_manifest(config)
+    expected = {
+        "status": "cpu_semantic_controls_passed_no_model_execution",
+        "config_sha256": canonical_sha256(config),
+        "source_dataset_sha256": source["content_sha256"],
+        "subset_manifest_sha256": manifest["content_sha256"],
+        "head_commit": protocol_commit_sha,
+        "protocol_commit_sha": protocol_commit_sha,
+        "model_forwards": 0,
+        "gpu_stages_ran": False,
+    }
+    if not _hash_valid(payload) or any(
+        payload.get(key) != value for key, value in expected.items()
+    ):
+        raise RuntimeError("CPU control artifact is not for the current reviewed commit")
+    return payload
+
+
+def _require_preflight(
+    config: dict[str, Any],
+    source: dict[str, Any],
+    subsets: dict[str, dict[str, Any]],
+    protocol_commit_sha: str,
+) -> dict[str, Any]:
     path = RESULT_ROOT / "raw" / "preflight_qwen38.json"
     if not path.exists():
         raise RuntimeError("run preflight-qwen38 first")
     payload = _read_json(path)
     if not _hash_valid(payload) or payload.get("status") != "qwen38_tokenizer_preflight_passed":
         raise RuntimeError("invalid Qwen3.8 preflight artifact")
+    expected = {
+        "protocol_commit_sha": protocol_commit_sha,
+        "config_sha256": canonical_sha256(config),
+        "source_dataset_sha256": source["content_sha256"],
+        "direct_subset_sha256": subsets["direct"]["content_sha256"],
+        "pilot_subset_sha256": subsets["pilot"]["content_sha256"],
+        "diagnostic_subset_sha256": subsets["diagnostic"]["content_sha256"],
+        "model_id": config["model"]["id"],
+        "model_revision_requested": config["model"]["revision"],
+        "model_revision_resolved": config["model"]["revision"],
+        "model_forwards": 0,
+    }
+    if any(payload.get(key) != value for key, value in expected.items()):
+        raise RuntimeError("preflight is not pinned to the current reviewed protocol")
+    contracts = payload.get("preflight_contract", {})
+    if set(contracts) != {"direct", "pilot", "diagnostic"}:
+        raise RuntimeError("preflight semantic contracts are incomplete")
+    if not all(
+        contracts[name].get("semantic_match") is True
+        for name in ("pilot", "diagnostic")
+    ):
+        raise RuntimeError("preflight semantic contracts are incomplete")
+    for selection in ("direct", "pilot", "diagnostic"):
+        _validate_preflight_binding(
+            payload,
+            source,
+            config,
+            subsets[selection],
+            selection=selection,
+            protocol_commit_sha=protocol_commit_sha,
+        )
     return payload
 
 
 @app.local_entrypoint(name="preflight_qwen38")
 def preflight_qwen38() -> None:
     config, source, subsets = _inputs()
+    protocol_commit_sha = _git_sha()
+    _require_cpu_controls(config, source, subsets, protocol_commit_sha)
     _admit_stage(config, "preflight-qwen38")
     payload_text = preflight_remote.remote(
-        source, subsets["direct"], subsets["diagnostic"], config
+        source,
+        subsets["direct"],
+        subsets["pilot"],
+        subsets["diagnostic"],
+        config,
+        protocol_commit_sha,
     )
     payload, _path = _write_remote_result("preflight_qwen38", payload_text)
     estimate = _record_cost(config, "preflight-qwen38", payload)
@@ -948,9 +1414,16 @@ def preflight_qwen38() -> None:
 @app.local_entrypoint(name="qwen38_direct")
 def qwen38_direct() -> None:
     config, source, subsets = _inputs()
-    _require_preflight()
+    protocol_commit_sha = _git_sha()
+    preflight = _require_preflight(config, source, subsets, protocol_commit_sha)
     _admit_stage(config, "qwen38-direct")
-    payload_text = direct_remote.remote(source, subsets["direct"], config)
+    payload_text = direct_remote.remote(
+        source,
+        subsets["direct"],
+        config,
+        preflight,
+        protocol_commit_sha,
+    )
     payload, _path = _write_remote_result("qwen38_direct", payload_text)
     estimate = _record_cost(config, "qwen38-direct", payload)
     _write_model_manifest("qwen38_direct", payload, estimate)
@@ -959,9 +1432,20 @@ def qwen38_direct() -> None:
 
 def _thinking_stage(stage: str, selection: str) -> None:
     config, source, subsets = _inputs()
-    _require_preflight()
+    protocol_commit_sha = _git_sha()
+    preflight = _require_preflight(config, source, subsets, protocol_commit_sha)
     _admit_stage(config, stage)
-    payload_text = thinking_remote.remote(source, subsets[selection], config, stage)
+    remote = {
+        "qwen38-thinking-pilot": thinking_pilot_remote,
+        "qwen38-thinking-diagnostic": thinking_diagnostic_remote,
+    }[stage]
+    payload_text = remote.remote(
+        source,
+        subsets[selection],
+        config,
+        preflight,
+        protocol_commit_sha,
+    )
     payload, _path = _write_remote_result(stage.replace("-", "_"), payload_text)
     estimate = _record_cost(config, stage, payload)
     _write_model_manifest(stage.replace("-", "_"), payload, estimate)

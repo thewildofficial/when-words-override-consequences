@@ -12,7 +12,7 @@
     "dataset_sha256": "14aea862bd5f195b11ebe77f97fb6be857717bd10c47375e9c11cd773214d77a",
     "row_count": 7488,
     "locked_row_count": 2496,
-    "base_commit": "1012195f99ebc7e49d1bd7e81b506b20e2cd9560"
+    "base_commit": "8169dadd96260041e2b1c43ad9cadf18e83612b0"
   },
   "model": {
     "id": "Qwen/Qwen3.8-27B",
@@ -31,11 +31,13 @@
       "measurement": "final_line_after_native_reasoning",
       "selection_pilot": "pilot",
       "selection_diagnostic": "diagnostic",
-      "reasoning_effort": null
+      "reasoning_effort": "xhigh",
+      "preserve_thinking": true
     }
   },
   "subset": {
     "locked_split": "locked",
+    "pilot_split": "validation",
     "diagnostic_families": [
       "ledger_binding",
       "policy_composition",
@@ -43,15 +45,19 @@
       "active_information"
     ],
     "diagnostic_selection_rule": "All locked ledger rows; all locked policy-composition rows; all locked evidence report rows with evidence_count=4, evidence_direction=prior, an independent/copy expected-value contrast, and both prompt modes; all locked active-information rows in positive/negative VOI matched groups and same-matrix threshold groups. The rule is evaluated before any Qwen3.8 output exists.",
-    "pilot_selection_rule": "The first locked ledger game in condition_id order; the first locked policy game; the first identifying evidence pair in each prompt mode; the first positive/negative VOI pair; and the first complete same-matrix threshold cell.",
+    "pilot_selection_rule": "The first validation ledger game in condition_id order; the first validation policy game; the first identifying evidence pair in each prompt mode; the first positive/negative VOI pair; and the first complete same-matrix threshold cell. The pilot is non-confirmatory and never selects locked rows.",
     "selection_sort": "condition_id ascending"
   },
   "behavior": {
     "batch_size": 4,
     "direct_max_new_tokens": 1,
     "thinking_max_new_tokens": 1536,
-    "thinking_temperature": 0.0,
-    "thinking_top_p": 1.0,
+    "thinking_do_sample": true,
+    "thinking_temperature": 1.0,
+    "thinking_top_p": 0.95,
+    "thinking_top_k": 20,
+    "thinking_repetition_penalty": 1.0,
+    "thinking_seed": 3838,
     "thinking_final_format": "exactly one line matching ^\\s*FINAL\\s*:\\s*[AB]\\s*$",
     "unparseable_is_failure": true,
     "retain_complete_generation": true
@@ -67,7 +73,12 @@
     },
     "H3_evidence_independence": {
       "action": "not scored in diagnostic subset",
-      "report_pair": "independent and copied rows both parse and selected label changes in each prompt mode"
+      "report_pair": "independent and copied rows both correct and selected semantic label switches in each prompt mode",
+      "raw_contrast": "selected-label change rate, descriptive only and never a support gate",
+      "prompt_modes": [
+        "explicit_rule",
+        "provenance_only"
+      ]
     },
     "H5_active_information": {
       "voi_pair": "positive and negative VOI rows both correct and inspect/act choice switches",
@@ -95,6 +106,7 @@
     "bootstrap_draws": 5000,
     "interval": "percentile_95",
     "paired_test": "paired_cluster_sign_flip_after_family_gate",
+    "paired_test_policy": "For direct-versus-thinking comparisons, match the same endpoint cells by condition identity, aggregate differences by game_id, and run the sign-flip test only when the endpoint's family gate is eligible in both conditions.",
     "missing_or_unparseable": "retain raw text and score as failure"
   },
   "execution": {
