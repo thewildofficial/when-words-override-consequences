@@ -6,7 +6,9 @@ real consequences distinct—but repairs the stimulus-construction failures
 identified in the V6 audit.
 
 Current status: the protocol and generated dataset pass the CPU semantic
-audit. No model has been run in this branch yet.
+audit. The pinned Qwen3.6-27B primary run is complete; all seven
+family-specific gates were falsified. See the [primary findings](primary-findings.md)
+and the committed [machine-readable analysis](../../results/v6_1_epistemic_repair/analysis_primary.json).
 
 The parent erratum is [V6 prompt completeness and trajectory
 confounds](../v6/erratum-prompt-completeness.md). The V6 raw artifacts remain
