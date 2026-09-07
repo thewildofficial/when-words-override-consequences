@@ -1,5 +1,11 @@
 # V6 — Epistemic Strategic Experiments
 
+> **Interpretation warning:** An independent post-run audit found stimulus
+> defects in the higher-order, core policy, action→report, and safety-pair
+> endpoints. Read [the erratum](erratum-prompt-completeness.md) before using
+> the historical findings. The repaired follow-up is
+> [V6.1-ES-2](../v6.1/README.md).
+
 V6 studies whether a language model keeps agent-indexed beliefs distinct and
 uses them in strategic decisions. The study namespace is deliberately stable:
 

@@ -1,5 +1,14 @@
 # V6-ES-1 primary findings
 
+> **Erratum supersedes the causal interpretation below.** The post-run audit
+> found that the higher-order target values were not rendered, the
+> action→report trajectory supplied target-relevant context that direct report
+> lacked, and the core action prompt supplied a derived receiver response.
+> These raw observations are retained, but the affected endpoints are not
+> evidence for ToM failure, self-scaffolding, or belief-policy composition.
+> See [the full erratum](erratum-prompt-completeness.md) and the repaired
+> [V6.1 protocol](../v6.1/README.md).
+
 This is a descriptive report of the pinned Qwen3.6-27B run. The dataset,
 model revision, and family gates were frozen before execution. These results do
 not establish a causal mechanism, deception, or a general safety property.
