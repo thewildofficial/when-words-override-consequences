@@ -173,6 +173,16 @@ def _render(
     thinking: bool,
     reasoning_effort: str | None = "xhigh",
 ) -> str:
+    """Render with the Qwen3.8 processor when present.
+
+    The official Qwen3.8 chat template only emits the disabled-thinking
+    sentinel when ``enable_thinking`` is a Jinja variable set to false.
+    Nested ``chat_template_kwargs`` on the inner tokenizer does not do
+    that; ``AutoProcessor.apply_chat_template(..., enable_thinking=False)``
+    does.  Pass both forms, processor first, and keep the inner tokenizer
+    for encode/decode.
+    """
+
     template_kwargs: dict[str, Any] = {
         "enable_thinking": thinking,
         "preserve_thinking": thinking,
@@ -181,53 +191,62 @@ def _render(
         if reasoning_effort is None:
             raise RuntimeError("thinking render requires an explicit reasoning_effort")
         template_kwargs["reasoning_effort"] = reasoning_effort
-    try:
-        return tokenizer.apply_chat_template(
-            messages,
-            tokenize=False,
-            add_generation_prompt=True,
-            chat_template_kwargs=template_kwargs,
-        )
-    except TypeError:
-        try:
-            return tokenizer.apply_chat_template(
-                messages,
-                tokenize=False,
-                add_generation_prompt=True,
-                **template_kwargs,
-            )
-        except TypeError:
-            if thinking:
-                raise RuntimeError(
-                    "Qwen3.8 tokenizer does not expose the frozen thinking/effort interface"
-                ) from None
-            return tokenizer.apply_chat_template(
-                messages,
-                tokenize=False,
-                add_generation_prompt=True,
-                enable_thinking=False,
-            )
+    renderers = [getattr(tokenizer, "_jspace_chat_renderer", tokenizer), tokenizer]
+    attempts: tuple[dict[str, Any], ...] = (
+        {"chat_template_kwargs": template_kwargs, **template_kwargs},
+        {"chat_template_kwargs": template_kwargs},
+        dict(template_kwargs),
+    )
+    last_error: Exception | None = None
+    seen: set[int] = set()
+    for renderer in renderers:
+        if id(renderer) in seen:
+            continue
+        seen.add(id(renderer))
+        for extra in attempts:
+            try:
+                return renderer.apply_chat_template(
+                    messages,
+                    tokenize=False,
+                    add_generation_prompt=True,
+                    **extra,
+                )
+            except TypeError as exc:
+                last_error = exc
+    if thinking:
+        raise RuntimeError(
+            "Qwen3.8 tokenizer does not expose the frozen thinking/effort interface"
+        ) from last_error
+    return tokenizer.apply_chat_template(
+        messages,
+        tokenize=False,
+        add_generation_prompt=True,
+    )
 
 
 def _load_tokenizer(spec: dict[str, Any]) -> tuple[Any, dict[str, Any]]:
     import transformers
     from huggingface_hub import model_info
 
+    renderer: Any
     if "3.8" in str(spec["id"]):
         processor = transformers.AutoProcessor.from_pretrained(
             spec["id"], revision=spec["revision"]
         )
         tokenizer = getattr(processor, "tokenizer", processor)
+        renderer = processor
         loader = "AutoProcessor"
     else:
         tokenizer = transformers.AutoTokenizer.from_pretrained(
             spec["id"], revision=spec["revision"]
         )
+        renderer = tokenizer
         loader = "AutoTokenizer"
     tokenizer.padding_side = "left"
     tokenizer.pad_token_id = tokenizer.pad_token_id or tokenizer.eos_token_id
     if tokenizer.pad_token_id is None:
         raise RuntimeError("tokenizer has no padding or EOS token")
+    tokenizer._jspace_chat_renderer = renderer
     resolved = model_info(spec["id"], revision=spec["revision"]).sha
     return tokenizer, {
         "tokenizer_loader": loader,

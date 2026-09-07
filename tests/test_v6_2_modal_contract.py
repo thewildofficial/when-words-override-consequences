@@ -30,12 +30,11 @@ class _ContractTokenizer:
         chat_template_kwargs=None,
         **_kwargs,
     ):
-        # Qwen3.8 reads these controls from chat_template_kwargs.  Ignore
-        # top-level values here so the test catches the real failure mode.
-        if chat_template_kwargs is None:
+        nested = chat_template_kwargs or {}
+        if "enable_thinking" in nested:
+            enable_thinking = nested["enable_thinking"]
+        elif enable_thinking is None:
             enable_thinking = True
-        else:
-            enable_thinking = chat_template_kwargs.get("enable_thinking", True)
         prefix = "<think>\n" if enable_thinking else ""
         return prefix + json.dumps(messages, sort_keys=True)
 
@@ -54,15 +53,29 @@ class _ContractTokenizer:
 class _Qwen38SentinelTokenizer(_ContractTokenizer):
     def apply_chat_template(self, messages, **kwargs):
         rendered = super().apply_chat_template(messages, **kwargs)
-        chat_template_kwargs = kwargs.get("chat_template_kwargs")
-        enable_thinking = (
-            chat_template_kwargs.get("enable_thinking", True)
-            if chat_template_kwargs is not None
-            else True
+        nested = kwargs.get("chat_template_kwargs") or {}
+        enable_thinking = nested.get(
+            "enable_thinking", kwargs.get("enable_thinking", True)
         )
         if not enable_thinking:
             rendered += "<think>\n\n</think>\n\n"
         return rendered
+
+
+class _TopLevelThinkingTokenizer(_ContractTokenizer):
+    """Qwen3.8's processor honors top-level enable_thinking, not nested kwargs."""
+
+    def apply_chat_template(
+        self,
+        messages,
+        *,
+        enable_thinking=None,
+        chat_template_kwargs=None,
+        **_kwargs,
+    ):
+        del chat_template_kwargs
+        prefix = "<think>\n" if (True if enable_thinking is None else enable_thinking) else ""
+        return prefix + json.dumps(messages, sort_keys=True)
 
 
 def test_preflight_detects_native_thinking_render_and_direct_label_tokens() -> None:
@@ -70,6 +83,15 @@ def test_preflight_detects_native_thinking_render_and_direct_label_tokens() -> N
     row = select_rows(source, "pilot")[0]
     tokenizer = _ContractTokenizer()
     sample = MODAL["_preflight_sample"](tokenizer, row)
+    assert sample["passed"] is True
+    assert sample["off"]["thinking_markers"] == []
+    assert "<think>" in sample["on"]["thinking_markers"]
+
+
+def test_preflight_disables_thinking_when_only_top_level_enable_thinking_is_honored() -> None:
+    source, _source_config, _source_manifest = source_dataset(CONFIG)
+    row = select_rows(source, "pilot")[0]
+    sample = MODAL["_preflight_sample"](_TopLevelThinkingTokenizer(), row)
     assert sample["passed"] is True
     assert sample["off"]["thinking_markers"] == []
     assert "<think>" in sample["on"]["thinking_markers"]
