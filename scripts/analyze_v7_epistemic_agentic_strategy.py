@@ -137,16 +137,22 @@ def _matched_pair_rate(
     draws: int,
     predicate: Callable[[dict[str, Any], dict[str, Any]], bool] = _pair_success,
 ) -> dict[str, Any]:
-    cells: list[float] = []
+    cells_by_game: dict[str, list[float]] = defaultdict(list)
     for group in _group(rows, "game_id", "surface").values():
         by_value = {row["condition_factors"][factor]: row for row in group}
         if left_value in by_value and right_value in by_value:
-            cells.append(float(predicate(by_value[left_value], by_value[right_value])))
-    return {**_bootstrap(cells, seed=seed, draws=draws), "n_cells": len(cells)}
+            cells_by_game[group[0]["game_id"]].append(
+                float(predicate(by_value[left_value], by_value[right_value]))
+            )
+    clusters = [sum(values) / len(values) for values in cells_by_game.values()]
+    return {
+        **_bootstrap(clusters, seed=seed, draws=draws),
+        "n_cells": sum(map(len, cells_by_game.values())),
+    }
 
 
 def _surface_invariance(rows: list[dict[str, Any]], *, seed: int, draws: int) -> dict[str, Any]:
-    cells: list[float] = []
+    cells_by_game: dict[str, list[float]] = defaultdict(list)
     for game_group in _group(rows, "game_id").values():
         condition_groups: dict[tuple[Any, ...], list[dict[str, Any]]] = defaultdict(list)
         for row in game_group:
@@ -161,13 +167,21 @@ def _surface_invariance(rows: list[dict[str, Any]], *, seed: int, draws: int) ->
         for condition_rows in condition_groups.values():
             by_surface = {row["surface"]: row for row in condition_rows}
             if set(by_surface) == set(SURFACES):
-                cells.append(
+                cells_by_game[game_group[0]["game_id"]].append(
                     float(
                         all(bool(row.get("correct")) for row in by_surface.values())
                         and len({row.get("selected_index") for row in by_surface.values()}) == 1
                     )
                 )
-    return {**_bootstrap(cells, seed=seed, draws=draws), "n_cells": len(cells)}
+    clusters = [sum(values) / len(values) for values in cells_by_game.values()]
+    return {
+        **_bootstrap(clusters, seed=seed, draws=draws),
+        "n_cells": sum(map(len, cells_by_game.values())),
+    }
+
+
+def _passes(metric: dict[str, Any], threshold: float) -> bool:
+    return metric.get("mean") is not None and metric["mean"] >= threshold
 
 
 def _validate_records(
@@ -230,18 +244,33 @@ def _family_common(
     draws = int(config["statistics"]["bootstrap_draws"])
     actions = [row for row in rows if row["task_kind"] == "action"]
     reports = _report_metrics(rows, config)
+    action_accuracy = _cluster_rate(
+        actions, lambda row: row["correct"], seed=seed + 2, draws=draws
+    )
+    surface_invariance = _surface_invariance(actions, seed=seed + 3, draws=draws)
     regrets = _cluster_mean(actions, "regret", seed=seed + 1, draws=draws)
     return {
         "report_competence": reports,
         "predicted_opponent_action_competence": reports["predicted_opponent_action"],
-        "final_action_accuracy": _cluster_rate(
-            actions, lambda row: row["correct"], seed=seed + 2, draws=draws
-        ),
+        "final_action_accuracy": action_accuracy,
         "mean_regret": regrets,
-        "surface_name_invariance": _surface_invariance(actions, seed=seed + 3, draws=draws),
+        "surface_name_invariance": surface_invariance,
         "trajectory_success": {
             "status": "not_collected_in_direct_screen",
             "rate": None,
+        },
+        "gates": {
+            "report_accuracy": _passes(
+                reports["all_reports"], config["gates"]["minimum_locked_report_accuracy"]
+            ),
+            "action_accuracy": _passes(
+                action_accuracy,
+                config["gates"]["minimum_locked_action_accuracy"],
+            ),
+            "surface_invariance": _passes(
+                surface_invariance,
+                config["gates"]["minimum_surface_invariance"],
+            ),
         },
     }
 
@@ -278,6 +307,7 @@ def _publicity_summary(rows: list[dict[str, Any]], config: dict[str, Any]) -> di
     }
     result["identifying_pairs"] = pairs
     result["gates"] = {
+        **result["gates"],
         "publicity_pair_switches": all(
             (pairs[name]["mean"] or 0.0)
             >= config["gates"]["minimum_publicity_pair_switch_rate"]
@@ -327,6 +357,7 @@ def _commitment_summary(rows: list[dict[str, Any]], config: dict[str, Any]) -> d
     }
     result["identifying_pairs"] = pairs
     result["gates"] = {
+        **result["gates"],
         "public_private_switch": (pairs["public_to_private_switch"]["mean"] or 0.0)
         >= config["gates"]["minimum_commitment_public_private_switch_rate"],
         "public_promise_switch": (pairs["public_to_promise_switch"]["mean"] or 0.0)
@@ -358,9 +389,11 @@ def _acquisition_summary(rows: list[dict[str, Any]], config: dict[str, Any]) -> 
     }
     target_indices = {
         "world_state": 1,
+        "world_state_known": 0,
         "opponent_belief": 2,
+        "opponent_belief_known": 0,
         "opponent_policy": 3,
-        "none": 0,
+        "opponent_policy_known": 0,
     }
     targeted_choice = _cluster_rate(
         actions,
@@ -372,38 +405,40 @@ def _acquisition_summary(rows: list[dict[str, Any]], config: dict[str, Any]) -> 
         draws=5000,
     )
     pairs = {
-        "world_to_opponent_belief_switch": _matched_pair_rate(
+        "world_to_world_known_switch": _matched_pair_rate(
             actions,
             "uncertainty_type",
             "world_state",
-            "opponent_belief",
+            "world_state_known",
             seed=73030,
             draws=5000,
         ),
-        "world_to_opponent_policy_switch": _matched_pair_rate(
+        "opponent_belief_to_belief_known_switch": _matched_pair_rate(
             actions,
             "uncertainty_type",
-            "world_state",
-            "opponent_policy",
+            "opponent_belief",
+            "opponent_belief_known",
             seed=73031,
             draws=5000,
         ),
-        "opponent_belief_to_none_switch": _matched_pair_rate(
-            actions, "uncertainty_type", "opponent_belief", "none", seed=73032, draws=5000
-        ),
-        "opponent_policy_to_none_switch": _matched_pair_rate(
-            actions, "uncertainty_type", "opponent_policy", "none", seed=73033, draws=5000
+        "opponent_policy_to_policy_known_switch": _matched_pair_rate(
+            actions,
+            "uncertainty_type",
+            "opponent_policy",
+            "opponent_policy_known",
+            seed=73032,
+            draws=5000,
         ),
     }
     result.update(
         {
             "accuracy_by_uncertainty": by_uncertainty,
             "targeted_choice_rate": targeted_choice,
-            "no_uncertainty_act_rate": _cluster_rate(
+            "known_target_act_rate": _cluster_rate(
                 [
                     row
                     for row in actions
-                    if row["condition_factors"]["uncertainty_type"] == "none"
+                    if row["condition_factors"]["uncertainty_type"].endswith("_known")
                 ],
                 lambda row: row.get("selected_index") == 0,
                 seed=73021,
@@ -413,10 +448,11 @@ def _acquisition_summary(rows: list[dict[str, Any]], config: dict[str, Any]) -> 
         }
     )
     result["gates"] = {
+        **result["gates"],
         "targeted_choice": (targeted_choice["mean"] or 0.0)
         >= config["gates"]["minimum_acquisition_targeted_choice_rate"],
-        "no_uncertainty_act": (result["no_uncertainty_act_rate"]["mean"] or 0.0)
-        >= config["gates"]["minimum_acquisition_no_uncertainty_act_rate"],
+        "known_target_act": (result["known_target_act_rate"]["mean"] or 0.0)
+        >= config["gates"]["minimum_acquisition_known_target_act_rate"],
     }
     result["status"] = "supported" if all(result["gates"].values()) else "falsified"
     return result

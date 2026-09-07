@@ -1,8 +1,8 @@
 {
-  "config_sha256": "7d0440bc79ab718d699651af3211e8b4bcc4c0f62d99c4546c5c65759b222c51",
-  "dataset_sha256": "6dd44ec883a346d1a88b68bfb487ea3b7b1fd8fcc0991dc1b8c6a87eb9d5924c",
-  "locked_row_count": 1248,
-  "row_count": 3744,
+  "config_sha256": "31eb756cb08bf481129179c720431df60e54a3c1aaecb928cad722c9bb00a6ef",
+  "dataset_sha256": "13a964d29835c56f165f6913e3f0da12fbc18df73263bd4306026ae27b25c39f",
+  "locked_row_count": 1440,
+  "row_count": 4320,
   "schema_version": 1,
   "status": "frozen_after_cpu_semantic_audit_before_model_execution",
   "study_id": "V7-EAS-1"

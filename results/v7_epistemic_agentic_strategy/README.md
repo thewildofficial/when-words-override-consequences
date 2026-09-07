@@ -10,9 +10,10 @@ No model forwards have occurred on this branch yet. The expected order is:
 1. `local-controls`: run tests, freeze the dataset, and run the CPU semantic
    audit;
 2. `preflight`: validate Qwen3.8-27B tokenizer and one-token A/B/C/D
-   continuations; and
-3. `behavior`: run the locked split's forced-choice next-token logits and
-   analyze them locally.
+   continuations, then manually review the artifact; and
+3. `behavior`: dispatch with the reviewed preflight run ID, revalidate its
+   commit/config/dataset/model/query hashes, run the locked split's
+   forced-choice next-token logits, and analyze them locally.
 
 There is no native-reasoning, activation, or remote tool-trajectory stage in
 this first screen. Raw behavior and analysis artifacts must carry content

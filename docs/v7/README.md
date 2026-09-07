@@ -51,9 +51,12 @@ The frozen branch contains the CPU dataset and semantic audit first. The
 intended workflow is:
 
 ```text
-local-controls -> tokenizer preflight -> manual review -> direct behavior
+local-controls -> tokenizer preflight -> manual review -> direct behavior (with the reviewed preflight run ID)
 ```
 
-The Modal function timeout and the config's cost ceiling are the same frozen
-1500-second bound. No thinking stage or activation stage is enabled in this
-protocol.
+The behavior dispatch must name the separately reviewed preflight run. The
+behavior stage rejects a preflight artifact whose commit, config, dataset,
+model specification, or full query/token contract differs from the current
+checkout. The Modal function timeout and the config's cost ceiling are the
+same frozen 1500-second bound. No thinking stage or activation stage is
+enabled in this protocol.

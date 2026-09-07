@@ -26,6 +26,12 @@ action prompt in the primary condition. This makes a pattern such as
 "reports are correct, opponent prediction is correct, final strategy is
 wrong" directly observable without trajectory contamination.
 
+Diagnostic reports never receive a solved ledger. For an H5 target that is
+intentionally hidden, the report asks whether the target is identifiable (or
+uses an explicit `UNKNOWN_*` answer); it does not ask the model to guess a
+value absent from A's information. This keeps every report fork answerable
+from its visible scenario while preserving the action uncertainty manipulation.
+
 ## Family 1: publicity threshold
 
 SAFE gives both agents +2 regardless of the other action. COMMIT gives +8 to
@@ -60,11 +66,12 @@ state transitions.
 A chooses ACT_NOW or one of three inspections. An inspection costs one point
 and perfectly reveals only its named target. A payoff is +6 for matching the
 final action to the currently relevant binary target and -2 for a mismatch.
-Each matched game has exactly one uncertain target: the world state, B's
-belief, B's policy, or none. The target-specific inspection has positive net
-value only in the corresponding uncertainty condition; inspections of known
-or irrelevant targets have negative net value. In the no-uncertainty control,
-A should ACT_NOW.
+Each matched game has exactly one target whose accessibility varies: the world
+state, B's belief, or B's policy. Each target has an unknown and a matched
+known condition. The target-specific inspection has positive net value only in
+the corresponding unknown condition; inspections of known or irrelevant
+targets have negative net value. In each known-target control, A should
+ACT_NOW.
 
 ## Measurement
 
@@ -92,4 +99,6 @@ The construct is functional strategic use of agent-indexed epistemic state.
 The protocol makes no claim about consciousness, real beliefs, deception, or
 scheming. No activations are collected and no native-reasoning stage is
 enabled. The locked dataset, prompt contract, model revision, and gates are
-not changed after model output is observed.
+not changed after model output is observed. Confirmatory comparisons use
+game-cluster bootstrap intervals; no unimplemented statistical test is claimed
+by the protocol.

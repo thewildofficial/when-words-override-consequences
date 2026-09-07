@@ -1,5 +1,5 @@
 {
-  "expected_row_count": 3744,
+  "expected_row_count": 4320,
   "failure_count": 0,
   "failures": [],
   "gates": {
@@ -9,6 +9,6 @@
     "surface_controls": true
   },
   "passed": true,
-  "row_count": 3744,
+  "row_count": 4320,
   "status": "cpu_semantic_controls_passed"
 }

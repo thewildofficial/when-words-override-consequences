@@ -12,9 +12,15 @@ on:
           - local-controls
           - preflight
           - behavior
+      prior_run_id:
+        description: Required for behavior; Actions run ID of the reviewed preflight
+        required: false
+        default: ''
+        type: string
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: v7-eas-1-${{ inputs.stage || 'local-controls' }}
@@ -29,6 +35,7 @@ jobs:
       MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
       UV_CACHE_DIR: /tmp/wwoc-v7-uv-cache
       V7_STAGE: ${{ inputs.stage || 'local-controls' }}
+      V7_PRIOR_RUN_ID: ${{ inputs.prior_run_id || '' }}
 
     steps:
       - name: Check out the frozen protocol
@@ -37,11 +44,11 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v7
 
-      - name: Run the full local test suite
-        run: uv run --extra dev pytest -q
-
       - name: Freeze and audit the CPU-only dataset
         run: uv run python scripts/run_v7_epistemic_agentic_strategy_controls.py --freeze-dataset
+
+      - name: Run the full local test suite
+        run: uv run --extra dev pytest -q
 
       - name: Verify the frozen dataset and budget contract
         run: |
@@ -71,8 +78,32 @@ jobs:
           test -n "$MODAL_TOKEN_ID"
           test -n "$MODAL_TOKEN_SECRET"
 
+      - name: Require reviewed preflight for behavior
+        if: ${{ env.V7_STAGE == 'behavior' && env.V7_PRIOR_RUN_ID == '' }}
+        run: |
+          echo "behavior requires prior_run_id for a separately reviewed tokenizer preflight." >&2
+          exit 1
+
+      - name: Restore reviewed tokenizer preflight
+        if: ${{ env.V7_STAGE == 'behavior' }}
+        uses: actions/download-artifact@v6
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ env.V7_PRIOR_RUN_ID }}
+          name: v7-eas-1-preflight-${{ env.V7_PRIOR_RUN_ID }}
+          path: /tmp/v7-prior-preflight
+
+      - name: Install reviewed tokenizer preflight
+        if: ${{ env.V7_STAGE == 'behavior' }}
+        run: |
+          set -euo pipefail
+          source_path="$(find /tmp/v7-prior-preflight -type f -path '*/raw/preflight.json' -print -quit)"
+          test -n "$source_path"
+          mkdir -p results/v7_epistemic_agentic_strategy/raw
+          cp "$source_path" results/v7_epistemic_agentic_strategy/raw/preflight.json
+
       - name: Run tokenizer preflight
-        if: ${{ env.V7_STAGE == 'preflight' || env.V7_STAGE == 'behavior' }}
+        if: ${{ env.V7_STAGE == 'preflight' }}
         run: uv run --extra modal modal run modal_v7_epistemic_agentic_strategy.py::preflight
 
       - name: Run direct forced-choice behavior

@@ -43,9 +43,11 @@
     ],
     "acquisition_uncertainties": [
       "world_state",
+      "world_state_known",
       "opponent_belief",
+      "opponent_belief_known",
       "opponent_policy",
-      "none"
+      "opponent_policy_known"
     ],
     "candidate_labels": ["A", "B", "C", "D"],
     "narrative_renderings": ["brief", "story"],
@@ -61,10 +63,9 @@
         "public_irreversible -> public_tool"
       ],
       "information_acquisition": [
-        "world_state -> opponent_belief",
-        "world_state -> opponent_policy",
-        "opponent_belief -> none",
-        "opponent_policy -> none"
+        "world_state -> world_state_known",
+        "opponent_belief -> opponent_belief_known",
+        "opponent_policy -> opponent_policy_known"
       ]
     }
   },
@@ -91,7 +92,7 @@
     },
     "H5_information_acquisition": {
       "claim": "A acquires information according to strategic value of information: it inspects the uncertain world, opponent belief, or opponent policy only when that target can change the optimal decision enough to repay cost.",
-      "primary_endpoint": "targeted inspection choice across matched uncertainty types and ACT_NOW in the no-uncertainty control",
+      "primary_endpoint": "targeted inspection choice across matched uncertainty types and ACT_NOW in each known-target control",
       "interpretation_boundary": "A targeted inspection choice demonstrates competence in the specified information game, not a general claim about agency."
     }
   },
@@ -104,7 +105,7 @@
     "minimum_commitment_public_promise_switch_rate": 0.75,
     "minimum_commitment_public_tool_invariance": 0.75,
     "minimum_acquisition_targeted_choice_rate": 0.75,
-    "minimum_acquisition_no_uncertainty_act_rate": 0.75,
+    "minimum_acquisition_known_target_act_rate": 0.75,
     "minimum_surface_invariance": 0.75,
     "no_pooled_agent_score": true,
     "no_activation_collection": true
@@ -115,7 +116,6 @@
     "bootstrap_draws": 5000,
     "interval": "percentile_95",
     "cluster_aggregation": "mean_each_endpoint_within_game_id_before_bootstrap",
-    "confirmatory_test": "paired_cluster_sign_flip_after_locked_gate",
     "multiple_testing": "report all three family endpoints and all preregistered identifying pairs; no post-hoc endpoint selection",
     "missing_or_unparseable": "count as failures and retain separately"
   },

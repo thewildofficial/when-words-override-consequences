@@ -9,6 +9,7 @@ Actions.
 from __future__ import annotations
 
 import json
+import subprocess
 import time
 import uuid
 from datetime import UTC, datetime
@@ -328,6 +329,27 @@ def _preflight_contract(queries: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
+def _validate_query_contract_shape(contract: dict[str, Any]) -> None:
+    required = {
+        "query_count",
+        "query_ids_sha256",
+        "rendered_prompts_sha256",
+        "prompt_token_ids_sha256",
+        "candidate_labels_sha256",
+        "candidate_token_ids_sha256",
+    }
+    if set(contract) != required:
+        raise RuntimeError("reviewed preflight has an incomplete query contract")
+
+
+def _require_query_contract(
+    actual: dict[str, Any], expected: dict[str, Any]
+) -> None:
+    _validate_query_contract_shape(expected)
+    if actual != expected:
+        raise RuntimeError("tokenizer query contract differs from reviewed preflight")
+
+
 def _semantic_contract(queries: list[dict[str, Any]]) -> dict[str, Any]:
     return {
         "query_count": len(queries),
@@ -343,6 +365,12 @@ def _hash_valid(payload: dict[str, Any]) -> bool:
     claimed = payload.get("content_sha256")
     body = {key: value for key, value in payload.items() if key != "content_sha256"}
     return claimed == canonical_sha256(body)
+
+
+def _protocol_commit() -> str:
+    return subprocess.check_output(
+        ["git", "rev-parse", "HEAD"], text=True
+    ).strip()
 
 
 def _record_cost(config: dict[str, Any], payload: dict[str, Any]) -> None:
@@ -385,6 +413,8 @@ def preflight_remote(dataset: dict[str, Any], config: dict[str, Any]) -> str:
         "created_at": datetime.now(UTC).isoformat(),
         "model_id": config["model"]["id"],
         "model_revision_requested": config["model"]["revision"],
+        "model_spec_sha256": canonical_sha256(config["model"]),
+        "source_config_sha256": canonical_sha256(config),
         "source_dataset_sha256": dataset["content_sha256"],
         "preflight_contract": _preflight_contract(queries),
         "semantic_preflight_contract": _semantic_contract(queries),
@@ -403,7 +433,11 @@ def preflight_remote(dataset: dict[str, Any], config: dict[str, Any]) -> str:
     volumes={"/cache": cache},
     timeout=1500,
 )
-def behavior_remote(dataset: dict[str, Any], config: dict[str, Any]) -> str:
+def behavior_remote(
+    dataset: dict[str, Any],
+    config: dict[str, Any],
+    expected_preflight_contract: dict[str, Any],
+) -> str:
     _validate_config(config)
     verify_dataset_payload(dataset, config)
     rows = [
@@ -411,7 +445,12 @@ def behavior_remote(dataset: dict[str, Any], config: dict[str, Any]) -> str:
     ]
     started = time.perf_counter()
     model, tokenizer, metadata = _load_model(config["model"])
-    queries = [_prepare_query(tokenizer, row) for row in rows]
+    all_queries = [_prepare_query(tokenizer, row) for row in dataset["rows"]]
+    _require_query_contract(
+        _preflight_contract(all_queries), expected_preflight_contract
+    )
+    locked_ids = {row["condition_id"] for row in rows}
+    queries = [query for query in all_queries if query["query_id"] in locked_ids]
     outputs = _logit_query(model, tokenizer, queries, int(config["behavior"]["batch_size"]))
     records = _records(rows, outputs)
     metadata.update(
@@ -420,6 +459,7 @@ def behavior_remote(dataset: dict[str, Any], config: dict[str, Any]) -> str:
             "elapsed_seconds": time.perf_counter() - started,
             "config_sha256": canonical_sha256(config),
             "dataset_sha256": dataset["content_sha256"],
+            "preflight_contract_sha256": canonical_sha256(expected_preflight_contract),
             "split": config["behavior"]["primary_split"],
             "query_count": len(queries),
         }
@@ -449,13 +489,33 @@ def _write_remote_result(stage: str, payload_text: str) -> Path:
     return path
 
 
-def _require_preflight() -> dict[str, Any]:
+def _require_preflight(dataset: dict[str, Any], config: dict[str, Any]) -> dict[str, Any]:
     path = RESULT_ROOT / "raw" / "preflight.json"
     if not path.exists():
         raise RuntimeError("run V7 tokenizer preflight first")
     payload = _load_json(path)
     if not _hash_valid(payload) or payload.get("status") != "tokenizer_preflight_passed":
         raise RuntimeError("invalid V7 tokenizer preflight artifact")
+    if payload.get("protocol_commit") != _protocol_commit():
+        raise RuntimeError("preflight was produced from a different protocol commit")
+    if payload.get("model_id") != config["model"]["id"]:
+        raise RuntimeError("preflight was produced for a different model")
+    if payload.get("model_revision_requested") != config["model"]["revision"]:
+        raise RuntimeError("preflight was produced for a different model revision")
+    if payload.get("model_spec_sha256") != canonical_sha256(config["model"]):
+        raise RuntimeError("preflight was produced from a different model spec")
+    if payload.get("source_config_sha256") != canonical_sha256(config):
+        raise RuntimeError("preflight was produced from a different config")
+    if payload.get("source_dataset_sha256") != dataset["content_sha256"]:
+        raise RuntimeError("preflight was produced from a different dataset")
+    contract = payload.get("preflight_contract", {})
+    _validate_query_contract_shape(contract)
+    if contract.get("query_count") != len(dataset["rows"]):
+        raise RuntimeError("preflight query count does not cover the frozen dataset")
+    if contract.get("query_ids_sha256") != canonical_sha256(
+        [row["condition_id"] for row in dataset["rows"]]
+    ):
+        raise RuntimeError("preflight query IDs do not match the frozen dataset")
     return payload
 
 
@@ -464,6 +524,10 @@ def preflight() -> None:
     config = _config()
     dataset = _dataset(config)
     payload = json.loads(preflight_remote.remote(dataset, config))
+    payload["protocol_commit"] = _protocol_commit()
+    payload["content_sha256"] = canonical_sha256(
+        {key: value for key, value in payload.items() if key != "content_sha256"}
+    )
     _write_remote_result("preflight", json.dumps(payload))
     print(json.dumps(payload["preflight_contract"], indent=2, sort_keys=True))
 
@@ -472,9 +536,11 @@ def preflight() -> None:
 def behavior() -> None:
     config = _config()
     dataset = _dataset(config)
-    _require_preflight()
+    preflight_payload = _require_preflight(dataset, config)
     _admit_gpu(config)
-    payload = json.loads(behavior_remote.remote(dataset, config))
+    payload = json.loads(
+        behavior_remote.remote(dataset, config, preflight_payload["preflight_contract"])
+    )
     _write_remote_result("behavior", json.dumps(payload))
     _record_cost(config, payload)
     print(json.dumps(payload["summary"], indent=2, sort_keys=True))

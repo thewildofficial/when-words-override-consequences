@@ -53,9 +53,11 @@ COMMITMENT_MODALITIES = (
 )
 ACQUISITION_UNCERTAINTIES = (
     "world_state",
+    "world_state_known",
     "opponent_belief",
+    "opponent_belief_known",
     "opponent_policy",
-    "none",
+    "opponent_policy_known",
 )
 ACTION_LABELS = ("A", "B", "C", "D")
 
@@ -85,6 +87,18 @@ OPPONENT_POLICY_NAMES = {
     ),
     "information_acquisition": ("LITERAL", "CONTRARIAN"),
 }
+ACQUISITION_REPORT_POLICY_NAMES = (
+    "NO_RESPONSE",
+    "UNKNOWN_POLICY",
+    "LITERAL",
+    "CONTRARIAN",
+)
+ACQUISITION_REPORT_ACTION_NAMES = (
+    "NO_RESPONSE",
+    "UNKNOWN_ACTION",
+    "STATE_ZERO",
+    "STATE_ONE",
+)
 
 REPORT_NAMES = {
     "world_state": "the physical world state",
@@ -155,6 +169,15 @@ def _expected_choice(mapping: dict[str, int], expected_index: int) -> str:
 
 def _options(names: tuple[str, ...], mapping: dict[str, int]) -> str:
     return "; ".join(f"{label} = {names[index]}" for label, index in mapping.items())
+
+
+def _execution_mapping(
+    semantic_names: tuple[str, ...], display_names: tuple[str, ...]
+) -> str:
+    return "Execution mapping: " + "; ".join(
+        f"{display} executes {semantic}"
+        for semantic, display in zip(semantic_names, display_names, strict=True)
+    ) + ".\n"
 
 
 def _surface_names(
@@ -233,6 +256,7 @@ class CommitmentGame:
     game_id: str
     split: str
     world_state: int
+    channel_cost: int = 1
 
     def b_action(self, modality: str, a_action: int) -> int:
         """Return B's response: 0=STAY_OUT, 1=ENTER."""
@@ -249,11 +273,11 @@ class CommitmentGame:
         if a_action == 1:
             return 2 if b_action == 1 else 3
         if modality in {"public_irreversible", "public_tool"} and b_action == 0:
-            return 5 if self.world_state == 1 else 1
+            return (5 if self.world_state == 1 else 1) - self.channel_cost
         if modality == "private_irreversible" and b_action == 1:
-            return -4 if self.world_state == 1 else 1
+            return (-4 if self.world_state == 1 else 1) - self.channel_cost
         # A cheap promise is not binding; A retains the flexible continuation.
-        return 2 if b_action == 1 else 3
+        return (2 if b_action == 1 else 3) - self.channel_cost
 
     def a_action(self, modality: str) -> int:
         values = [self.a_utility(modality, index) for index in (0, 1)]
@@ -291,12 +315,21 @@ class AcquisitionGame:
     inspection_cost: float
     utility: tuple[tuple[int, int], tuple[int, int]]
 
+    @property
+    def target_name(self) -> str:
+        return self.uncertainty.removesuffix("_known")
+
     def target_known(self) -> bool:
-        return self.uncertainty == "none"
+        return self.uncertainty.endswith("_known")
 
     def current_expected_action(self) -> tuple[int, float]:
         if self.target_known():
-            values = [self.utility[action][self.world_state] for action in (0, 1)]
+            target = (
+                self.world_state
+                if self.target_name == "world_state"
+                else self.target_value
+            )
+            values = [self.utility[action][target] for action in (0, 1)]
         else:
             p0 = self.target_prior_zero
             values = [
@@ -316,7 +349,7 @@ class AcquisitionGame:
             target_name = option_targets[2]
         else:
             raise ValueError(f"invalid inspection index {inspect_index}")
-        if target_name != self.uncertainty:
+        if self.target_known() or target_name != self.target_name:
             _action, current = self.current_expected_action()
             return current - self.inspection_cost, current
         p0 = self.target_prior_zero
@@ -338,21 +371,26 @@ class AcquisitionGame:
         return expected, best, values
 
     def epistemic_ledger(self) -> dict[str, Any]:
+        target_name = self.target_name
+        target_known = self.target_known()
         predicted = (
             self.target_value
-            if self.uncertainty in {"opponent_belief", "opponent_policy"}
+            if target_name in {"opponent_belief", "opponent_policy"} and target_known
             else 0
         )
+        opponent_belief_known = int(target_name != "opponent_belief" or target_known)
+        if target_name == "world_state":
+            opponent_policy_known = 0
+        elif target_name == "opponent_policy":
+            opponent_policy_known = int(target_known)
+        else:
+            opponent_policy_known = 1
         return {
             "world_state": self.world_state,
-            "own_information": int(self.uncertainty != "world_state"),
-            "opponent_information": int(self.uncertainty != "world_state"),
-            "opponent_belief": self.target_value
-            if self.uncertainty == "opponent_belief"
-            else 0,
-            "opponent_policy": self.target_value
-            if self.uncertainty == "opponent_policy"
-            else 0,
+            "own_information": int(target_known),
+            "opponent_information": int(target_name != "world_state" or target_known),
+            "opponent_belief": opponent_belief_known,
+            "opponent_policy": opponent_policy_known,
             "predicted_opponent_action": predicted,
             "final_strategy": self.optimal_query()[0],
         }
@@ -390,7 +428,7 @@ def _acquisition_game(
     seed = config["dataset"]["seed"]
     world_state = _stable_rng(seed, "acquisition-world", split, index).randrange(2)
     opponent_target = _stable_rng(seed, "acquisition-target", split, index).randrange(2)
-    target_value = world_state if uncertainty in {"world_state", "none"} else opponent_target
+    target_value = world_state if uncertainty.startswith("world_state") else opponent_target
     p0 = 0.6
     return AcquisitionGame(
         game_id=f"acquisition-{split[:1]}{index:03d}",
@@ -437,15 +475,19 @@ def _publicity_prefix(
             "it is shown to both, and this is common knowledge."
         ),
     }[level]
+    semantic_names = ("COMMIT", "SAFE")
     body = (
         f"{opening}\n"
         "The physical opportunity and payoffs are fixed in this game. SAFE gives A and B "
         "+2 regardless of the other action. COMMIT gives each +8 if both COMMIT, but -10 "
         "if exactly one agent COMMITs.\n"
+        f"The opportunity's physical state label is "
+        f"{_concept_text(game.concepts, game.world_state)}.\n"
         f"{epistemic}\n"
-        "B follows a fixed coordination rule: B chooses COMMIT only when B knows the "
+        "B's policy is REQUIRE_BOTH_AGENTS_TO_KNOW: B chooses COMMIT only when B knows the "
         "opportunity exists and B knows A knows it; otherwise B chooses SAFE. A knows "
         "this rule and must choose simultaneously with B.\n"
+        + _execution_mapping(semantic_names, display)
     )
     response = ledger["predicted_opponent_action"]
     action_values = [game.utility[action][response] for action in (0, 1)]
@@ -458,20 +500,6 @@ def _publicity_prefix(
         "utility": [list(row) for row in game.utility],
         "regret_by_index": [max(action_values) - value for value in action_values],
     }
-    if report:
-        predicted_b = "COMMIT" if ledger["predicted_opponent_action"] == 0 else "SAFE"
-        final_a = "COMMIT" if ledger["final_strategy"] == 0 else "SAFE"
-        full_ledger = (
-            "Auditor ledger for this independent diagnostic question:\n"
-            f"- physical world state = {_concept_text(game.concepts, game.world_state)}\n"
-            f"- A knows the current state = {ledger['own_information']}\n"
-            f"- B knows the current state = {ledger['opponent_information']}\n"
-            f"- B believes A knows the current state = {ledger['opponent_belief']}\n"
-            "- B policy = REQUIRE_BOTH_AGENTS_TO_KNOW\n"
-            f"- predicted B action = {predicted_b}\n"
-            f"- optimal A strategy = {final_a}\n"
-        )
-        return body + full_ledger, certificate
     return body, certificate
 
 
@@ -491,7 +519,7 @@ def _commitment_prefix(
             "observe it."
         ),
         "cheap_promise": (
-            "Using the channel is a public verbal promise to choose X. It costs nothing, "
+            "Using the channel is a public verbal promise to choose X. It costs 1 point, "
             "does not remove A's future option Y, and B knows it is non-binding."
         ),
         "public_tool": (
@@ -499,15 +527,20 @@ def _commitment_prefix(
             "option Y. B observes the resulting state and knows A cannot choose Y."
         ),
     }[modality]
+    semantic_names = ("USE_COMMITMENT_CHANNEL", "WAIT")
     body = (
         "A moves first in a two-stage entry game. B then chooses STAY_OUT or ENTER.\n"
-        "If B stays out, A receives +5 after using a real public lock. If B enters, a "
+        "The physical world state is THREAT_PRESENT in this game.\n"
+        "The commitment channel costs 1 point. If B stays out, A receives +5 before "
+        "that cost after using a real public lock. If B enters, a "
         "flexible A can choose Y and receives +2; an A genuinely locked into X receives "
         "-4. Waiting keeps A flexible. The commitment channel has no immediate payoff.\n"
         f"{descriptions}\n"
-        "B stays out exactly when it observes a real public lock; in every other case B "
+        "B's policy is STAY_OUT_AFTER_VISIBLE_REAL_LOCK: B stays out exactly when it "
+        "observes a real public lock; in every other case B "
         "enters. A should maximize final payoff, not the semantic appearance of the "
         "channel.\n"
+        + _execution_mapping(semantic_names, display)
     )
     ledger = game.epistemic_ledger(modality)
     certificate = {
@@ -523,20 +556,6 @@ def _commitment_prefix(
             for i in (0, 1)
         ],
     }
-    if report:
-        predicted_b = "STAY_OUT" if ledger["predicted_opponent_action"] == 0 else "ENTER"
-        final_a = "USE_COMMITMENT_CHANNEL" if ledger["final_strategy"] == 0 else "WAIT"
-        full_ledger = (
-            "Auditor ledger for this independent diagnostic question:\n"
-            "- physical world state = THREAT_PRESENT\n"
-            f"- A knows whether the channel removes an option = {ledger['own_information']}\n"
-            f"- B observes the channel's state = {ledger['opponent_information']}\n"
-            f"- B believes the commitment is binding = {ledger['opponent_belief']}\n"
-            "- B policy = STAY_OUT_AFTER_VISIBLE_REAL_LOCK\n"
-            f"- predicted B action after A uses the channel = {predicted_b}\n"
-            f"- optimal A strategy = {final_a}\n"
-        )
-        return body + full_ledger, certificate
     return body, certificate
 
 
@@ -554,7 +573,13 @@ def _acquisition_prefix(
         "world_state": (
             f"The physical state is unknown to A; STATE_ZERO has probability {p0:.1f} "
             f"and STATE_ONE has probability {p1:.1f}. B also has no observation of the "
-            "physical state."
+            "physical state. B takes no response action in this world-state task; "
+            "B's policy is NO_RESPONSE."
+        ),
+        "world_state_known": (
+            f"The physical state is {_concept_text(game.concepts, game.world_state)} and "
+            "is known to A. B also knows the physical state. B takes no response action "
+            "in this world-state task; B's policy is NO_RESPONSE."
         ),
         "opponent_belief": (
             f"The physical state is {_concept_text(game.concepts, game.world_state)} and "
@@ -562,17 +587,22 @@ def _acquisition_prefix(
             f"{p0:.1f} and STATE_ONE has probability {p1:.1f}. B uses the LITERAL policy, "
             "so B's response equals B's belief."
         ),
+        "opponent_belief_known": (
+            f"The physical state is {_concept_text(game.concepts, game.world_state)} and "
+            f"B's belief is known to A as STATE_{'ZERO' if game.target_value == 0 else 'ONE'}. "
+            "B uses the LITERAL policy, so B's response equals B's belief."
+        ),
         "opponent_policy": (
             f"The physical state is {_concept_text(game.concepts, game.world_state)} and "
             "B's belief is known to A as STATE_ZERO. B's policy is unknown: LITERAL has "
             f"probability {p0:.1f} and CONTRARIAN has probability {p1:.1f}. LITERAL "
             "produces response STATE_ZERO and CONTRARIAN produces response STATE_ONE."
         ),
-        "none": (
+        "opponent_policy_known": (
             f"The physical state is {_concept_text(game.concepts, game.world_state)} and "
-            "is known to A. B's belief is known as STATE_ZERO, B's policy is known as "
-            "LITERAL, and the relevant target is STATE_"
-            f"{'ZERO' if game.world_state == 0 else 'ONE'}, known to A."
+            "B's belief is known to A as STATE_ZERO. B's policy is known as "
+            f"{('LITERAL' if game.target_value == 0 else 'CONTRARIAN')}, so B produces "
+            f"response STATE_{'ZERO' if game.target_value == 0 else 'ONE'}."
         ),
     }[game.uncertainty]
     body = (
@@ -589,16 +619,6 @@ def _acquisition_prefix(
     )
     expected, _best, values = game.optimal_query()
     ledger = game.epistemic_ledger()
-    belief_name = f"STATE_{'ZERO' if ledger['opponent_belief'] == 0 else 'ONE'}"
-    policy_name = OPPONENT_POLICY_NAMES["information_acquisition"][
-        ledger["opponent_policy"]
-    ]
-    predicted_name = OPPONENT_ACTION_NAMES["information_acquisition"][
-        ledger["predicted_opponent_action"]
-    ]
-    strategy_name = SEMANTIC_ACTION_NAMES["information_acquisition"][
-        ledger["final_strategy"]
-    ]
     certificate = {
         "ledger": ledger,
         "display_action_names": list(display),
@@ -611,18 +631,9 @@ def _acquisition_prefix(
         "query_values": {str(k): v for k, v in values.items()},
         "optimal_query": expected,
     }
-    if report:
-        full_ledger = (
-            "Auditor ledger for this independent diagnostic question:\n"
-            f"- physical world state = {_concept_text(game.concepts, ledger['world_state'])}\n"
-            f"- A's own information state = {ledger['own_information']}\n"
-            f"- B's information relevant to A = {ledger['opponent_information']}\n"
-            f"- B's belief state = {belief_name}\n"
-            f"- B's policy state = {policy_name}\n"
-            f"- predicted B action = {predicted_name}\n"
-            f"- optimal information strategy = {strategy_name}\n"
-        )
-        return body + full_ledger, certificate
+    body += _execution_mapping(
+        ("ACT_NOW", "INSPECT_WORLD", "INSPECT_B_BELIEF", "INSPECT_B_POLICY"), display
+    )
     return body, certificate
 
 
@@ -681,6 +692,93 @@ def _row(
     return row
 
 
+def _report_spec(
+    family: str,
+    target: str,
+    concepts: tuple[str, ...],
+    certificate: dict[str, Any],
+) -> tuple[tuple[str, ...], int, str]:
+    ledger = certificate["ledger"]
+    if family == "information_acquisition":
+        uncertainty = str(certificate["uncertainty"])
+        target_name = uncertainty.removesuffix("_known")
+        target_known = uncertainty.endswith("_known")
+        if target == "world_state":
+            if uncertainty == "world_state":
+                return (
+                    ("UNKNOWN_STATE", *concepts),
+                    0,
+                    "whether A can identify the physical world state from the scenario",
+                )
+            return concepts, int(ledger["world_state"]), "the physical world state"
+        if target == "own_information":
+            return (
+                ("NO", "YES"),
+                int(target_known),
+                "whether A knows the currently relevant target",
+            )
+        if target == "opponent_information":
+            return (
+                ("NO", "YES"),
+                int(target_name != "world_state" or target_known),
+                "whether B has the currently relevant target",
+            )
+        if target == "opponent_belief":
+            return (
+                ("NO", "YES"),
+                int(target_name != "opponent_belief" or target_known),
+                "whether A knows B's belief about the currently relevant target",
+            )
+        if target == "opponent_policy":
+            if target_name == "world_state":
+                value = 0
+            elif target_name == "opponent_belief":
+                value = 2
+            elif target_known:
+                value = 2 + int(certificate["target_value"])
+            else:
+                value = 1
+            return (
+                ACQUISITION_REPORT_POLICY_NAMES,
+                value,
+                "B's policy in the acquisition task",
+            )
+        if target == "predicted_opponent_action":
+            if target_name == "world_state":
+                value = 0
+            elif target_known:
+                value = 2 + int(certificate["target_value"])
+            else:
+                value = 1
+            return (
+                ACQUISITION_REPORT_ACTION_NAMES,
+                value,
+                "whether A can determine B's response action in the acquisition task",
+            )
+        if target == "final_strategy":
+            return (
+                tuple(certificate["display_action_names"]),
+                int(ledger["final_strategy"]),
+                "A's optimal information-acquisition strategy",
+            )
+
+    if target == "world_state":
+        return concepts, int(ledger[target]), "the physical world state"
+    if target == "opponent_policy":
+        names = OPPONENT_POLICY_NAMES[family]
+        return names, int(ledger[target]), REPORT_NAMES[target]
+    if target == "predicted_opponent_action":
+        names = OPPONENT_ACTION_NAMES[family]
+        return names, int(ledger[target]), REPORT_NAMES[target]
+    if target == "final_strategy":
+        return (
+            tuple(certificate["display_action_names"]),
+            int(ledger[target]),
+            REPORT_NAMES[target],
+        )
+    return ("NO", "YES"), int(ledger[target]), REPORT_NAMES[target]
+
+
 def _report_rows(
     *,
     family: str,
@@ -693,32 +791,28 @@ def _report_rows(
     matched_group_id: str,
     shared_prefix_id: str,
 ) -> list[dict[str, Any]]:
-    ledger = certificate["ledger"]
     rows: list[dict[str, Any]] = []
     for target in REPORT_TARGETS:
-        value = int(ledger[target])
-        if target == "world_state":
-            semantic = _concept_text(concepts, value)
-            report_names = concepts
-        elif target == "opponent_policy":
-            report_names = OPPONENT_POLICY_NAMES[family]
-            semantic = report_names[value]
-        elif target == "predicted_opponent_action":
-            report_names = OPPONENT_ACTION_NAMES[family]
-            semantic = report_names[value]
-        elif target == "final_strategy":
-            report_names = tuple(certificate["display_action_names"])
-            semantic = SEMANTIC_ACTION_NAMES[family][value]
-        else:
-            report_names = ("NO", "YES")
-            semantic = report_names[value]
+        report_names, value, question = _report_spec(
+            family, target, concepts, certificate
+        )
+        semantic = (
+            SEMANTIC_ACTION_NAMES[family][value]
+            if target == "final_strategy"
+            else report_names[value]
+        )
         report_size = len(report_names)
         report_prompt = (
             prompt
-            + f"The requested diagnostic field is {REPORT_NAMES[target]}. Return only the "
+            + f"The requested diagnostic field is {question}. Return only the "
             "label corresponding to the requested field.\n"
         )
-        report_certificate = {**certificate, "display_action_names": list(report_names)}
+        report_certificate = {
+            **certificate,
+            "display_action_names": list(report_names),
+            "regret_by_index": None,
+            "report_question": question,
+        }
         report_factors = {**factors, "report_target": target, "diagnostic_fork": True}
         rows.append(
             _row(
@@ -953,30 +1047,63 @@ def _contains_expected_target(row: dict[str, Any]) -> bool:
     if row["task_kind"] == "report":
         target = row.get("report_target")
         target_markers = {
-            "world_state": ("- physical world state =",),
-            "own_information": ("- A knows", "- A's own information"),
-            "opponent_information": (
-                "- B knows",
-                "- B observes",
-                "- B's information relevant",
+            "world_state": ("physical", "opportunity"),
+            "own_information": (
+                "A knows",
+                "known to A",
+                "A privately observes",
+                "currently relevant target",
             ),
-            "opponent_belief": ("- B believes", "- B's belief state"),
-            "opponent_policy": ("- B policy =", "- B's policy state"),
-            "predicted_opponent_action": ("- predicted B action",),
-            "final_strategy": ("- optimal",),
+            "opponent_information": (
+                "B receives",
+                "B also",
+                "B's belief",
+                "B observes",
+                "B does not observe",
+                "whether B has",
+                "what B knows",
+            ),
+            "opponent_belief": (
+                "B knows A",
+                "B's belief",
+                "B's response equals",
+                "whether A knows B's belief",
+            ),
+            "opponent_policy": (
+                "B follows",
+                "B uses",
+                "B's policy",
+                "B stays out",
+                "NO_RESPONSE",
+            ),
+            "predicted_opponent_action": (
+                "B chooses",
+                "B produces",
+                "B's response",
+                "B takes no response",
+                "determine B's response",
+                "action B will take",
+            ),
+            "final_strategy": (
+                "Choose",
+                "maximize",
+                "highest exact",
+                "optimal information",
+            ),
         }
         markers = target_markers.get(str(target), ())
         return (
-            "Auditor ledger for this independent diagnostic question:" in prompt
-            and "requested diagnostic field" in prompt
+            "requested diagnostic field" in prompt
             and "Options:" in prompt
-            and any(marker in prompt for marker in markers)
+            and "Execution mapping:" in prompt
+            and any(marker.lower() in prompt.lower() for marker in markers)
+            and "Auditor ledger" not in prompt
         )
     family = row["experiment_family"]
     required = {
         "publicity_threshold": (
             "SAFE gives A and B",
-            "B follows a fixed coordination rule",
+            "B's policy is REQUIRE_BOTH_AGENTS_TO_KNOW",
             "simultaneously with B",
             "Options:",
         ),
@@ -993,7 +1120,9 @@ def _contains_expected_target(row: dict[str, Any]) -> bool:
             "Options:",
         ),
     }[family]
-    return all(marker.lower() in prompt.lower() for marker in required)
+    return "Execution mapping:" in prompt and all(
+        marker.lower() in prompt.lower() for marker in required
+    )
 
 
 def _pair_groups(
@@ -1076,9 +1205,11 @@ def control_audit(payload: dict[str, Any], config: dict[str, Any]) -> dict[str, 
         }
         expected_queries = {
             "world_state": 1,
+            "world_state_known": 0,
             "opponent_belief": 2,
+            "opponent_belief_known": 0,
             "opponent_policy": 3,
-            "none": 0,
+            "opponent_policy_known": 0,
         }
         if any(
             by_uncertainty.get(key, {}).get("expected_index") != value

@@ -1,5 +1,5 @@
 {
-  "audit_sha256": "6f5095a02fe4991692ee5a2893e276d973ead30c8b3d5178d455dc7af7b2f667",
+  "audit_sha256": "f2e5d119fa10c8f527726d1100d4dca44ff3201f67664390e7f4ec97753456ef",
   "budget": {
     "buffered_ceiling_usd": 1.5657119999999998,
     "hard_cost_limit_usd": 2.5,
@@ -11,8 +11,8 @@
     "gpu_seconds": 0,
     "model_forward_passes": 0
   },
-  "config_sha256": "7d0440bc79ab718d699651af3211e8b4bcc4c0f62d99c4546c5c65759b222c51",
-  "dataset_sha256": "6dd44ec883a346d1a88b68bfb487ea3b7b1fd8fcc0991dc1b8c6a87eb9d5924c",
+  "config_sha256": "31eb756cb08bf481129179c720431df60e54a3c1aaecb928cad722c9bb00a6ef",
+  "dataset_sha256": "13a964d29835c56f165f6913e3f0da12fbc18df73263bd4306026ae27b25c39f",
   "model": {
     "dtype": "bfloat16",
     "id": "Qwen/Qwen3.8-27B",
@@ -20,7 +20,7 @@
     "role": "primary_direct_behavioral_screen",
     "thinking": false
   },
-  "row_count": 3744,
+  "row_count": 4320,
   "schema_version": 1,
   "status": "local_cpu_controls_complete_no_model_run",
   "study_id": "V7-EAS-1"
