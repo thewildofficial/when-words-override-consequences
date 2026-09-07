@@ -56,6 +56,7 @@ MODAL_HARD_TIMEOUTS = {
     "qwen38-thinking-pilot": 1200,
     "qwen38-thinking-diagnostic": 2400,
 }
+THINKING_END_MARKERS = ("</think>", "</|think|>", "</|assistant_thinking|>")
 
 app = modal.App("jspace-v6-2-reasoning-capability-control")
 cache = modal.Volume.from_name("jspace-hf-cache", create_if_missing=True)
@@ -741,18 +742,35 @@ def _preflight_sample(
     on = _prepare_query(tokenizer, row, thinking=True, reasoning_effort=reasoning_effort)
     off_markers = [marker for marker in THINKING_MARKERS if marker in off["rendered"]]
     on_markers = [marker for marker in THINKING_MARKERS if marker in on["rendered"]]
-    if off_markers or not on_markers:
+    off_end_markers = [marker for marker in THINKING_END_MARKERS if marker in off["rendered"]]
+    on_end_markers = [marker for marker in THINKING_END_MARKERS if marker in on["rendered"]]
+    off_empty_sentinel = any(
+        re.search(
+            rf"{re.escape(open_marker)}\s*{re.escape(end_marker)}\s*$",
+            off["rendered"],
+        )
+        for open_marker, end_marker in zip(THINKING_MARKERS, THINKING_END_MARKERS, strict=True)
+    )
+    off_valid = (not off_markers and not off_end_markers) or off_empty_sentinel
+    on_valid = bool(on_markers) and not on_end_markers
+    if not off_valid or not on_valid:
         raise RuntimeError(
-            f"native thinking render contract failed: off={off_markers}, on={on_markers}"
+            "native thinking render contract failed: "
+            f"off_open={off_markers}, off_close={off_end_markers}, "
+            f"on_open={on_markers}, on_close={on_end_markers}"
         )
     return {
         "off": {
             "rendered_sha256": canonical_sha256(off["rendered"]),
             "thinking_markers": off_markers,
+            "thinking_end_markers": off_end_markers,
+            "empty_disabled_sentinel": off_empty_sentinel,
         },
         "on": {
             "rendered_sha256": canonical_sha256(on["rendered"]),
             "thinking_markers": on_markers,
+            "thinking_end_markers": on_end_markers,
+            "empty_disabled_sentinel": False,
         },
         "passed": True,
     }

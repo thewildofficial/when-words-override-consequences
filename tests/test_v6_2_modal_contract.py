@@ -51,6 +51,20 @@ class _ContractTokenizer:
         return {101: "A", 102: "B"}[token_ids[0]]
 
 
+class _Qwen38SentinelTokenizer(_ContractTokenizer):
+    def apply_chat_template(self, messages, **kwargs):
+        rendered = super().apply_chat_template(messages, **kwargs)
+        chat_template_kwargs = kwargs.get("chat_template_kwargs")
+        enable_thinking = (
+            chat_template_kwargs.get("enable_thinking", True)
+            if chat_template_kwargs is not None
+            else True
+        )
+        if not enable_thinking:
+            rendered += "<think>\n\n</think>\n\n"
+        return rendered
+
+
 def test_preflight_detects_native_thinking_render_and_direct_label_tokens() -> None:
     source, _source_config, _source_manifest = source_dataset(CONFIG)
     row = select_rows(source, "pilot")[0]
@@ -59,6 +73,18 @@ def test_preflight_detects_native_thinking_render_and_direct_label_tokens() -> N
     assert sample["passed"] is True
     assert sample["off"]["thinking_markers"] == []
     assert "<think>" in sample["on"]["thinking_markers"]
+
+
+def test_preflight_accepts_qwen38_empty_disabled_thinking_sentinel() -> None:
+    source, _source_config, _source_manifest = source_dataset(CONFIG)
+    row = select_rows(source, "pilot")[0]
+    sample = MODAL["_preflight_sample"](_Qwen38SentinelTokenizer(), row)
+    assert sample["passed"] is True
+    assert sample["off"]["thinking_markers"] == ["<think>"]
+    assert sample["off"]["thinking_end_markers"] == ["</think>"]
+    assert sample["off"]["empty_disabled_sentinel"] is True
+    assert sample["on"]["thinking_markers"] == ["<think>"]
+    assert sample["on"]["thinking_end_markers"] == []
 
 
 def test_direct_and_thinking_query_contracts_share_task_semantics() -> None:
