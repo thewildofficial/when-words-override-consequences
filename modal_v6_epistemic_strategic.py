@@ -52,8 +52,10 @@ image = (
     .apt_install("git")
     .uv_pip_install(
         "numpy>=2.0",
+        "pillow>=11",
         "scikit-learn>=1.6",
         "torch>=2.8",
+        "torchvision>=0.23",
         "transformers>=5.5",
         "huggingface_hub>=0.34",
     )

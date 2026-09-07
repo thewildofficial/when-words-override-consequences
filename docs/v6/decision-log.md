@@ -27,3 +27,14 @@ Append-only. New decisions are added at the bottom with a date and a reason.
 - Config SHA256: `8eed1a0c09ad37f329137e119f6ac7a973a86592a618b1de074d1d7553cb3706`.
 - All structural family gates passed.
 - No model forward pass or GPU allocation occurred.
+
+## 2026-09-07 — Qwen3.8 preflight infrastructure stop
+
+- Attempted the registered Qwen3.8 tokenizer parity preflight through GitHub
+  Actions/Modal run `34074486263`.
+- The run stopped before any prompt or token parity check because the Modal
+  image lacked `torchvision` and Pillow, which the model's multimodal
+  processor imports.
+- This is recorded as an infrastructure failure, not as a Qwen3.8 parity or
+  model finding. The image now declares those dependencies; the preflight must
+  be rerun before any Qwen3.8 paid stage can be considered.
