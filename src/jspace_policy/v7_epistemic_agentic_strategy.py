@@ -100,6 +100,20 @@ ACQUISITION_REPORT_ACTION_NAMES = (
     "STATE_ONE",
 )
 
+COMMITMENT_REPORT_OPTIONS = {
+    "own_information": (
+        ("CHANNEL_NONBINDING", "CHANNEL_BINDING"),
+        "whether using the channel is a binding irreversible lock",
+    ),
+    "opponent_information": (
+        ("B_DOES_NOT_OBSERVE_LOCK", "B_OBSERVES_LOCK"),
+        "whether B observes a real public lock",
+    ),
+    "opponent_belief": (
+        ("B_BELIEVES_A_NOT_LOCKED", "B_BELIEVES_A_LOCKED"),
+        "whether B believes A is irreversibly locked",
+    ),
+}
 REPORT_NAMES = {
     "world_state": "the physical world state",
     "own_information": "what A knows about the decision-relevant state",
@@ -290,6 +304,11 @@ class CommitmentGame:
         return int(values[1] > values[0])
 
     def epistemic_ledger(self, modality: str) -> dict[str, Any]:
+        # These fields are channel propositions, not knowledge-access bits.
+        # own_information = 1 iff the channel is a real irreversible lock;
+        # opponent_information = 1 iff B observes that real public lock;
+        # opponent_belief = 1 iff B believes A is irreversibly locked.
+        # A cheap promise is known-nonbinding, not unknown.
         real = int(modality in {"public_irreversible", "private_irreversible", "public_tool"})
         observed = int(modality in {"public_irreversible", "public_tool"})
         return {
@@ -763,6 +782,10 @@ def _report_spec(
                 "A's optimal information-acquisition strategy",
             )
 
+    if family == "credible_commitment" and target in COMMITMENT_REPORT_OPTIONS:
+        names, question = COMMITMENT_REPORT_OPTIONS[target]
+        return names, int(ledger[target]), question
+
     if target == "world_state":
         return concepts, int(ledger[target]), "the physical world state"
     if target == "opponent_policy":
@@ -1050,6 +1073,7 @@ def _contains_expected_target(row: dict[str, Any]) -> bool:
                 "known to A",
                 "A privately observes",
                 "currently relevant target",
+                "binding irreversible lock",
             ),
             "opponent_information": (
                 "B receives",
@@ -1059,12 +1083,14 @@ def _contains_expected_target(row: dict[str, Any]) -> bool:
                 "B does not observe",
                 "whether B has",
                 "what B knows",
+                "real public lock",
             ),
             "opponent_belief": (
                 "B knows A",
                 "B's belief",
                 "B's response equals",
                 "whether A knows B's belief",
+                "B believes A is irreversibly locked",
             ),
             "opponent_policy": (
                 "B follows",

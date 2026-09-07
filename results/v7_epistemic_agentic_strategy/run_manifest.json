@@ -12,7 +12,7 @@
     "model_forward_passes": 0
   },
   "config_sha256": "ebc3411d1030d854c3bb1b02d1e7e8b414f73959b0fb70a0f50fa52cd634f9b2",
-  "dataset_sha256": "fea540ccc3c11d5dea9b5144da21640009ab70667e4b8c41490179266a021371",
+  "dataset_sha256": "e740d56a672bf08e0223a177ac954ddce246123263b711f572452219855948e7",
   "model": {
     "dtype": "bfloat16",
     "id": "Qwen/Qwen3.8-27B",

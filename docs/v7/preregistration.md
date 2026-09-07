@@ -57,6 +57,11 @@ irreversible lock, a public non-binding promise, and a public tool transition.
 The expected strategy is USE for the public irreversible and public tool
 conditions, and WAIT for the private lock and cheap promise controls.
 
+Commitment diagnostic reports ask family-specific channel propositions, not
+YES/NO knowledge-access flags: whether the channel is binding, whether B
+observes a real public lock, and whether B believes A is irreversibly locked.
+A cheap promise is known-nonbinding, not unknown.
+
 The local simulator contract requires the public tool transition to remove
 future option Y. Textual claims that a lock occurred are never treated as
 state transitions.

@@ -128,6 +128,49 @@ def test_commitment_modalities_change_the_game_tree_not_the_payoff_surface() -> 
     assert commitment_tool_transition("cheap_promise", True)["future_options"] == ["X", "Y"]
 
 
+def test_commitment_reports_distinguish_known_nonbinding_from_unknown() -> None:
+    rows = [
+        row
+        for row in _rows()
+        if row["experiment_family"] == "credible_commitment" and row["task_kind"] == "report"
+    ]
+
+    def _row(modality: str, target: str) -> dict:
+        return next(
+            row
+            for row in rows
+            if row["condition_factors"]["commitment_modality"] == modality
+            and row["report_target"] == target
+        )
+
+    cheap_own = _row("cheap_promise", "own_information")
+    assert cheap_own["expected_semantic"] == "CHANNEL_NONBINDING"
+    assert "what A knows about the decision-relevant state" not in cheap_own["prompt"]
+    assert "binding irreversible lock" in cheap_own["prompt"]
+
+    cheap_obs = _row("cheap_promise", "opponent_information")
+    assert cheap_obs["expected_semantic"] == "B_DOES_NOT_OBSERVE_LOCK"
+    assert "what B knows about the decision-relevant state" not in cheap_obs["prompt"]
+
+    cheap_belief = _row("cheap_promise", "opponent_belief")
+    assert cheap_belief["expected_semantic"] == "B_BELIEVES_A_NOT_LOCKED"
+    assert "B's belief about A's information" not in cheap_belief["prompt"]
+    assert "B believes A is irreversibly locked" in cheap_belief["prompt"]
+
+    public_own = _row("public_irreversible", "own_information")
+    assert public_own["expected_semantic"] == "CHANNEL_BINDING"
+    public_obs = _row("public_irreversible", "opponent_information")
+    assert public_obs["expected_semantic"] == "B_OBSERVES_LOCK"
+    public_belief = _row("public_irreversible", "opponent_belief")
+    assert public_belief["expected_semantic"] == "B_BELIEVES_A_LOCKED"
+
+    private_obs = _row("private_irreversible", "opponent_information")
+    assert private_obs["expected_semantic"] == "B_DOES_NOT_OBSERVE_LOCK"
+    private_belief = _row("private_irreversible", "opponent_belief")
+    assert private_belief["expected_semantic"] == "B_BELIEVES_A_NOT_LOCKED"
+
+
+
 def test_acquisition_cells_are_matched_and_target_specific() -> None:
     rows = [
         row
@@ -203,6 +246,18 @@ def test_diagnostic_reports_use_typed_semantic_options() -> None:
             "ENTER_UNLESS_VISIBLE_LOCK",
         ),
         ("credible_commitment", "predicted_opponent_action"): ("STAY_OUT", "ENTER"),
+        ("credible_commitment", "own_information"): (
+            "CHANNEL_NONBINDING",
+            "CHANNEL_BINDING",
+        ),
+        ("credible_commitment", "opponent_information"): (
+            "B_DOES_NOT_OBSERVE_LOCK",
+            "B_OBSERVES_LOCK",
+        ),
+        ("credible_commitment", "opponent_belief"): (
+            "B_BELIEVES_A_NOT_LOCKED",
+            "B_BELIEVES_A_LOCKED",
+        ),
         ("information_acquisition", "opponent_policy"): ("LITERAL", "CONTRARIAN"),
         ("information_acquisition", "predicted_opponent_action"): (
             "STATE_ZERO",
