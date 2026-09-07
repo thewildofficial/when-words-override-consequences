@@ -49,6 +49,11 @@ A second-pass audit found a scoring bug (a skipped normalization step) in one se
 
 Next up is a proposed ~$30 follow-up asking whether reports *reveal* or *change* the information behind actions: [the next-sprint plan](docs/next-sprint/README.md) ([audit](docs/next-sprint/audit.md) · [literature](docs/next-sprint/literature.md) · [design](docs/next-sprint/experiments.md)).
 
+The next clean research branch is [V6-ES-1](docs/v6/README.md): a separate,
+factorial study of agent-indexed epistemic states, higher-order theory of mind,
+provenance, strategic safety reweighting, and evaluation-context sensitivity.
+Its CPU audit is complete; model execution is not yet run.
+
 ## Go deeper
 
 | You want... | Go here |
@@ -60,6 +65,7 @@ Next up is a proposed ~$30 follow-up asking whether reports *reveal* or *change*
 | Offline analyses and figures | [scripts](scripts/README.md) |
 | Test guardrails | [tests](tests/README.md) |
 | Why this matters for tool-using agents | [safety note](docs/v5/literature-positioning.md) |
+| New epistemic/ToM/strategy branch | [V6-ES-1 protocol](docs/v6/README.md) |
 
 Reproduce the lightweight checks (committed GPU outputs are immutable; these verify everything else):
 
