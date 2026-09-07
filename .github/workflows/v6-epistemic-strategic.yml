@@ -1,0 +1,114 @@
+name: V6 epistemic strategic experiments
+
+on:
+  push:
+    branches:
+      - research/epistemic-strategic-experiments
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: Maximum stage to run
+        required: true
+        default: local-controls
+        type: choice
+        options:
+          - local-controls
+          - preflight
+          - blackbox
+          - behavior
+          - trajectory
+          - activation-discovery
+          - activation-locked
+      model_key:
+        description: Frozen model namespace
+        required: true
+        default: primary
+        type: choice
+        options:
+          - primary
+          - qwen38_27b
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v6-epistemic-strategic-${{ github.event.inputs.model_key || 'primary' }}
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
+      MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
+      UV_CACHE_DIR: /tmp/jspace-uv-cache
+      V6_STAGE: ${{ inputs.stage || 'local-controls' }}
+      V6_MODEL_KEY: ${{ inputs.model_key || 'primary' }}
+
+    steps:
+      - name: Check out the frozen protocol
+        uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Run the full local test suite
+        run: uv run --extra dev pytest -q
+
+      - name: Run CPU-only freeze and family control audit
+        if: ${{ env.V6_STAGE == 'local-controls' }}
+        run: uv run python scripts/run_v6_epistemic_strategic_controls.py --freeze-dataset
+
+      - name: Refuse unapproved Qwen3.8 paid stages
+        if: ${{ env.V6_MODEL_KEY == 'qwen38_27b' && env.V6_STAGE != 'preflight' && env.V6_STAGE != 'local-controls' }}
+        shell: bash
+        run: |
+          echo "Qwen3.8 is registered but parity-locked; only preflight is permitted on this branch."
+          exit 1
+
+      - name: Refuse missing Modal credentials for remote stages
+        if: ${{ env.V6_STAGE != 'local-controls' }}
+        shell: bash
+        run: |
+          test -n "$MODAL_TOKEN_ID"
+          test -n "$MODAL_TOKEN_SECRET"
+
+      - name: Run tokenizer preflight
+        if: ${{ env.V6_STAGE == 'preflight' }}
+        run: uv run --extra modal modal run modal_v6_epistemic_strategic.py::preflight --model-key "$V6_MODEL_KEY"
+
+      - name: Run true black-box free generation
+        if: ${{ env.V6_STAGE == 'blackbox' }}
+        run: uv run --extra modal modal run modal_v6_epistemic_strategic.py::blackbox --model-key "$V6_MODEL_KEY"
+
+      - name: Run forced-choice logit behavior
+        if: ${{ env.V6_STAGE == 'behavior' }}
+        run: uv run --extra modal modal run modal_v6_epistemic_strategic.py::behavior --model-key "$V6_MODEL_KEY"
+
+      - name: Run matched trajectory controls
+        if: ${{ env.V6_STAGE == 'trajectory' }}
+        run: uv run --extra modal modal run modal_v6_epistemic_strategic.py::trajectory --model-key "$V6_MODEL_KEY"
+
+      - name: Run observational activation discovery
+        if: ${{ env.V6_STAGE == 'activation-discovery' }}
+        run: uv run --extra modal modal run modal_v6_epistemic_strategic.py::activation_discovery --model-key "$V6_MODEL_KEY"
+
+      - name: Keep locked causal stage sealed
+        if: ${{ env.V6_STAGE == 'activation-locked' }}
+        shell: bash
+        run: |
+          if uv run --extra modal modal run modal_v6_epistemic_strategic.py::activation_locked --model-key "$V6_MODEL_KEY"; then
+            echo "causal stage unexpectedly unlocked"
+            exit 1
+          fi
+          echo "locked causal stage refused as designed"
+
+      - name: Upload V6 artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: v6-epistemic-strategic-${{ env.V6_MODEL_KEY }}-${{ env.V6_STAGE }}-${{ github.run_id }}
+          path: results/v6_epistemic_strategic
+          if-no-files-found: warn
+          retention-days: 14

@@ -1,0 +1,8 @@
+{
+  "config_sha256": "8eed1a0c09ad37f329137e119f6ac7a973a86592a618b1de074d1d7553cb3706",
+  "dataset_sha256": "e5192e32126fcdfe5a606708a98a8264753092871bce3f427de8d5254d681995",
+  "row_count": 1740,
+  "schema_version": 1,
+  "status": "frozen_after_cpu_control_audit_before_model_execution",
+  "study_id": "V6-ES-1"
+}

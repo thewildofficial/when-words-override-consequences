@@ -1,0 +1,37 @@
+{
+  "candidate_token_sets": {
+    "actions": [
+      "A",
+      "B"
+    ],
+    "reports": [
+      "X",
+      "Y"
+    ]
+  },
+  "content_sha256": "8720a21ff8342fe44c1b7bedaa1c85f1a1d62cf6d483da875a72be8307a7b23e",
+  "created_at": "2026-09-07T02:08:16.038391+00:00",
+  "cross_model_parity": {
+    "passed": true,
+    "status": "not_applicable_primary_model"
+  },
+  "maximum_tokens": 322,
+  "minimum_tokens": 135,
+  "model_id": "Qwen/Qwen3.6-27B",
+  "model_key": "primary",
+  "model_revision_requested": "6a9e13bd6fc8f0983b9b99948120bc37f49c13e9",
+  "preflight_contract": {
+    "candidate_labels_sha256": "347d79b773ffeccd66c2d776b2372ab90f38b3b57ef95edbab3ac8737d612aa9",
+    "candidate_token_ids_sha256": "5be690a544323dbf1511adb7207f22d16533fa6c842f1a7ba200f7f04f193bee",
+    "prompt_token_ids_sha256": "e89b7156b7f222f6e0abbe195c645c1be32b5024ee6bf85a49bd6cbe27418984",
+    "query_count": 3544,
+    "query_ids_sha256": "5020fec8f9e0c4b40485af2987e545d89c8739d1b9ecc3aa9622ec21c57f1596",
+    "rendered_prompts_sha256": "bb398edac014338db20fc2f042f383ef161c44e82d72ff5e5081da1cbbe1f913"
+  },
+  "queries_checked": 3544,
+  "schema_version": 1,
+  "source_dataset_sha256": "e5192e32126fcdfe5a606708a98a8264753092871bce3f427de8d5254d681995",
+  "status": "tokenizer_preflight_passed",
+  "study_id": "V6-ES-1",
+  "tokenizer_loader": "AutoTokenizer"
+}
