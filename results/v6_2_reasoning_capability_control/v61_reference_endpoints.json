@@ -1,0 +1,54 @@
+{
+  "content_sha256": "4c40ee91ea2e7ac39a522d5d524c74f9a68bedee2bb1df5118f05f68512d814c",
+  "definition": "Secondary reanalysis of the V6.1 locked forced-choice artifact; this endpoint is not a replacement V6.1 preregistered gate.",
+  "endpoints": {
+    "H3_explicit_both_correct_and_switch": {
+      "definition": "Both independent and copied rows are correct and their selected semantic indexes differ. Mean is the unweighted mean of game-level cell rates.",
+      "game_rates": {
+        "evidence-l000": 0.0,
+        "evidence-l001": 0.0,
+        "evidence-l002": 0.0,
+        "evidence-l003": 0.0,
+        "evidence-l004": 0.0,
+        "evidence-l005": 0.0
+      },
+      "mean": 0.0,
+      "n_games": 6,
+      "n_pair_cells": 36,
+      "prompt_mode": "explicit_rule",
+      "successes": 0
+    },
+    "H3_provenance_both_correct_and_switch": {
+      "definition": "Both independent and copied rows are correct and their selected semantic indexes differ. Mean is the unweighted mean of game-level cell rates.",
+      "game_rates": {
+        "evidence-l000": 0.0,
+        "evidence-l001": 0.0,
+        "evidence-l002": 0.0,
+        "evidence-l003": 0.0,
+        "evidence-l004": 0.0,
+        "evidence-l005": 0.16666666666666666
+      },
+      "mean": 0.027777777777777776,
+      "n_games": 6,
+      "n_pair_cells": 36,
+      "prompt_mode": "provenance_only",
+      "successes": 1
+    }
+  },
+  "reference_condition": "qwen36_direct",
+  "reference_model_id": "Qwen/Qwen3.6-27B",
+  "reference_study_id": "V6.1-ES-2",
+  "schema_version": 1,
+  "source": {
+    "locked_h3_pair_row_count": 144,
+    "locked_row_count": 2496,
+    "raw_file_sha256": "5c804655454ec6d31821ef55df89840cd8fbe4cf96653869bc5f62a02e63a975",
+    "raw_member": "v6.1-es2-qwen36-primary/raw/behavior_primary.json",
+    "raw_payload_content_sha256": "7c41c8ed2ae611f10291d2104558cf54fff5b4eb3620c98a29c4c043b11dc455",
+    "release_asset_sha256": "716a37a330c8681106587fd441aa0f7b0a42facae7b65c927ed48f9dcab08f37",
+    "release_asset_url": "https://github.com/thewildofficial/when-words-override-consequences/releases/download/v6.1-es2-qwen36-primary/v6.1-es2-qwen36-primary-raw.tar.gz",
+    "source_config_sha256": "c2c272a2fb7f3feeceb3651b85b334bfcd9177b05353fb1ee5e86c9b0ff1b9a5",
+    "source_dataset_sha256": "14aea862bd5f195b11ebe77f97fb6be857717bd10c47375e9c11cd773214d77a"
+  },
+  "study_id": "V6.2-RCC-1"
+}
