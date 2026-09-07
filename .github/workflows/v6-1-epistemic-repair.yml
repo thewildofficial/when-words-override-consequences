@@ -22,9 +22,23 @@ on:
         options:
           - primary
           - qwen38_27b
+      prior_run_id:
+        description: Prior behavior Actions run ID for standalone black-box ledger restoration
+        required: false
+        default: ''
+        type: string
+      prior_stage:
+        description: Stage name of the prior run containing the behavior ledger
+        required: false
+        default: full-primary
+        type: choice
+        options:
+          - behavior
+          - full-primary
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: v6-1-epistemic-repair-${{ inputs.model_key || 'primary' }}-${{ inputs.stage || 'local-controls' }}
@@ -40,6 +54,8 @@ jobs:
       UV_CACHE_DIR: /tmp/jspace-uv-cache
       V61_STAGE: ${{ inputs.stage || 'local-controls' }}
       V61_MODEL_KEY: ${{ inputs.model_key || 'primary' }}
+      V61_PRIOR_RUN_ID: ${{ inputs.prior_run_id || '' }}
+      V61_PRIOR_STAGE: ${{ inputs.prior_stage || 'full-primary' }}
 
     steps:
       - name: Check out the frozen protocol
@@ -71,6 +87,30 @@ jobs:
         run: |
           test -n "$MODAL_TOKEN_ID"
           test -n "$MODAL_TOKEN_SECRET"
+
+      - name: Require prior run for standalone black-box ledger restoration
+        if: ${{ env.V61_STAGE == 'blackbox' && env.V61_PRIOR_RUN_ID == '' }}
+        shell: bash
+        run: |
+          echo "Standalone black-box requires prior_run_id so cumulative study cost can be restored."
+          exit 1
+
+      - name: Restore prior cumulative study ledger
+        if: ${{ env.V61_STAGE == 'blackbox' && env.V61_PRIOR_RUN_ID != '' }}
+        uses: actions/download-artifact@v6
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ env.V61_PRIOR_RUN_ID }}
+          name: v6-1-epistemic-repair-${{ env.V61_MODEL_KEY }}-${{ env.V61_PRIOR_STAGE }}-${{ env.V61_PRIOR_RUN_ID }}
+          path: /tmp/v61-prior-behavior
+
+      - name: Install restored cumulative study ledger
+        if: ${{ env.V61_STAGE == 'blackbox' && env.V61_PRIOR_RUN_ID != '' }}
+        shell: bash
+        run: |
+          test -s /tmp/v61-prior-behavior/cost_ledger.jsonl
+          mkdir -p results/v6_1_epistemic_repair
+          cp /tmp/v61-prior-behavior/cost_ledger.jsonl results/v6_1_epistemic_repair/cost_ledger.jsonl
 
       - name: Run model-specific tokenizer preflight
         if: ${{ env.V61_STAGE == 'preflight' }}

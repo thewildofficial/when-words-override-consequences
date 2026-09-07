@@ -34,6 +34,13 @@
     }
   },
   "total_measured_subtotal_usd": 1.2617046187905618,
+  "cost_admission": {
+    "frozen_hard_limit_usd": 2.0,
+    "combined_workflow_blackbox_projection_usd": 2.26,
+    "historical_separate_blackbox_run": "execution_deviation_job_local_ledger_reset",
+    "historical_deviation_affects_confirmatory_behavior": false,
+    "future_standalone_blackbox_requires_prior_run_id": true
+  },
   "gpu": "NVIDIA A100-SXM4-80GB",
   "activations_collected": false,
   "interpretation": {

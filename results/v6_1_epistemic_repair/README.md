@@ -50,6 +50,12 @@ and links are recorded in [`model_run_manifest_primary.json`](model_run_manifest
 - `analysis_primary.json` (compact overview)
 - `analysis_primary_production.json` (full production analyzer output)
 
+Standalone black-box workflow runs now require `prior_run_id` and restore the
+prior behavior artifact's `cost_ledger.jsonl` before GPU admission. This keeps
+the cumulative study budget fail-closed across Actions runs; the historical
+black-box run predates that guard and is explicitly recorded as a deviation in
+the primary findings.
+
 These files are content-addressed and refuse non-identical overwrite. A model
 failure is retained as a family-specific negative; infrastructure or parity
 failures are labeled separately and are not scored as model behavior.
