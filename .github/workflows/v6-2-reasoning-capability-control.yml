@@ -11,8 +11,8 @@ on:
         options:
           - local-controls
           - preflight-qwen38
-          - qwen38-direct
           - qwen38-thinking-pilot
+          - qwen38-direct
           - qwen38-thinking-diagnostic
       prior_run_id:
         description: Prior Actions run ID whose V6.2 artifact restores the cumulative ledger
@@ -27,8 +27,8 @@ on:
         options:
           - local-controls
           - preflight-qwen38
-          - qwen38-direct
           - qwen38-thinking-pilot
+          - qwen38-direct
           - qwen38-thinking-diagnostic
 
 permissions:
@@ -82,9 +82,9 @@ jobs:
           test -n "$MODAL_TOKEN_SECRET"
           case "$V62_STAGE:$V62_PRIOR_STAGE" in
             preflight-qwen38:local-controls) ;;
-            qwen38-direct:preflight-qwen38) ;;
-            qwen38-thinking-pilot:qwen38-direct) ;;
-            qwen38-thinking-diagnostic:qwen38-thinking-pilot) ;;
+            qwen38-thinking-pilot:preflight-qwen38) ;;
+            qwen38-direct:qwen38-thinking-pilot) ;;
+            qwen38-thinking-diagnostic:qwen38-direct) ;;
             *)
               echo "invalid staged predecessor: $V62_STAGE requires $V62_PRIOR_STAGE" >&2
               exit 1

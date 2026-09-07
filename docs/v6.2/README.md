@@ -62,8 +62,8 @@ Paid stages are exposed only through the manual
 
 1. `local-controls`
 2. `preflight-qwen38`
-3. `qwen38-direct` (locked)
-4. `qwen38-thinking-pilot` (validation only)
+3. `qwen38-thinking-pilot` (validation only)
+4. `qwen38-direct` (locked)
 5. `qwen38-thinking-diagnostic` (locked)
 
 Each later launch requires the exact predecessor Actions run ID. The preflight

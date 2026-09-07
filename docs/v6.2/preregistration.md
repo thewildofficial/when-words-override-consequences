@@ -154,10 +154,11 @@ the same values used by the ledger: 900 seconds for preflight, 1,800 for
 direct, 1,200 for the validation pilot, and 2,400 for the locked diagnostic.
 
 The workflow has separate `workflow_dispatch` choices for CPU controls,
-Qwen3.8 preflight, full locked direct behavior, validation thinking pilot, and
-locked thinking diagnostic. The required predecessor chain is explicit and
-there is no automatic sequence. Every later Actions run restores the ledger
-from an explicitly supplied prior run ID. The preflight records a
+Qwen3.8 preflight, validation thinking pilot, full locked direct behavior, and
+locked thinking diagnostic. The required predecessor chain is explicit:
+preflight → validation pilot → locked direct → locked diagnostic. There is no
+automatic sequence. Every later Actions run restores the ledger from an
+explicitly supplied prior run ID. The preflight records a
 `protocol_commit_sha`; every paid stage fails closed unless the current
 Actions commit, config, source dataset, all subset hashes, model revision, and
 preflight hash match it. No multi-GPU or 100B+ model is permitted.

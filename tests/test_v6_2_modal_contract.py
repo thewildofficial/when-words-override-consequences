@@ -126,3 +126,24 @@ def test_thinking_generation_uses_the_frozen_sampling_regime() -> None:
         "max_new_tokens": 1536,
         "pad_token_id": 0,
     }
+
+
+def test_direct_query_contract_uses_the_flat_preflight_contract() -> None:
+    source, _source_config, _source_manifest = source_dataset(CONFIG)
+    subset = subset_payload(source, CONFIG, "pilot")
+    tokenizer = _ContractTokenizer()
+    queries, _ = MODAL["_query_rows"](tokenizer, subset, thinking=False)
+    preflight = {
+        "preflight_contract": {
+            "direct": MODAL["_query_contract"](queries, semantic=False)
+        }
+    }
+    validated = MODAL["_validate_query_contract"](
+        tokenizer,
+        subset,
+        preflight,
+        selection="direct",
+        thinking=False,
+        reasoning_effort="xhigh",
+    )
+    assert len(validated) == len(queries)

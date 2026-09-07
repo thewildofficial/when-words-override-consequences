@@ -712,9 +712,10 @@ def _validate_query_contract(
         thinking=thinking,
         reasoning_effort=reasoning_effort,
     )
-    expected = preflight["preflight_contract"][selection]
     contract_key = "thinking" if thinking else "direct"
-    if _query_contract(queries, semantic=False) != expected[contract_key]:
+    expected = preflight["preflight_contract"][selection]
+    expected_contract = expected if selection == "direct" else expected[contract_key]
+    if _query_contract(queries, semantic=False) != expected_contract:
         raise RuntimeError(f"{selection} query contract differs from preflight")
     return queries
 
