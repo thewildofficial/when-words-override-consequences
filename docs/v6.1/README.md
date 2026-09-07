@@ -31,9 +31,9 @@ pooled result.
 
 ## What the CPU audit froze
 
-The committed generator produces 6,144 deterministic rows at control time:
-2,048 per split across discovery, validation, and locked. The locked split is
-2,048 rows. The generated row table is intentionally ignored by git; the
+The committed generator produces 7,392 deterministic rows at control time:
+2,464 per split across discovery, validation, and locked. The locked split is
+2,464 rows. The generated row table is intentionally ignored by git; the
 manifest pins its hash, and the CPU control step regenerates and verifies it
 before any Modal stage.
 
@@ -41,16 +41,16 @@ before any Modal stage.
 |---|---:|---:|---|
 | `ledger_binding` | 480 | 160 | Are complete, visible role-indexed values kept distinct? |
 | `policy_composition` | 144 | 48 | Is receiver belief composed with a within-game policy flip? |
-| `evidence_update` | 3,456 | 1,152 | Do independent observations count differently from copies? |
+| `evidence_update` | 4,320 | 1,440 | Do independent observations count differently from copies, including provenance-only prompts? |
 | `recursive_strategy` | 192 | 64 | Does explicit level-k recursion affect prediction and action? |
-| `active_information` | 384 | 128 | Is inspection chosen by certified value of information? |
-| `monitoring_goal` | 1,152 | 384 | Do real penalties matter while audit wording stays inert? |
-| `scaffold_order` | 336 | 112 | Does preceding content matter beyond turn/label priming? |
+| `active_information` | 768 | 256 | Is inspection chosen by certified value of information rather than superficial cues? |
+| `monitoring_goal` | 1,152 | 384 | Do real penalties matter while audit wording stays inert, including lexical conflict? |
+| `scaffold_order` | 336 | 112 | Does preceding content matter beyond turn/label priming, with a real prior-report trajectory? |
 
 The CPU control record reports:
 
-- config SHA256: `f0afb9d073a46cedf2b9685dfa12b4d9affc32781fb99c6759822afbcda37c12`
-- dataset SHA256: `fe5b63bb7bbe31c95fe35d700b8b8cefa6de7a409cac0207ece79e909ebc669a`
+- config SHA256: `0931f43b68d155708168190e10f2173d3f7b9547f63493f64f54f48faaa8dff4`
+- dataset SHA256: `4a0caeabefd8a52883d0e3632460fec138f4919cc541f7ecb21d255a39712114`
 - all seven structural and semantic family gates: passed
 - GPU seconds: `0`
 - model forward passes: `0`
@@ -65,10 +65,26 @@ The CPU control record reports:
 3. Action→report is compared with a direct report using the exact same report
    prompt. The only extra content is the preceding action turn, whose answer
    is recorded separately.
-4. Safety rows cross both modeled beliefs and force a penalty switch in every
+4. Active-information rows pair positive-VOI and negative-VOI payoff profiles
+   within the same uncertainty, stake, cost, and reliability cell. The gate is
+   a within-pair inspect/act switch; a superficial stake/cost heuristic cannot
+   satisfy it.
+5. Safety rows cross both modeled beliefs and force a penalty switch in every
    game/belief cell. Audit cues are payoff-, policy-, and information-neutral.
-5. Independent and copied evidence are explicitly crossed at counts 0, 1, 2,
-   and 4, with an integer scoring certificate visible in the prompt.
+   The `lexical_conflict` surface intentionally calls the penalized action
+   “protective” and the unpenalized action “hazardous”; it is an adversarial
+   wording control, not a safety conclusion.
+6. Independent and copied evidence are crossed at counts 0, 1, 2, and 4. The
+   four-observation cells have both an explicit-rule calibration and a
+   provenance-only prompt that exposes IDs without stating how repeated IDs
+   should be weighted.
+7. Fixed scaffold rows are content-only controls. Only the `self_generated`
+   rows receive an earlier sampled report as a genuine assistant turn; no
+   fixed-source row is interpreted as evidence of source provenance.
+
+All confirmatory estimates first aggregate matched endpoints within each
+`game_id`; bootstrap draws resample games, not lower-level cells. Paired
+sign-flip tests are run only after the corresponding family gate passes.
 
 ## Measurement boundary
 

@@ -300,6 +300,7 @@ def _report_materialization(
     )
     return prompt, {
         "source_report_id": report_id,
+        "source_report_prompt": report_row["prompt"],
         "source_report_label": label,
         "source_report_value": value,
         "source_report_correct": label == report_row["expected_choice"],
@@ -350,7 +351,13 @@ def _query_rows(
             continue
         if row.get("scaffold_source") == "self_generated":
             prompt, materialization = _report_materialization(row, static_outputs, row_by_id)
-            messages = trajectory_messages(row, materialized_prompt=prompt)
+            report_row = row_by_id[str(row["scaffold_report_id"])]
+            messages = trajectory_messages(
+                row,
+                first_answer=str(materialization["source_report_label"]),
+                materialized_prompt=prompt,
+                preceding_prompt=report_row["prompt"],
+            )
         else:
             action_row = row_by_id[str(row["trajectory_action_row_id"])]
             action_output = static_outputs[action_row["condition_id"]]
@@ -394,12 +401,14 @@ def _records(
             "task_kind": row["task_kind"],
             "split": row["split"],
             "game_id": row["game_id"],
+            "matched_group_id": row["matched_group_id"],
             "expected": expected,
             "selected": selected,
             "expected_index": row["expected_index"],
             "expected_value": row["expected_value"],
             "expected_semantic": row["expected_semantic"],
             "selected_index": row["choice_mapping"].get(selected) if selected else None,
+            "choice_mapping": row["choice_mapping"],
             "vo_i": row["vo_i"],
             "scaffold_source": row["scaffold_source"],
             "trajectory_condition": row.get("trajectory_condition"),

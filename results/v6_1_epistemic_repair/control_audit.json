@@ -1,9 +1,9 @@
 {
-  "config_sha256": "f0afb9d073a46cedf2b9685dfa12b4d9affc32781fb99c6759822afbcda37c12",
-  "dataset_sha256": "fe5b63bb7bbe31c95fe35d700b8b8cefa6de7a409cac0207ece79e909ebc669a",
+  "config_sha256": "0931f43b68d155708168190e10f2173d3f7b9547f63493f64f54f48faaa8dff4",
+  "dataset_sha256": "4a0caeabefd8a52883d0e3632460fec138f4919cc541f7ecb21d255a39712114",
   "family_counts": {
-    "active_information": 384,
-    "evidence_update": 3456,
+    "active_information": 768,
+    "evidence_update": 4320,
     "ledger_binding": 480,
     "monitoring_goal": 1152,
     "policy_composition": 144,
@@ -15,19 +15,23 @@
       "both_query_outcomes_exist": true,
       "factorial_cells_complete": true,
       "gate_pass": true,
-      "stop_if_failed": "do not infer value-of-information sensitivity"
+      "stop_if_failed": "do not infer value-of-information sensitivity",
+      "within_pair_voi_switches_present": true
     },
     "evidence_update": {
       "evidence_prompts_are_visible": true,
       "gate_pass": true,
       "independent_and_copied_cells_complete": true,
-      "stop_if_failed": "do not interpret count/dependence effects"
+      "stop_if_failed": "do not interpret count/dependence effects",
+      "target_perturbation_contract": true
     },
     "ledger_binding": {
       "complete_ledger_cells": true,
       "gate_pass": true,
+      "nuisance_invariance_contract": true,
       "prompt_values_are_visible": true,
-      "stop_if_failed": "do not interpret report/action consistency as agent-indexed state use"
+      "stop_if_failed": "do not interpret report/action consistency as agent-indexed state use",
+      "target_perturbation_contract": true
     },
     "monitoring_goal": {
       "audit_cue_is_payoff_invariant": true,
@@ -39,6 +43,7 @@
       "derived_response_not_supplied": true,
       "gate_pass": true,
       "stop_if_failed": "do not call policy differences a belief-policy composition result",
+      "target_perturbation_contract": true,
       "within_game_policy_pairs_complete": true
     },
     "recursive_strategy": {
@@ -50,7 +55,7 @@
       "all_sources_present": true,
       "direct_and_action_first_report_prompts_identical": true,
       "gate_pass": true,
-      "self_generated_is_placeholder_bound": true,
+      "self_generated_is_true_trajectory": true,
       "stop_if_failed": "do not claim self-generated scaffolding"
     }
   },
@@ -62,6 +67,86 @@
   "interpretation": "No model has been run; this is protocol validation only.",
   "prompt_audit": {
     "derived_response_leaks": [],
+    "downstream_answer_leaks": [],
+    "family_audit": {
+      "active_information": {
+        "derived_response_leak": true,
+        "downstream_answer_leak": true,
+        "dynamic_contract": true,
+        "nuisance_invariance": true,
+        "passed": true,
+        "static_placeholder": true,
+        "target_latent_perturbation": true,
+        "target_removal": true,
+        "visible_derivability": true
+      },
+      "evidence_update": {
+        "derived_response_leak": true,
+        "downstream_answer_leak": true,
+        "dynamic_contract": true,
+        "nuisance_invariance": true,
+        "passed": true,
+        "static_placeholder": true,
+        "target_latent_perturbation": true,
+        "target_removal": true,
+        "visible_derivability": true
+      },
+      "ledger_binding": {
+        "derived_response_leak": true,
+        "downstream_answer_leak": true,
+        "dynamic_contract": true,
+        "nuisance_invariance": true,
+        "passed": true,
+        "static_placeholder": true,
+        "target_latent_perturbation": true,
+        "target_removal": true,
+        "visible_derivability": true
+      },
+      "monitoring_goal": {
+        "derived_response_leak": true,
+        "downstream_answer_leak": true,
+        "dynamic_contract": true,
+        "nuisance_invariance": true,
+        "passed": true,
+        "static_placeholder": true,
+        "target_latent_perturbation": true,
+        "target_removal": true,
+        "visible_derivability": true
+      },
+      "policy_composition": {
+        "derived_response_leak": true,
+        "downstream_answer_leak": true,
+        "dynamic_contract": true,
+        "nuisance_invariance": true,
+        "passed": true,
+        "static_placeholder": true,
+        "target_latent_perturbation": true,
+        "target_removal": true,
+        "visible_derivability": true
+      },
+      "recursive_strategy": {
+        "derived_response_leak": true,
+        "downstream_answer_leak": true,
+        "dynamic_contract": true,
+        "nuisance_invariance": true,
+        "passed": true,
+        "static_placeholder": true,
+        "target_latent_perturbation": true,
+        "target_removal": true,
+        "visible_derivability": true
+      },
+      "scaffold_order": {
+        "derived_response_leak": true,
+        "downstream_answer_leak": true,
+        "dynamic_contract": true,
+        "nuisance_invariance": true,
+        "passed": true,
+        "static_placeholder": true,
+        "target_latent_perturbation": true,
+        "target_removal": true,
+        "visible_derivability": true
+      }
+    },
     "family_prompt_variation": {
       "active_information": true,
       "evidence_update": true,
@@ -72,15 +157,20 @@
       "scaffold_order": true
     },
     "missing_expected_target_rows": [],
+    "nuisance_invariance_failures": [],
     "passed": true,
-    "self_generated_placeholder_failures": []
+    "self_generated_dynamic_contract_failures": [],
+    "self_generated_placeholder_failures": [],
+    "target_latent_perturbation_failures": [],
+    "target_removal_failures": [],
+    "visible_derivability_failures": []
   },
-  "row_count": 6144,
+  "row_count": 7392,
   "schema_version": 1,
   "split_counts": {
-    "discovery": 2048,
-    "locked": 2048,
-    "validation": 2048
+    "discovery": 2464,
+    "locked": 2464,
+    "validation": 2464
   },
   "status": "cpu_semantic_controls_passed",
   "study_id": "V6.1-ES-2"

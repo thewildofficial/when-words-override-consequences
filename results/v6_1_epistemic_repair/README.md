@@ -5,8 +5,8 @@ Branch: `research/v6-1-epistemic-repair`
 
 ## Current status
 
-The local CPU protocol audit passed. It generated and verified 6,144 rows
-across seven family-specific factorials and three splits, including 2,048
+The local CPU protocol audit passed. It generated and verified 7,392 rows
+across seven family-specific factorials and three splits, including 2,464
 locked rows. The generated table is hash-pinned but git-ignored; it is
 materialized by the control step in every clean checkout. No model forward
 pass has occurred in this checkout yet.
@@ -17,6 +17,12 @@ The machine-readable records are:
   cells, trajectory prompt identity, and family structural gates;
 - [`run_manifest.json`](run_manifest.json) — content hashes and zero-compute
   provenance.
+
+Confirmatory analysis aggregates each endpoint to the declared `game_id`
+cluster before bootstrapping. Paired sign-flip tests are conditional on a
+family gate and never rescue a failed gate. H5 uses matched positive/negative
+VOI profiles; H7 treats fixed scaffolds as content-only and reserves the
+“self-generated” label for a real preceding assistant report turn.
 
 The expected remote artifacts, once the manual GitHub Actions workflow runs,
 are stored under `raw/`:
