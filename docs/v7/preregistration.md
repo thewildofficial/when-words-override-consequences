@@ -71,7 +71,9 @@ state, B's belief, or B's policy. Each target has an unknown and a matched
 known condition. The target-specific inspection has positive net value only in
 the corresponding unknown condition; inspections of known or irrelevant
 targets have negative net value. In each known-target control, A should
-ACT_NOW.
+ACT_NOW. H5 support requires the world, opponent-belief, and opponent-policy
+unknown-to-known identifying pairs to pass separately; an aggregate targeted
+choice rate cannot rescue a failed pair.
 
 ## Measurement
 

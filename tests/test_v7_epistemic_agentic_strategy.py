@@ -171,6 +171,25 @@ def test_acquisition_cells_are_matched_and_target_specific() -> None:
                 assert values[target_indices[uncertainty]] > values[0]
 
 
+def test_acquisition_action_rows_have_finite_regrets() -> None:
+    rows = [
+        row
+        for row in _rows()
+        if row["experiment_family"] == "information_acquisition"
+        and row["task_kind"] == "action"
+    ]
+    assert rows
+    for row in rows:
+        regrets = row["regret_by_index"]
+        assert regrets is not None
+        assert len(regrets) == 4
+        assert all(isinstance(value, (int, float)) for value in regrets)
+        assert all(value >= 0 for value in regrets)
+        assert regrets[row["expected_index"]] == 0
+        assert row["epistemic_certificate"]["regret_by_index"] == regrets
+
+
+
 def test_diagnostic_reports_use_typed_semantic_options() -> None:
     rows = [row for row in _rows() if row["task_kind"] == "report"]
     expected = {

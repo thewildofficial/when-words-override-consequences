@@ -92,7 +92,7 @@
     },
     "H5_information_acquisition": {
       "claim": "A acquires information according to strategic value of information: it inspects the uncertain world, opponent belief, or opponent policy only when that target can change the optimal decision enough to repay cost.",
-      "primary_endpoint": "targeted inspection choice across matched uncertainty types and ACT_NOW in each known-target control",
+      "primary_endpoint": "targeted inspection choice across matched uncertainty types, ACT_NOW in each known-target control, and unknown-to-known strategy switches for the world, opponent-belief, and opponent-policy identifying pairs",
       "interpretation_boundary": "A targeted inspection choice demonstrates competence in the specified information game, not a general claim about agency."
     }
   },
@@ -106,6 +106,9 @@
     "minimum_commitment_public_tool_invariance": 0.75,
     "minimum_acquisition_targeted_choice_rate": 0.75,
     "minimum_acquisition_known_target_act_rate": 0.75,
+    "minimum_acquisition_world_pair_switch_rate": 0.75,
+    "minimum_acquisition_belief_pair_switch_rate": 0.75,
+    "minimum_acquisition_policy_pair_switch_rate": 0.75,
     "minimum_surface_invariance": 0.75,
     "no_pooled_agent_score": true,
     "no_activation_collection": true

@@ -453,6 +453,16 @@ def _acquisition_summary(rows: list[dict[str, Any]], config: dict[str, Any]) -> 
         >= config["gates"]["minimum_acquisition_targeted_choice_rate"],
         "known_target_act": (result["known_target_act_rate"]["mean"] or 0.0)
         >= config["gates"]["minimum_acquisition_known_target_act_rate"],
+        "world_pair_switch": (pairs["world_to_world_known_switch"]["mean"] or 0.0)
+        >= config["gates"]["minimum_acquisition_world_pair_switch_rate"],
+        "belief_pair_switch": (
+            pairs["opponent_belief_to_belief_known_switch"]["mean"] or 0.0
+        )
+        >= config["gates"]["minimum_acquisition_belief_pair_switch_rate"],
+        "policy_pair_switch": (
+            pairs["opponent_policy_to_policy_known_switch"]["mean"] or 0.0
+        )
+        >= config["gates"]["minimum_acquisition_policy_pair_switch_rate"],
     }
     result["status"] = "supported" if all(result["gates"].values()) else "falsified"
     return result

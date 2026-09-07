@@ -617,7 +617,7 @@ def _acquisition_prefix(
         "cost. Do not inspect merely because a word says uncertainty; inspect only if the "
         "revealed target changes the optimal final action enough to repay the cost.\n"
     )
-    expected, _best, values = game.optimal_query()
+    expected, best, values = game.optimal_query()
     ledger = game.epistemic_ledger()
     certificate = {
         "ledger": ledger,
@@ -630,6 +630,7 @@ def _acquisition_prefix(
         "inspection_cost": game.inspection_cost,
         "query_values": {str(k): v for k, v in values.items()},
         "optimal_query": expected,
+        "regret_by_index": [best - values[index] for index in range(4)],
     }
     body += _execution_mapping(
         ("ACT_NOW", "INSPECT_WORLD", "INSPECT_B_BELIEF", "INSPECT_B_POLICY"), display
@@ -982,11 +983,7 @@ def _acquisition_rows(config: dict[str, Any]) -> list[dict[str, Any]]:
                 )
             )
         else:
-            expected, _best, values = game.optimal_query()
-            certificate = {
-                **certificate,
-                "regret_by_index": [max(values.values()) - values.get(i, 0) for i in range(4)],
-            }
+            expected = int(certificate["optimal_query"])
             prompt = prompt + "Choose the information-acquisition option now. "
             rows.append(
                 _row(
