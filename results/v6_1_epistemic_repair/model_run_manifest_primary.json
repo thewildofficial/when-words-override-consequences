@@ -1,0 +1,58 @@
+{
+  "study_id": "V6.1-ES-2",
+  "model_key": "primary",
+  "model_id": "Qwen/Qwen3.6-27B",
+  "model_revision": "6a9e13bd6fc8f0983b9b99948120bc37f49c13e9",
+  "config_sha256": "c2c272a2fb7f3feeceb3651b85b334bfcd9177b05353fb1ee5e86c9b0ff1b9a5",
+  "dataset_sha256": "14aea862bd5f195b11ebe77f97fb6be857717bd10c47375e9c11cd773214d77a",
+  "locked_rows": 2496,
+  "stages": {
+    "behavior": {
+      "measurement": "candidate_token_logits_no_activations",
+      "records_total": 7488,
+      "records_by_split": {
+        "discovery": 2496,
+        "validation": 2496,
+        "locked": 2496
+      },
+      "confirmatory_records": 2496,
+      "content_sha256": "7c41c8ed2ae611f10291d2104558cf54fff5b4eb3620c98a29c4c043b11dc455",
+      "run_id": "2baf643038f047eca6e76e3e85d185ad",
+      "actions_run": "34152531767",
+      "elapsed_seconds": 965.794427704,
+      "measured_subtotal_usd": 0.8400866249940473
+    },
+    "blackbox": {
+      "measurement": "free_generation_text_only",
+      "records": 2496,
+      "parse_rate": 1.0,
+      "content_sha256": "97b4713fc31f847b6cb4b8531bdec4576d8f8f2ae8173891d0951502339c39a0",
+      "run_id": "f9622bce604d4087a402ad73406256ae",
+      "actions_run": "34154058341",
+      "elapsed_seconds": 484.707525288,
+      "measured_subtotal_usd": 0.4216179937965139
+    }
+  },
+  "total_measured_subtotal_usd": 1.2617046187905618,
+  "cost_admission": {
+    "frozen_hard_limit_usd": 2.0,
+    "combined_workflow_blackbox_projection_usd": 2.26,
+    "historical_separate_blackbox_run": "execution_deviation_job_local_ledger_reset",
+    "historical_deviation_affects_confirmatory_behavior": false,
+    "future_standalone_blackbox_requires_prior_run_id": true
+  },
+  "gpu": "NVIDIA A100-SXM4-80GB",
+  "activations_collected": false,
+  "interpretation": {
+    "gate_pass": false,
+    "all_seven_family_gates": "falsified",
+    "mechanistic_claim_allowed": false,
+    "deception_claim_allowed": false,
+    "blackbox_is_descriptive_companion": true
+  },
+  "artifact_links": {
+    "behavior_and_full_primary": "https://github.com/thewildofficial/when-words-override-consequences/actions/runs/34152531767/artifacts/10030218459",
+    "blackbox": "https://github.com/thewildofficial/when-words-override-consequences/actions/runs/34154058341/artifacts/10030538627",
+    "persistent_raw_archive": "https://github.com/thewildofficial/when-words-override-consequences/releases/tag/v6.1-es2-qwen36-primary"
+  }
+}

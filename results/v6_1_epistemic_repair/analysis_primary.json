@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "study_id": "V6.1-ES-2",
+  "model_key": "primary",
+  "model_id": "Qwen/Qwen3.6-27B",
+  "model_revision": "6a9e13bd6fc8f0983b9b99948120bc37f49c13e9",
+  "config_sha256": "c2c272a2fb7f3feeceb3651b85b334bfcd9177b05353fb1ee5e86c9b0ff1b9a5",
+  "dataset_sha256": "14aea862bd5f195b11ebe77f97fb6be857717bd10c47375e9c11cd773214d77a",
+  "locked_rows": 2496,
+  "behavior": {
+    "content_sha256": "7c41c8ed2ae611f10291d2104558cf54fff5b4eb3620c98a29c4c043b11dc455",
+    "accuracy": 0.6229967948717948,
+    "accuracy_by_family": {
+      "ledger_binding": 0.9125,
+      "policy_composition": 0.5,
+      "evidence_update": 0.6076388888888888,
+      "recursive_strategy": 0.453125,
+      "active_information": 0.5138888888888888,
+      "monitoring_goal": 0.6666666666666666,
+      "scaffold_order": 0.6875
+    }
+  },
+  "blackbox": {
+    "content_sha256": "97b4713fc31f847b6cb4b8531bdec4576d8f8f2ae8173891d0951502339c39a0",
+    "records": 2496,
+    "parse_rate": 1.0,
+    "accuracy": 0.6266025641025641,
+    "accuracy_by_family": {
+      "ledger_binding": 0.9125,
+      "policy_composition": 0.5,
+      "evidence_update": 0.6131944444444445,
+      "recursive_strategy": 0.453125,
+      "active_information": 0.5173611111111112,
+      "monitoring_goal": 0.6666666666666666,
+      "scaffold_order": 0.6875
+    }
+  },
+  "cross_mode": {
+    "joined_locked_conditions": 2496,
+    "selected_index_agreement": 0.9923878205128205,
+    "accuracy_agreement": 0.9923878205128205,
+    "blackbox_generated_only_A_or_B": true,
+    "blackbox_formatting_compliance": 1.0
+  },
+  "hypotheses": {
+    "H1_ledger_binding": "falsified",
+    "H2_policy_composition": "falsified",
+    "H3_evidence_update": "falsified",
+    "H4_recursive_strategy": "falsified",
+    "H5_active_information": "falsified",
+    "H6_monitoring_goal": "falsified",
+    "H7_scaffold_order": "falsified"
+  },
+  "interpretation": {
+    "gate_pass": false,
+    "mechanistic_claim_allowed": false,
+    "deception_claim_allowed": false,
+    "scope": "locked behavior analysis; black-box is a descriptive companion and was not independently gated"
+  }
+}

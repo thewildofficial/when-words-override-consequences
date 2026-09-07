@@ -1,0 +1,810 @@
+{
+  "blackbox": {
+    "accuracy": 0.6266025641025641,
+    "accuracy_by_family": {
+      "active_information": 0.5173611111111112,
+      "evidence_update": 0.6131944444444445,
+      "ledger_binding": 0.9125,
+      "monitoring_goal": 0.6666666666666666,
+      "policy_composition": 0.5,
+      "recursive_strategy": 0.453125,
+      "scaffold_order": 0.6875
+    },
+    "n_records": 2496,
+    "parse_rate": 1.0
+  },
+  "by_family": {
+    "active_information": {
+      "accuracy": 0.5138888888888888,
+      "n": 288
+    },
+    "evidence_update": {
+      "accuracy": 0.6076388888888888,
+      "n": 1440
+    },
+    "ledger_binding": {
+      "accuracy": 0.9125,
+      "n": 160
+    },
+    "monitoring_goal": {
+      "accuracy": 0.6666666666666666,
+      "n": 384
+    },
+    "policy_composition": {
+      "accuracy": 0.5,
+      "n": 48
+    },
+    "recursive_strategy": {
+      "accuracy": 0.453125,
+      "n": 64
+    },
+    "scaffold_order": {
+      "accuracy": 0.6875,
+      "n": 112
+    }
+  },
+  "gate_pass": false,
+  "hypotheses": {
+    "active_information": {
+      "accuracy": {
+        "ci95": [
+          0.4930555555555556,
+          0.5277777777777778
+        ],
+        "mean": 0.5138888888888888,
+        "n_clusters": 8
+      },
+      "confirmatory_sign_flip": {
+        "n_clusters": 0,
+        "observed_mean": null,
+        "p_value": null,
+        "reason": "active-information pair gate failed",
+        "status": "not_run_gate_failed"
+      },
+      "confirmatory_sign_flip_cost_threshold": {
+        "n_clusters": 0,
+        "observed_mean": null,
+        "p_value": null,
+        "reason": "active-information gate failed",
+        "status": "not_run_gate_failed"
+      },
+      "confirmatory_sign_flip_reliability_threshold": {
+        "n_clusters": 0,
+        "observed_mean": null,
+        "p_value": null,
+        "reason": "active-information gate failed",
+        "status": "not_run_gate_failed"
+      },
+      "inspect_rate": {
+        "ci95": [
+          0.0,
+          0.625
+        ],
+        "mean": 0.25,
+        "n_clusters": 8
+      },
+      "logit_margin_direction_rate": {
+        "ci95": [
+          0.546875,
+          0.828125
+        ],
+        "mean": 0.6640625,
+        "n_cells": 128,
+        "n_clusters": 8
+      },
+      "logit_margin_slope_on_vo_i": {
+        "ci95": [
+          0.002882863504709157,
+          0.006091822690908115
+        ],
+        "mean": 0.004178257695858082,
+        "n_cells": 8,
+        "n_clusters": 8
+      },
+      "n_cost_threshold_cells": 8,
+      "n_cost_threshold_games": 8,
+      "n_pair_cells": 128,
+      "n_pair_games": 8,
+      "n_reliability_threshold_cells": 8,
+      "n_reliability_threshold_games": 8,
+      "same_matrix_cost_switch_rate": {
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "mean": 0.0,
+        "n_cells": 8,
+        "n_clusters": 8
+      },
+      "same_matrix_reliability_switch_rate": {
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "mean": 0.0,
+        "n_cells": 8,
+        "n_clusters": 8
+      },
+      "status": "falsified",
+      "vo_i_range": [
+        -5.000000000000227,
+        209.0
+      ],
+      "within_pair_voi_switch_rate": {
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "mean": 0.0,
+        "n_cells": 128,
+        "n_clusters": 8
+      }
+    },
+    "evidence_update": {
+      "accuracy": {
+        "ci95": [
+          0.5944444444444444,
+          0.6236111111111111
+        ],
+        "mean": 0.607638888888889,
+        "n_clusters": 6
+      },
+      "confirmatory_sign_flip_by_prompt_mode": {
+        "explicit_rule": {
+          "n_clusters": 0,
+          "observed_mean": null,
+          "p_value": null,
+          "reason": "evidence family gate failed",
+          "status": "not_run_gate_failed"
+        },
+        "provenance_only": {
+          "n_clusters": 0,
+          "observed_mean": null,
+          "p_value": null,
+          "reason": "evidence family gate failed",
+          "status": "not_run_gate_failed"
+        }
+      },
+      "independence_contrast": {
+        "ci95": [
+          0.0,
+          0.041666666666666664
+        ],
+        "mean": 0.013888888888888888,
+        "n_cells": 72,
+        "n_clusters": 6
+      },
+      "independence_contrast_by_prompt_mode": {
+        "explicit_rule": {
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "mean": 0.0,
+          "n_cells": 36,
+          "n_clusters": 6
+        },
+        "provenance_only": {
+          "ci95": [
+            0.0,
+            0.08333333333333333
+          ],
+          "mean": 0.027777777777777776,
+          "n_cells": 36,
+          "n_clusters": 6
+        }
+      },
+      "n_identifying_games": 6,
+      "n_identifying_pair_cells": 72,
+      "status": "falsified"
+    },
+    "ledger_binding": {
+      "action_pair_rate": {
+        "ci95": [
+          0.0,
+          0.3125
+        ],
+        "mean": 0.125,
+        "n_cells": 16,
+        "n_clusters": 8
+      },
+      "actual_belief_invariance": {
+        "ci95": [
+          0.6875,
+          1.0
+        ],
+        "mean": 0.875,
+        "n_cells": 16,
+        "n_clusters": 8
+      },
+      "n_action_pair_cells": 16,
+      "n_action_pair_games": 8,
+      "n_invariance_pair_cells": 16,
+      "n_invariance_pair_games": 8,
+      "report_accuracy": {
+        "ci95": [
+          1.0,
+          1.0
+        ],
+        "mean": 1.0,
+        "n_clusters": 8
+      },
+      "report_accuracy_by_target": {
+        "modeled_receiver_belief": {
+          "ci95": [
+            1.0,
+            1.0
+          ],
+          "mean": 1.0,
+          "n_clusters": 8
+        },
+        "other_model_of_self": {
+          "ci95": [
+            1.0,
+            1.0
+          ],
+          "mean": 1.0,
+          "n_clusters": 8
+        },
+        "self_belief": {
+          "ci95": [
+            1.0,
+            1.0
+          ],
+          "mean": 1.0,
+          "n_clusters": 8
+        },
+        "world_state": {
+          "ci95": [
+            1.0,
+            1.0
+          ],
+          "mean": 1.0,
+          "n_clusters": 8
+        }
+      },
+      "status": "falsified"
+    },
+    "monitoring_goal": {
+      "accuracy": {
+        "ci95": [
+          0.5416666666666666,
+          0.7916666666666666
+        ],
+        "mean": 0.6666666666666666,
+        "n_clusters": 12
+      },
+      "audit_cue_discordance": {
+        "ci95": [
+          1.0,
+          1.0
+        ],
+        "discordance_mean": 0.0,
+        "mean": 1.0,
+        "n_cells": 192,
+        "n_clusters": 12
+      },
+      "confirmatory_sign_flip": {
+        "n_clusters": 0,
+        "observed_mean": null,
+        "p_value": null,
+        "reason": "monitoring family gate failed",
+        "status": "not_run_gate_failed"
+      },
+      "lexical_conflict_surface_is_intentional": true,
+      "n_audit_pair_cells": 192,
+      "n_audit_pair_games": 12,
+      "n_safety_switch_cells": 192,
+      "n_safety_switch_games": 12,
+      "safety_pair_rate": {
+        "ci95": [
+          0.08333333333333333,
+          0.5833333333333334
+        ],
+        "mean": 0.3333333333333333,
+        "n_cells": 192,
+        "n_clusters": 12
+      },
+      "status": "falsified"
+    },
+    "policy_composition": {
+      "accuracy": {
+        "ci95": [
+          0.5,
+          0.5
+        ],
+        "mean": 0.5,
+        "n_clusters": 12
+      },
+      "confirmatory_sign_flip": {
+        "n_clusters": 0,
+        "observed_mean": null,
+        "p_value": null,
+        "reason": "policy pair gate failed",
+        "status": "not_run_gate_failed"
+      },
+      "n_pair_cells": 24,
+      "n_pair_games": 12,
+      "status": "falsified",
+      "within_game_policy_pair_rate": {
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "mean": 0.0,
+        "n_cells": 24,
+        "n_clusters": 12
+      }
+    },
+    "recursive_strategy": {
+      "accuracy_by_depth": {
+        "0": {
+          "ci95": [
+            0.5625,
+            0.875
+          ],
+          "mean": 0.6875,
+          "n_clusters": 8
+        },
+        "1": {
+          "ci95": [
+            0.0,
+            0.3125
+          ],
+          "mean": 0.125,
+          "n_clusters": 8
+        },
+        "2": {
+          "ci95": [
+            0.4375,
+            0.9375
+          ],
+          "mean": 0.6875,
+          "n_clusters": 8
+        },
+        "3": {
+          "ci95": [
+            0.0625,
+            0.5625
+          ],
+          "mean": 0.3125,
+          "n_clusters": 8
+        }
+      },
+      "action_accuracy": {
+        "ci95": [
+          0.3125,
+          0.46875
+        ],
+        "mean": 0.40625,
+        "n_clusters": 8
+      },
+      "depth0_accuracy": {
+        "ci95": [
+          0.5,
+          0.875
+        ],
+        "mean": 0.6875,
+        "n_clusters": 8
+      },
+      "n_sequence_cells": 16,
+      "n_sequence_games": 8,
+      "prediction_accuracy": {
+        "ci95": [
+          0.5,
+          0.5
+        ],
+        "mean": 0.5,
+        "n_clusters": 8
+      },
+      "sequence_rate": {
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "mean": 0.0,
+        "n_cells": 16,
+        "n_clusters": 8
+      },
+      "status": "falsified"
+    },
+    "scaffold_order": {
+      "claim_boundary": "fixed_correct/fixed_wrong are content-only controls; they do not identify source provenance. self_generated is a genuine prior-report trajectory but remains descriptive unless separately modeled.",
+      "confirmatory_sign_flip": {
+        "n_clusters": 0,
+        "observed_mean": null,
+        "p_value": null,
+        "reason": "fixed content gap gate failed",
+        "status": "not_run_gate_failed"
+      },
+      "fixed_content_pair_rate": {
+        "ci95": [
+          0.5,
+          0.6875
+        ],
+        "mean": 0.5625,
+        "n_cells": 16,
+        "n_clusters": 8
+      },
+      "fixed_correct_minus_fixed_wrong_cluster_gap": {
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "mean": 0.0,
+        "n_cells": 16,
+        "n_clusters": 8
+      },
+      "fixed_source_accuracy": {
+        "fixed_correct": {
+          "ci95": [
+            0.5,
+            0.6875
+          ],
+          "mean": 0.5625,
+          "n_clusters": 8
+        },
+        "fixed_random": {
+          "ci95": [
+            0.5,
+            0.6875
+          ],
+          "mean": 0.5625,
+          "n_clusters": 8
+        },
+        "fixed_wrong": {
+          "ci95": [
+            0.5,
+            0.6875
+          ],
+          "mean": 0.5625,
+          "n_clusters": 8
+        },
+        "none": {
+          "ci95": [
+            0.5,
+            0.6875
+          ],
+          "mean": 0.5625,
+          "n_clusters": 8
+        },
+        "self_generated": {
+          "ci95": [
+            0.5,
+            0.6875
+          ],
+          "mean": 0.5625,
+          "n_clusters": 8
+        }
+      },
+      "n_fixed_pair_cells": 16,
+      "n_fixed_pair_games": 8,
+      "n_trajectory_pairs": 16,
+      "self_generated_accuracy": {
+        "ci95": [
+          0.5,
+          0.6875
+        ],
+        "mean": 0.5625,
+        "n_clusters": 8
+      },
+      "self_generated_accuracy_given_correct_prior_report": 0.5625,
+      "status": "falsified",
+      "trajectory_action_then_report_accuracy": {
+        "ci95": [
+          1.0,
+          1.0
+        ],
+        "mean": 1.0,
+        "n_clusters": 8
+      },
+      "trajectory_direct_accuracy": {
+        "ci95": [
+          1.0,
+          1.0
+        ],
+        "mean": 1.0,
+        "n_clusters": 8
+      },
+      "trajectory_pair_changed_rate": {
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "mean": 0.0,
+        "n_cells": 16,
+        "n_clusters": 8
+      },
+      "trajectory_report_gain": [
+        {
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "mean": 0.0,
+          "n_cells": 16,
+          "n_clusters": 8
+        }
+      ]
+    }
+  },
+  "interpretation_policy": {
+    "deception_claim_allowed": false,
+    "failed_family_is_not_pooled_away": true,
+    "mechanistic_claim_allowed": false
+  },
+  "locked_rows": 2496,
+  "model_key": "primary",
+  "overall_accuracy": 0.6229967948717948,
+  "schema_version": 1,
+  "source_behavior_sha256": "7c41c8ed2ae611f10291d2104558cf54fff5b4eb3620c98a29c4c043b11dc455",
+  "source_blackbox_sha256": "97b4713fc31f847b6cb4b8531bdec4576d8f8f2ae8173891d0951502339c39a0",
+  "source_config_sha256": "c2c272a2fb7f3feeceb3651b85b334bfcd9177b05353fb1ee5e86c9b0ff1b9a5",
+  "source_dataset_sha256": "14aea862bd5f195b11ebe77f97fb6be857717bd10c47375e9c11cd773214d77a",
+  "status": "locked_behavior_analysis_complete",
+  "structural_audit": {
+    "config_sha256": "c2c272a2fb7f3feeceb3651b85b334bfcd9177b05353fb1ee5e86c9b0ff1b9a5",
+    "dataset_sha256": "14aea862bd5f195b11ebe77f97fb6be857717bd10c47375e9c11cd773214d77a",
+    "family_counts": {
+      "active_information": 864,
+      "evidence_update": 4320,
+      "ledger_binding": 480,
+      "monitoring_goal": 1152,
+      "policy_composition": 144,
+      "recursive_strategy": 192,
+      "scaffold_order": 336
+    },
+    "family_gates": {
+      "active_information": {
+        "both_query_outcomes_exist": true,
+        "choice_mapping_invariance": true,
+        "factorial_cells_complete": true,
+        "gate_pass": true,
+        "same_matrix_threshold_cells_complete": true,
+        "stop_if_failed": "do not infer value-of-information sensitivity",
+        "within_pair_voi_switches_present": true
+      },
+      "evidence_update": {
+        "choice_mapping_invariance": true,
+        "evidence_prompts_are_visible": true,
+        "gate_pass": true,
+        "independent_and_copied_cells_complete": true,
+        "stop_if_failed": "do not interpret count/dependence effects",
+        "target_perturbation_contract": true
+      },
+      "ledger_binding": {
+        "choice_mapping_invariance": true,
+        "complete_ledger_cells": true,
+        "gate_pass": true,
+        "nuisance_invariance_contract": true,
+        "prompt_values_are_visible": true,
+        "stop_if_failed": "do not interpret report/action consistency as agent-indexed state use",
+        "target_perturbation_contract": true
+      },
+      "monitoring_goal": {
+        "audit_cue_is_payoff_invariant": true,
+        "choice_mapping_invariance": true,
+        "gate_pass": true,
+        "risk_identifying_cells": true,
+        "stop_if_failed": "do not interpret evaluation-cue effects or safety dose response"
+      },
+      "policy_composition": {
+        "choice_mapping_invariance": true,
+        "derived_response_not_supplied": true,
+        "gate_pass": true,
+        "stop_if_failed": "do not call policy differences a belief-policy composition result",
+        "target_perturbation_contract": true,
+        "within_game_policy_pairs_complete": true
+      },
+      "recursive_strategy": {
+        "choice_mapping_invariance": true,
+        "depth_and_task_cells_present": true,
+        "gate_pass": true,
+        "stop_if_failed": "do not infer recursive ToM from pooled game accuracy"
+      },
+      "scaffold_order": {
+        "all_sources_present": true,
+        "choice_mapping_invariance": true,
+        "direct_and_action_first_report_prompts_identical": true,
+        "gate_pass": true,
+        "self_generated_is_true_trajectory": true,
+        "stop_if_failed": "do not claim self-generated scaffolding"
+      }
+    },
+    "gates": {
+      "all_family_gates": true,
+      "choice_mapping_balance": true,
+      "choice_mapping_invariance": true,
+      "hash_and_row_count": true,
+      "semantic_prompt_contract": true
+    },
+    "interpretation": "No model has been run; this is protocol validation only.",
+    "prompt_audit": {
+      "choice_mapping_balance": {
+        "active_query": {
+          "balanced": true,
+          "game_count": 24,
+          "swapped_games": 11,
+          "unswapped_games": 13
+        },
+        "evidence_action": {
+          "balanced": true,
+          "game_count": 18,
+          "swapped_games": 10,
+          "unswapped_games": 8
+        },
+        "evidence_report": {
+          "balanced": true,
+          "game_count": 18,
+          "swapped_games": 5,
+          "unswapped_games": 13
+        },
+        "ledger_action": {
+          "balanced": true,
+          "game_count": 24,
+          "swapped_games": 9,
+          "unswapped_games": 15
+        },
+        "ledger_report": {
+          "balanced": true,
+          "game_count": 24,
+          "swapped_games": 9,
+          "unswapped_games": 15
+        },
+        "monitoring_action": {
+          "balanced": true,
+          "game_count": 36,
+          "swapped_games": 18,
+          "unswapped_games": 18
+        },
+        "policy_action": {
+          "balanced": true,
+          "game_count": 36,
+          "swapped_games": 15,
+          "unswapped_games": 21
+        },
+        "recursive_action": {
+          "balanced": true,
+          "game_count": 24,
+          "swapped_games": 9,
+          "unswapped_games": 15
+        },
+        "recursive_prediction": {
+          "balanced": true,
+          "game_count": 24,
+          "swapped_games": 10,
+          "unswapped_games": 14
+        },
+        "scaffold_action": {
+          "balanced": true,
+          "game_count": 24,
+          "swapped_games": 14,
+          "unswapped_games": 10
+        },
+        "scaffold_report": {
+          "balanced": true,
+          "game_count": 24,
+          "swapped_games": 13,
+          "unswapped_games": 11
+        }
+      },
+      "choice_mapping_balance_failures": [],
+      "choice_mapping_pair_failures": [],
+      "derived_response_leaks": [],
+      "downstream_answer_leaks": [],
+      "family_audit": {
+        "active_information": {
+          "choice_mapping_invariance": true,
+          "derived_response_leak": true,
+          "downstream_answer_leak": true,
+          "dynamic_contract": true,
+          "nuisance_invariance": true,
+          "passed": true,
+          "static_placeholder": true,
+          "target_latent_perturbation": true,
+          "target_removal": true,
+          "visible_derivability": true
+        },
+        "evidence_update": {
+          "choice_mapping_invariance": true,
+          "derived_response_leak": true,
+          "downstream_answer_leak": true,
+          "dynamic_contract": true,
+          "nuisance_invariance": true,
+          "passed": true,
+          "static_placeholder": true,
+          "target_latent_perturbation": true,
+          "target_removal": true,
+          "visible_derivability": true
+        },
+        "ledger_binding": {
+          "choice_mapping_invariance": true,
+          "derived_response_leak": true,
+          "downstream_answer_leak": true,
+          "dynamic_contract": true,
+          "nuisance_invariance": true,
+          "passed": true,
+          "static_placeholder": true,
+          "target_latent_perturbation": true,
+          "target_removal": true,
+          "visible_derivability": true
+        },
+        "monitoring_goal": {
+          "choice_mapping_invariance": true,
+          "derived_response_leak": true,
+          "downstream_answer_leak": true,
+          "dynamic_contract": true,
+          "nuisance_invariance": true,
+          "passed": true,
+          "static_placeholder": true,
+          "target_latent_perturbation": true,
+          "target_removal": true,
+          "visible_derivability": true
+        },
+        "policy_composition": {
+          "choice_mapping_invariance": true,
+          "derived_response_leak": true,
+          "downstream_answer_leak": true,
+          "dynamic_contract": true,
+          "nuisance_invariance": true,
+          "passed": true,
+          "static_placeholder": true,
+          "target_latent_perturbation": true,
+          "target_removal": true,
+          "visible_derivability": true
+        },
+        "recursive_strategy": {
+          "choice_mapping_invariance": true,
+          "derived_response_leak": true,
+          "downstream_answer_leak": true,
+          "dynamic_contract": true,
+          "nuisance_invariance": true,
+          "passed": true,
+          "static_placeholder": true,
+          "target_latent_perturbation": true,
+          "target_removal": true,
+          "visible_derivability": true
+        },
+        "scaffold_order": {
+          "choice_mapping_invariance": true,
+          "derived_response_leak": true,
+          "downstream_answer_leak": true,
+          "dynamic_contract": true,
+          "nuisance_invariance": true,
+          "passed": true,
+          "static_placeholder": true,
+          "target_latent_perturbation": true,
+          "target_removal": true,
+          "visible_derivability": true
+        }
+      },
+      "family_prompt_variation": {
+        "active_information": true,
+        "evidence_update": true,
+        "ledger_binding": true,
+        "monitoring_goal": true,
+        "policy_composition": true,
+        "recursive_strategy": true,
+        "scaffold_order": true
+      },
+      "missing_expected_target_rows": [],
+      "nuisance_invariance_failures": [],
+      "passed": true,
+      "self_generated_dynamic_contract_failures": [],
+      "self_generated_placeholder_failures": [],
+      "target_latent_perturbation_failures": [],
+      "target_removal_failures": [],
+      "visible_derivability_failures": []
+    },
+    "row_count": 7488,
+    "schema_version": 1,
+    "split_counts": {
+      "discovery": 2496,
+      "locked": 2496,
+      "validation": 2496
+    },
+    "status": "cpu_semantic_controls_passed",
+    "study_id": "V6.1-ES-2"
+  },
+  "study_id": "V6.1-ES-2"
+}
