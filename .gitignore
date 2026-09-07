@@ -20,3 +20,8 @@ artifacts/cache/
 
 # Local operational controls; not part of the public research narrative.
 docs/compute-budget.md
+
+# V6.1's generated row table is deterministic output of the committed
+# generator. The CPU control step regenerates it, verifies the manifest hash,
+# and freezes it before any Modal stage.
+configs/v6.1/epistemic_repair/dataset.json

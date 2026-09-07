@@ -49,11 +49,14 @@ A second-pass audit found a scoring bug (a skipped normalization step) in one se
 
 Next up is a proposed ~$30 follow-up asking whether reports *reveal* or *change* the information behind actions: [the next-sprint plan](docs/next-sprint/README.md) ([audit](docs/next-sprint/audit.md) · [literature](docs/next-sprint/literature.md) · [design](docs/next-sprint/experiments.md)).
 
-The next clean research branch is [V6-ES-1](docs/v6/README.md): a separate,
-factorial study of agent-indexed epistemic states, higher-order theory of mind,
-provenance, strategic safety reweighting, and evaluation-context sensitivity.
-Its CPU audit and primary Qwen3.6 execution are complete; the family gates
-closed mechanistic follow-up. See the retained [run record](results/v6_epistemic_strategic/README.md).
+The V6-ES-1 run is retained, but a post-run stimulus audit found that its
+higher-order values were absent from the rendered prompts, its action→report
+trajectory supplied missing information, and its core policy test supplied a
+derived receiver response. Those affected interpretations are quarantined in
+the [erratum](docs/v6/erratum-prompt-completeness.md). The corrective
+[V6.1-ES-2 protocol](docs/v6.1/README.md) now has a passing CPU audit and is
+the active research branch; its model stages are dispatched manually through
+GitHub Actions.
 
 ## Go deeper
 
@@ -66,7 +69,8 @@ closed mechanistic follow-up. See the retained [run record](results/v6_epistemic
 | Offline analyses and figures | [scripts](scripts/README.md) |
 | Test guardrails | [tests](tests/README.md) |
 | Why this matters for tool-using agents | [safety note](docs/v5/literature-positioning.md) |
-| New epistemic/ToM/strategy branch | [V6-ES-1 protocol](docs/v6/README.md) |
+| V6-ES-1 audit and retained run | [V6 documentation](docs/v6/README.md) · [erratum](docs/v6/erratum-prompt-completeness.md) |
+| New epistemic/ToM/strategy branch | [V6.1-ES-2 protocol](docs/v6.1/README.md) |
 
 Reproduce the lightweight checks (committed GPU outputs are immutable; these verify everything else):
 

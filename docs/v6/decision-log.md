@@ -58,3 +58,18 @@ Append-only. New decisions are added at the bottom with a date and a reason.
 - Activation discovery was therefore not run. The negative and heterogeneous
   result is retained in `results/v6_epistemic_strategic/raw/` with its measured
   cost ledger; no causal claim is made.
+
+## 2026-09-07 — post-run stimulus audit and V6.1 repair
+
+- Quarantined the V6 higher-order result because the rendered prompts named
+  target fields without supplying their values.
+- Retracted the V6 action→report bootstrapping interpretation because the
+  preceding action prompt supplied target-relevant context absent from direct
+  report.
+- Quarantined the V6 core policy result because the prompt supplied the derived
+  receiver response, and recorded the seven-cell safety-pair limitation.
+- Created the new namespace `V6.1-ES-2` with complete visible ledgers,
+  within-game policy flips, exact direct/action-first report prompt identity,
+  crossed evidence independence, and forced penalty-switch cells.
+- Sealed activation collection and deception labels until every V6.1 family
+  gate passes under the repaired behavioral protocol.

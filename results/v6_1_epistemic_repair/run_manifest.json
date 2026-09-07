@@ -1,0 +1,14 @@
+{
+  "audit_sha256": "decf94fad4195d8d275352bd72140fa1c720d5c702573250d88c5542d5bc4faa",
+  "compute": {
+    "executor": "local_cpu",
+    "gpu_seconds": 0,
+    "model_forward_passes": 0
+  },
+  "config_sha256": "f0afb9d073a46cedf2b9685dfa12b4d9affc32781fb99c6759822afbcda37c12",
+  "dataset_sha256": "fe5b63bb7bbe31c95fe35d700b8b8cefa6de7a409cac0207ece79e909ebc669a",
+  "row_count": 6144,
+  "schema_version": 1,
+  "status": "local_cpu_controls_complete_no_model_run",
+  "study_id": "V6.1-ES-2"
+}

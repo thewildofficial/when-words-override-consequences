@@ -1,0 +1,108 @@
+name: V6.1 epistemic repair
+
+on:
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: Stage to run
+        required: true
+        default: full-primary
+        type: choice
+        options:
+          - local-controls
+          - preflight
+          - behavior
+          - blackbox
+          - full-primary
+      model_key:
+        description: Frozen model namespace
+        required: true
+        default: primary
+        type: choice
+        options:
+          - primary
+          - qwen38_27b
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v6-1-epistemic-repair-${{ inputs.model_key || 'primary' }}-${{ inputs.stage || 'local-controls' }}
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    env:
+      MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
+      MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
+      UV_CACHE_DIR: /tmp/jspace-uv-cache
+      V61_STAGE: ${{ inputs.stage || 'local-controls' }}
+      V61_MODEL_KEY: ${{ inputs.model_key || 'primary' }}
+
+    steps:
+      - name: Check out the frozen protocol
+        uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Run the full local test suite
+        run: uv run --extra dev pytest -q
+
+      - name: Run CPU-only freeze and semantic family audit
+        run: uv run python scripts/run_v6_1_epistemic_repair_controls.py --freeze-dataset
+
+      - name: Stop after local controls
+        if: ${{ env.V61_STAGE == 'local-controls' }}
+        run: echo "CPU controls passed; no remote compute requested."
+
+      - name: Refuse unapproved Qwen3.8 paid stages
+        if: ${{ env.V61_MODEL_KEY == 'qwen38_27b' && env.V61_STAGE != 'preflight' && env.V61_STAGE != 'local-controls' }}
+        shell: bash
+        run: |
+          echo "Qwen3.8 is registered but disabled; only its separate preflight is permitted."
+          exit 1
+
+      - name: Refuse missing Modal credentials for remote stages
+        if: ${{ env.V61_STAGE != 'local-controls' }}
+        shell: bash
+        run: |
+          test -n "$MODAL_TOKEN_ID"
+          test -n "$MODAL_TOKEN_SECRET"
+
+      - name: Run model-specific tokenizer preflight
+        if: ${{ env.V61_STAGE == 'preflight' }}
+        run: uv run --extra modal modal run modal_v6_1_epistemic_repair.py::preflight --model-key "$V61_MODEL_KEY"
+
+      - name: Run forced-choice behavior
+        if: ${{ env.V61_STAGE == 'behavior' }}
+        run: uv run --extra modal modal run modal_v6_1_epistemic_repair.py::behavior --model-key "$V61_MODEL_KEY"
+
+      - name: Run locked free-generation black box
+        if: ${{ env.V61_STAGE == 'blackbox' }}
+        run: uv run --extra modal modal run modal_v6_1_epistemic_repair.py::blackbox --model-key "$V61_MODEL_KEY"
+
+      - name: Run complete primary behavioral study
+        if: ${{ env.V61_STAGE == 'full-primary' }}
+        run: uv run --extra modal modal run modal_v6_1_epistemic_repair.py::full_primary --model-key "$V61_MODEL_KEY"
+
+      - name: Analyze locked behavior when available
+        if: ${{ always() && env.V61_STAGE != 'local-controls' && env.V61_STAGE != 'preflight' }}
+        shell: bash
+        run: |
+          if test -f results/v6_1_epistemic_repair/raw/behavior_${V61_MODEL_KEY}.json; then
+            uv run python scripts/analyze_v6_1_epistemic_repair.py --model-key "$V61_MODEL_KEY"
+          else
+            echo "No behavior artifact is present; retaining the stage artifact without analysis."
+          fi
+
+      - name: Upload immutable V6.1 outputs
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: v6-1-epistemic-repair-${{ env.V61_MODEL_KEY }}-${{ env.V61_STAGE }}-${{ github.run_id }}
+          path: results/v6_1_epistemic_repair
+          if-no-files-found: warn
+          retention-days: 30

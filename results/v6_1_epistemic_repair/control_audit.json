@@ -1,0 +1,87 @@
+{
+  "config_sha256": "f0afb9d073a46cedf2b9685dfa12b4d9affc32781fb99c6759822afbcda37c12",
+  "dataset_sha256": "fe5b63bb7bbe31c95fe35d700b8b8cefa6de7a409cac0207ece79e909ebc669a",
+  "family_counts": {
+    "active_information": 384,
+    "evidence_update": 3456,
+    "ledger_binding": 480,
+    "monitoring_goal": 1152,
+    "policy_composition": 144,
+    "recursive_strategy": 192,
+    "scaffold_order": 336
+  },
+  "family_gates": {
+    "active_information": {
+      "both_query_outcomes_exist": true,
+      "factorial_cells_complete": true,
+      "gate_pass": true,
+      "stop_if_failed": "do not infer value-of-information sensitivity"
+    },
+    "evidence_update": {
+      "evidence_prompts_are_visible": true,
+      "gate_pass": true,
+      "independent_and_copied_cells_complete": true,
+      "stop_if_failed": "do not interpret count/dependence effects"
+    },
+    "ledger_binding": {
+      "complete_ledger_cells": true,
+      "gate_pass": true,
+      "prompt_values_are_visible": true,
+      "stop_if_failed": "do not interpret report/action consistency as agent-indexed state use"
+    },
+    "monitoring_goal": {
+      "audit_cue_is_payoff_invariant": true,
+      "gate_pass": true,
+      "risk_identifying_cells": true,
+      "stop_if_failed": "do not interpret evaluation-cue effects or safety dose response"
+    },
+    "policy_composition": {
+      "derived_response_not_supplied": true,
+      "gate_pass": true,
+      "stop_if_failed": "do not call policy differences a belief-policy composition result",
+      "within_game_policy_pairs_complete": true
+    },
+    "recursive_strategy": {
+      "depth_and_task_cells_present": true,
+      "gate_pass": true,
+      "stop_if_failed": "do not infer recursive ToM from pooled game accuracy"
+    },
+    "scaffold_order": {
+      "all_sources_present": true,
+      "direct_and_action_first_report_prompts_identical": true,
+      "gate_pass": true,
+      "self_generated_is_placeholder_bound": true,
+      "stop_if_failed": "do not claim self-generated scaffolding"
+    }
+  },
+  "gates": {
+    "all_family_gates": true,
+    "hash_and_row_count": true,
+    "semantic_prompt_contract": true
+  },
+  "interpretation": "No model has been run; this is protocol validation only.",
+  "prompt_audit": {
+    "derived_response_leaks": [],
+    "family_prompt_variation": {
+      "active_information": true,
+      "evidence_update": true,
+      "ledger_binding": true,
+      "monitoring_goal": true,
+      "policy_composition": true,
+      "recursive_strategy": true,
+      "scaffold_order": true
+    },
+    "missing_expected_target_rows": [],
+    "passed": true,
+    "self_generated_placeholder_failures": []
+  },
+  "row_count": 6144,
+  "schema_version": 1,
+  "split_counts": {
+    "discovery": 2048,
+    "locked": 2048,
+    "validation": 2048
+  },
+  "status": "cpu_semantic_controls_passed",
+  "study_id": "V6.1-ES-2"
+}
