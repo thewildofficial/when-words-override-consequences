@@ -26,3 +26,19 @@ No historical reservation is released using a runtime estimate.
 Trigger on this branch with `[run-aligned-mechanisms]`; ordinary pushes skip it.
 The original corpus hashes remain unchanged despite the generator's new optional
 explicit concept-pair parameter.
+
+## Implementation-only recovery
+
+Run `38143348343` completed token-matched behavior and thirteen of fourteen frozen
+patch sites before reaching the discovery timeout during layer 56 `policy_end`.
+The completed per-site checkpoint and exact states were recovered from the Modal
+volume. No completed site is discarded, and no site is selected until the last
+frozen candidate completes. Its original full reservation remains in the ledger.
+
+`recovery_protocol.json` prospectively bounds the missing-site completion at 120
+seconds and the unchanged locked test at 400 seconds, for a maximum cumulative
+reservation of $4.97797152. The shortened locked timeout changes an execution
+limit, not its sample, metric, or gates. `[recover-mechanisms]` dispatches this
+specific salvage. It validates every recovered source/destination/direction pair
+and identity control before GPU admission. A timeout is infrastructure censoring,
+not a negative causal endpoint.

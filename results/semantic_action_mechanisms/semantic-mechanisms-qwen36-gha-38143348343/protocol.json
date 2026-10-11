@@ -1,0 +1,138 @@
+{
+  "accounting": "Reuse cumulative ledger, including failed CPU preparation and alignment-gate invocation.",
+  "behavior_gate": "Both opaque state cells >=95%; reports >=90%; assertion-minus-opaque state accuracy effect >=15 points; assertion state margin difference >=.5.",
+  "causal_rules": "Unchanged parent sites, minimum eight families, identity tolerance, source selection, discovery repair threshold and locked conjunction. No threshold relaxation.",
+  "concept_pairs": {
+    "discovery": [
+      [
+        "ALDER",
+        "BRIAR"
+      ],
+      [
+        "DAWN",
+        "DRIFT"
+      ],
+      [
+        "ELM",
+        "HOLLOW"
+      ],
+      [
+        "IRIS",
+        "JADE"
+      ],
+      [
+        "KELP",
+        "PLUME"
+      ],
+      [
+        "QUILL",
+        "ROSE"
+      ],
+      [
+        "SHORE",
+        "UMBER"
+      ],
+      [
+        "CLOVER",
+        "DUSK"
+      ],
+      [
+        "FJORD",
+        "GARNET"
+      ],
+      [
+        "LILAC",
+        "MONSOON"
+      ],
+      [
+        "NECTAR",
+        "OASIS"
+      ],
+      [
+        "THYME",
+        "VERDANT"
+      ]
+    ],
+    "locked": [
+      [
+        "NORTH",
+        "SOUTH"
+      ],
+      [
+        "AMBER",
+        "ASPEN"
+      ],
+      [
+        "BASALT",
+        "CEDAR"
+      ],
+      [
+        "COPPER",
+        "DELTA"
+      ],
+      [
+        "FINCH",
+        "MANGO"
+      ],
+      [
+        "MAPLE",
+        "MARBLE"
+      ],
+      [
+        "OPAL",
+        "PEACH"
+      ],
+      [
+        "SATIN",
+        "SATURN"
+      ],
+      [
+        "SIGMA",
+        "SILVER"
+      ],
+      [
+        "TOPAZ",
+        "VENUS"
+      ],
+      [
+        "COBALT",
+        "RAVEN"
+      ],
+      [
+        "VELVET",
+        "WILLOW"
+      ]
+    ]
+  },
+  "cumulative_ceiling_usd": 5.0,
+  "dataset_sha256": {
+    "discovery": "89866bef49895333373550c39cbf1181d9a5111bbcb1b57c75f6710bdf7fb74c",
+    "locked": "610d6745a2745b2849d9065ce032914f5b1eb8532d36d8f51ae1e28fda5ddd03"
+  },
+  "discovery_contexts": 192,
+  "discovery_queries": 576,
+  "discovery_status": "Vocabulary re-used with re-paired concepts; exploratory. Original locked vocabulary remains unscored until frozen-site confirmation.",
+  "incremental_reserved_usd": 1.5016444799999997,
+  "locked_pairs": 48,
+  "maximum_cumulative_reserved_usd": 4.94409984,
+  "model_id": "Qwen/Qwen3.6-27B",
+  "parent_run": "38140636684",
+  "prepared_sha256": {
+    "discovery": "d70f8f92e3b942e39742035c9ab2fbe502b7ba585bf0579822faeb35061dddab",
+    "locked": "5029d6c7d0d9bc7e5fc9ee4bd1d2d0d2dc54b283a860d4eb490e1767288db4e9"
+  },
+  "prior_reserved_usd": 3.44245536,
+  "reason": "Parent state contrast passed; causal alignment gate had only five eligible lexical families.",
+  "retries": 0,
+  "revision": "6a9e13bd6fc8f0983b9b99948120bc37f49c13e9",
+  "sampling_unit": "lexical family; target and label permutations are repeated measures",
+  "selection_rule": "Sort words within tokenizer-length buckets, pair adjacent words, take first twelve pairs. Add DAWN and DUSK to discovery to make odd buckets even. Selection uses tokenization only, never behavior.",
+  "status": "prospective_before_token_aligned_model_inference",
+  "study_id": "semantic_action_mechanisms_aligned",
+  "timeouts_seconds": {
+    "behavior": 400,
+    "discovery": 400,
+    "locked": 500
+  },
+  "tokenizer_version": "5.15.1"
+}

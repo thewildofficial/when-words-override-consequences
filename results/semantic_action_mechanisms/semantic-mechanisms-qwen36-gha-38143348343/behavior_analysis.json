@@ -1,0 +1,152 @@
+{
+  "causal_gate": true,
+  "cells": {
+    "assertion/matching": {
+      "accuracy": 1.0,
+      "rows": 48
+    },
+    "assertion/opposed": {
+      "accuracy": 0.22916666666666666,
+      "rows": 48
+    },
+    "opaque/matching": {
+      "accuracy": 1.0,
+      "rows": 48
+    },
+    "opaque/opposed": {
+      "accuracy": 1.0,
+      "rows": 48
+    }
+  },
+  "contrasts": {
+    "assertion": {
+      "accuracy_ci95": [
+        0.6875,
+        0.8541666666666666
+      ],
+      "accuracy_difference": 0.7708333333333334,
+      "families": 12,
+      "family_differences": {
+        "discovery-00": [
+          0.5,
+          6.78125
+        ],
+        "discovery-01": [
+          0.75,
+          4.09375
+        ],
+        "discovery-02": [
+          0.75,
+          6.65625
+        ],
+        "discovery-03": [
+          0.75,
+          8.625
+        ],
+        "discovery-04": [
+          0.75,
+          7.4375
+        ],
+        "discovery-05": [
+          1.0,
+          6.96875
+        ],
+        "discovery-06": [
+          0.75,
+          8.375
+        ],
+        "discovery-07": [
+          0.75,
+          6.28125
+        ],
+        "discovery-08": [
+          0.5,
+          7.40625
+        ],
+        "discovery-09": [
+          1.0,
+          5.75
+        ],
+        "discovery-10": [
+          0.75,
+          8.03125
+        ],
+        "discovery-11": [
+          1.0,
+          8.40625
+        ]
+      },
+      "margin_ci95": [
+        6.320247395833333,
+        7.718815104166667
+      ],
+      "margin_difference": 7.067708333333333
+    },
+    "opaque": {
+      "accuracy_ci95": [
+        0.0,
+        0.0
+      ],
+      "accuracy_difference": 0.0,
+      "families": 12,
+      "family_differences": {
+        "discovery-00": [
+          0.0,
+          4.0
+        ],
+        "discovery-01": [
+          0.0,
+          2.78125
+        ],
+        "discovery-02": [
+          0.0,
+          3.75
+        ],
+        "discovery-03": [
+          0.0,
+          4.0625
+        ],
+        "discovery-04": [
+          0.0,
+          3.78125
+        ],
+        "discovery-05": [
+          0.0,
+          3.65625
+        ],
+        "discovery-06": [
+          0.0,
+          4.09375
+        ],
+        "discovery-07": [
+          0.0,
+          4.1875
+        ],
+        "discovery-08": [
+          0.0,
+          4.34375
+        ],
+        "discovery-09": [
+          0.0,
+          4.625
+        ],
+        "discovery-10": [
+          0.0,
+          4.125
+        ],
+        "discovery-11": [
+          0.0,
+          3.71875
+        ]
+      },
+      "margin_ci95": [
+        3.6614583333333335,
+        4.153645833333333
+      ],
+      "margin_difference": 3.9270833333333335
+    }
+  },
+  "report_accuracy": 0.9947916666666666,
+  "state_surface_accuracy_interaction": 0.7708333333333334,
+  "status": "exploratory_token_aligned"
+}

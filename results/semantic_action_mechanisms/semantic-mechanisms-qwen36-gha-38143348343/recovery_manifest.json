@@ -1,0 +1,12 @@
+{
+  "checkpoint_sha256": "7247fd5d1403ede0c5c676fe4bd991a0c860688e6b033ec31a2673e85a64735e",
+  "completed_sites": 13,
+  "missing_site": {
+    "anchor": "policy_end",
+    "layer": 56
+  },
+  "remote_checkpoint": "/semantic-mechanisms-qwen36-gha-38143348343/discovery_states-layer56-state_end.json",
+  "source_run": "38143348343",
+  "states_sha256": "ddb775bf5d891c60d01251952866f09b5064bfcf9ae1dc295aee2f0a4f4734e9",
+  "status": "partial_checkpoint_preserved_not_complete_discovery"
+}

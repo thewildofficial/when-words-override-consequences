@@ -143,3 +143,30 @@ def test_aligned_decorators_enforce_reduced_timeout_reservations():
                 if kw.arg in ("timeout", "retries")
             }
             assert kwargs == {"timeout": expected[node.name], "retries": 0}
+
+
+def test_recovery_preserves_all_completed_sites_and_rejects_omission():
+    from copy import deepcopy
+
+    from jspace_policy.sprint_runtime import load_json_file
+
+    spec = importlib.util.spec_from_file_location(
+        "mechanism_recovery", ROOT / "modal_semantic_mechanisms_recover.py"
+    )
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    directory = (
+        ROOT / "results/semantic_action_mechanisms/semantic-mechanisms-qwen36-gha-38143348343"
+    )
+    prepared = load_json_file(directory / "prepared.json.gz")["discovery"]
+    completed = load_json_file(directory / "recovered_sites.json.gz")
+    module.validate_completed(prepared, completed)
+    bad = deepcopy(completed)
+    bad["records"].pop()
+    with pytest.raises(RuntimeError, match="omitted"):
+        module.validate_completed(prepared, bad)
+    protocol = load_json_file(
+        ROOT / "experiments/semantic_action_mechanisms/aligned/recovery_protocol.json"
+    )
+    assert protocol["maximum_cumulative_reserved_usd"] < 5
+    assert protocol["scientific_changes"] is False

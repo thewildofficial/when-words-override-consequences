@@ -1,0 +1,91 @@
+# Semantic action mechanisms: behavioral localization
+
+Parent run [38140636684](https://github.com/thewildofficial/when-words-override-consequences/actions/runs/38140636684),
+frozen commit `c50c38752f7b4637edaef547d7dc41a9e4b4acc3`. Discovery only:
+12 historical lexical families, with both targets and both label permutations.
+There are 1,120 contexts and 3,360 queries; repeated conditions are not independent
+new samples. Qwen3.6-27B's pinned revision and thinking-off forced-choice interface
+match the declared protocol. Singleton replay error was zero. Batch/singleton
+candidate error was 0.25 logits with agreeing probe choices; the frozen 0.125
+tolerance triggered singleton scoring for the whole screen.
+
+## Irrelevant private-state information changes action selection
+
+For strategic assertion actions with redundant history and unlabeled prose:
+
+| Private-state sentence | Correct actions | Consequence report accuracy |
+|---|---:|---:|
+| State matches the goal | 48/48 (100%) | 100% |
+| State opposes the goal | 15/48 (31.25%) | 93.75% |
+| State sentence removed | 47/48 (97.92%) | 100% |
+| Neutral sentence substituted | 42/48 (87.50%) | 98.96% |
+
+The action map, target, payoff and correct action stay fixed within each
+state-intervention pair. Removing the sentence produces a 66.67-point gain
+(descriptive lexical-family bootstrap 95% interval: 56.25–77.08 points).
+Matching versus opposed state produces a 68.75-point gain (58.33–79.17 points).
+This is direct behavioral evidence that task-irrelevant state information
+contributes to the failure, beyond merely observing wrong actions.
+
+Opaque actions remain 100% correct. However, their matching-minus-opposed
+margin also changes by 4.05 logits; the assertion margin changes by 6.99 logits.
+Thus accuracy-level selectivity does not imply opaque representations are immune.
+The assertion-minus-opaque margin interaction is 2.94 logits.
+
+In the opposed assertion cell, both reports are correct on 42/48 scenarios and
+27 of those scenarios still have a wrong action. The device subset has 13
+wrong actions despite both reports being correct on all 16 scenarios. Its four
+families are a small descriptive replication, not a broad frame interaction.
+Reports are separate query forks: recoverability under that query is not proof
+of an unchanged internal computation on the action branch.
+
+## Layout and explicit A/B binding both contribute
+
+In the same strategic/opposed/assertion/redundant population:
+
+| Mapping representation | Correct actions |
+|---|---:|
+| Prose without A/B binding | 15/48 (31.25%) |
+| Prose with A/B binding | 32/48 (66.67%) |
+| Table without A/B binding | 27/48 (56.25%) |
+| Table with A/B binding | 40/48 (83.33%) |
+
+Explicit labels improve prose by 35.42 points and tables by 27.08 points.
+Unlabeled tables improve on unlabeled prose by 25 points. This resolves the
+earlier confound at the behavioral level: the table rescue contains contributions
+from both structure and label binding. It does not isolate a neural binding
+representation; wording/length differences between renderings remain.
+
+## Internal localization status
+
+The behavior gate passed: opaque accuracy 100%, overall report accuracy 99.06%.
+The state contrast was selected by the prospective rule. Only five discovery
+families passed exact prompt-length and anchor-position matching, below the
+minimum eight. The alignment gate therefore withheld **all activation patches
+and held-out causal inference**. This is an instrument-eligibility failure,
+not evidence against an internal mechanism.
+
+A separately frozen token-aligned follow-up re-pairs vocabulary by tokenizer
+length without using model outcomes. It preserves the original gates and causal
+implementation; its discovery words are reused, while held-out vocabulary is
+disjoint and unscored. See
+[`aligned/protocol.json`](../../experiments/semantic_action_mechanisms/aligned/protocol.json).
+
+The leading explanation is context-sensitive selection interference involving
+truth, goals and assertions. Defaulting to the true state as the objective and
+choosing a false assertion remain observationally equivalent under the tested
+contrarian policy. A literal-policy control would distinguish them. Neural
+localization remains a separate claim requiring the gated intervention.
+
+## Artifacts and cost
+
+Raw scores, tokenized input corpus, protocol, hashes, analyses and all failed
+reservations are in `semantic-mechanisms-qwen36-gha-38140636684/`.
+GPU runtime estimates: behavior $1.29783 unbuffered, alignment-gate invocation
+$0.04224 unbuffered. These are compute approximations, not provider invoices.
+The cumulative admission ledger retains full timeout reservations, including
+failures; it is not reset using these runtime estimates.
+
+Reproduce the behavioral summary with
+`jspace_policy.semantic_action_mechanisms.analyze(prepared['discovery']['dataset'], raw)`.
+The standalone figure is generated by `scripts/plot_semantic_action_mechanisms.py`.
