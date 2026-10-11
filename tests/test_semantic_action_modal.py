@@ -100,3 +100,46 @@ def test_workflow_always_archives_and_does_not_reset_ledger():
     source = (ROOT / "modal_semantic_action_mechanisms.py").read_text()
     cpu_definition = source.split("cpu_image =", 1)[1].split("gpu_image =", 1)[0]
     assert '"jinja2==3.1.6"' in cpu_definition
+
+
+def test_aligned_followup_preserves_parent_dataset_and_every_anchor(runner):
+    from jspace_policy.semantic_action_mechanisms import paired_rows
+    from jspace_policy.sprint_runtime import load_json_file
+
+    directory = ROOT / "experiments/semantic_action_mechanisms/aligned"
+    protocol = load_json_file(directory / "protocol.json")
+    prepared = load_json_file(directory / "prepared.json.gz")
+    assert protocol["maximum_cumulative_reserved_usd"] < 5
+    assert set(w for p in protocol["concept_pairs"]["discovery"] for w in p).isdisjoint(
+        w for p in protocol["concept_pairs"]["locked"] for w in p
+    )
+    for split, value in prepared.items():
+        runner.verify_prepared(value)
+        assert value["sha256"] == protocol["prepared_sha256"][split]
+        assert len(value["queries"]) == 576
+        pairs = paired_rows(value["dataset"], "state")
+        assert len(pairs) == 48
+        for source, recipient in pairs:
+            sq = value["queries"][source["id"] + ":action"]
+            rq = value["queries"][recipient["id"] + ":action"]
+            assert len(sq["input_ids"]) == len(rq["input_ids"])
+            assert sq["anchors"] == rq["anchors"]
+    frozen = json.loads(
+        (ROOT / "experiments/semantic_action_mechanisms/protocol.json").read_text()
+    )
+    assert {s: make_dataset(s)["sha256"] for s in ("discovery", "locked")} == frozen[
+        "dataset_sha256"
+    ]
+
+
+def test_aligned_decorators_enforce_reduced_timeout_reservations():
+    tree = ast.parse((ROOT / "modal_semantic_mechanisms_aligned.py").read_text())
+    expected = {"behavior_aligned": 400, "discovery_aligned": 400, "locked_aligned": 500}
+    for node in tree.body:
+        if isinstance(node, ast.FunctionDef) and node.name in expected:
+            kwargs = {
+                kw.arg: ast.literal_eval(kw.value)
+                for kw in node.decorator_list[0].keywords
+                if kw.arg in ("timeout", "retries")
+            }
+            assert kwargs == {"timeout": expected[node.name], "retries": 0}

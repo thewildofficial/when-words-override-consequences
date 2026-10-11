@@ -26,7 +26,7 @@ concurrency:
 
 jobs:
   experiment:
-    if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[run-semantic-mechanisms]') || contains(github.event.head_commit.message, '[prepare-semantic-mechanisms]') }}
+    if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[run-semantic-mechanisms]') || contains(github.event.head_commit.message, '[prepare-semantic-mechanisms]') || contains(github.event.head_commit.message, '[run-aligned-mechanisms]') }}
     runs-on: ubuntu-latest
     timeout-minutes: 100
     env:
@@ -34,6 +34,7 @@ jobs:
       MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
       RUN_ID: ${{ inputs.run_id || format('semantic-mechanisms-qwen36-gha-{0}', github.run_id) }}
       PREPARE_ONLY: ${{ inputs.prepare_only || contains(github.event.head_commit.message, '[prepare-semantic-mechanisms]') }}
+      ALIGNED_RUN: ${{ contains(github.event.head_commit.message, '[run-aligned-mechanisms]') }}
       UV_CACHE_DIR: /tmp/semantic-mechanisms-uv-cache
     steps:
       - uses: actions/checkout@v6
@@ -51,7 +52,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if [[ "$PREPARE_ONLY" == "true" ]]; then
+          if [[ "$ALIGNED_RUN" == "true" ]]; then
+            uv run --extra modal modal run modal_semantic_mechanisms_aligned.py --run-id "$RUN_ID"
+          elif [[ "$PREPARE_ONLY" == "true" ]]; then
             uv run --extra modal modal run modal_semantic_action_mechanisms.py --run-id "$RUN_ID" --prepare-only
           else
             uv run --extra modal modal run modal_semantic_action_mechanisms.py --run-id "$RUN_ID"

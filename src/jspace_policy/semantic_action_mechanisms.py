@@ -51,8 +51,11 @@ def make_row(
     layout: str,
     binding: bool,
     frame: str = "strategic",
+    concepts_override: tuple[str, str] | None = None,
 ) -> dict[str, Any]:
-    concepts = (CONCEPT_PAIRS if split == "discovery" else LOCKED_PAIRS)[family]
+    concepts = (
+        concepts_override or (CONCEPT_PAIRS if split == "discovery" else LOCKED_PAIRS)[family]
+    )
     tokens = TOKEN_PAIRS[family]
     labels = ("A", "B") if permutation == 0 else ("B", "A")
     surfaces = {
@@ -136,6 +139,8 @@ def make_row(
         binding,
         frame,
     ]
+    if concepts_override is not None:
+        identity.append(list(concepts_override))
     return {
         "id": digest(identity)[:20],
         "split": split,
@@ -206,8 +211,10 @@ def make_dataset(split: str) -> dict[str, Any]:
 
 def verify_dataset(dataset: dict) -> None:
     assert dataset["sha256"] == digest({k: v for k, v in dataset.items() if k != "sha256"})
-    assert len(dataset["rows"]) == 1120
-    assert len({r["id"] for r in dataset["rows"]}) == 1120
+    sizes = {STUDY_ID: 1120, "semantic_action_mechanisms_aligned": 192}
+    expected = sizes[dataset["study_id"]]
+    assert len(dataset["rows"]) == expected
+    assert len({r["id"] for r in dataset["rows"]}) == expected
     for row in dataset["rows"]:
         assert row["responses"][row["expected_action"]] == row["target"]
 
