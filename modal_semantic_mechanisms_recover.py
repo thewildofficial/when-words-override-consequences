@@ -90,6 +90,18 @@ def locked_recovery(prepared: dict, site: dict, provenance: dict) -> str:
     return base.locked_remote.get_raw_f()(prepared, "state", site, provenance)
 
 
+def load_recovery_inputs():
+    prepared = load_json_file(SOURCE_ROOT / "prepared.json.gz")
+    completed = load_json_file(SOURCE_ROOT / "recovered_sites.json.gz")
+    protocol = load_json_file(
+        Path("experiments/semantic_action_mechanisms/aligned/recovery_protocol.json")
+    )
+    if digest(completed) != protocol["completed_checkpoint_digest"]:
+        raise RuntimeError("recovered checkpoint changed")
+    validate_completed(prepared["discovery"], completed)
+    return prepared, completed, protocol
+
+
 @app.local_entrypoint()
 def run(run_id: str):
     if Path(run_id).name != run_id or run_id in (".", ".."):
@@ -97,14 +109,7 @@ def run(run_id: str):
     root = base.ROOT / run_id
     if root.exists():
         raise RuntimeError("refusing overwrite or automatic retry")
-    prepared = load_json_file(SOURCE_ROOT / "prepared.json.gz")
-    completed = load_json_file(SOURCE_ROOT / "recovered_sites.json.gz")
-    protocol = load_json_file(
-        "experiments/semantic_action_mechanisms/aligned/recovery_protocol.json"
-    )
-    if digest(completed) != protocol["completed_checkpoint_digest"]:
-        raise RuntimeError("recovered checkpoint changed")
-    validate_completed(prepared["discovery"], completed)
+    prepared, completed, protocol = load_recovery_inputs()
     ledger = base.ROOT / "reservations.jsonl"
     spent = sum(json.loads(line)["ceiling_usd"] for line in ledger.read_text().splitlines())
     if spent + sum(CEILINGS.values()) > 5:

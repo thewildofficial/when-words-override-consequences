@@ -155,6 +155,12 @@ def test_recovery_preserves_all_completed_sites_and_rejects_omission():
     )
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
+    loaded_prepared, loaded_completed, loaded_protocol = module.load_recovery_inputs()
+    assert len(loaded_completed["records"]) == 312
+    assert (
+        loaded_prepared["discovery"]["sha256"]
+        == loaded_protocol["prepared_sha256"]["discovery"]
+    )
     directory = (
         ROOT / "results/semantic_action_mechanisms/semantic-mechanisms-qwen36-gha-38143348343"
     )
