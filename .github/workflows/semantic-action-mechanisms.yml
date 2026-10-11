@@ -1,0 +1,66 @@
+name: Semantic action mechanisms
+
+on:
+  push:
+    branches:
+      - codex/semantic-action-mechanisms
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: Immutable run directory name
+        required: true
+        default: semantic-mechanisms-qwen36-20261011-v1
+        type: string
+      prepare_only:
+        description: Stop after CPU tokenization (no GPU inference)
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: semantic-action-mechanisms
+  cancel-in-progress: false
+
+jobs:
+  experiment:
+    if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[run-semantic-mechanisms]') || contains(github.event.head_commit.message, '[prepare-semantic-mechanisms]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    env:
+      MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
+      MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
+      RUN_ID: ${{ inputs.run_id || format('semantic-mechanisms-qwen36-gha-{0}', github.run_id) }}
+      PREPARE_ONLY: ${{ inputs.prepare_only || contains(github.event.head_commit.message, '[prepare-semantic-mechanisms]') }}
+      UV_CACHE_DIR: /tmp/semantic-mechanisms-uv-cache
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v7
+      - name: Validate credentials and inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$MODAL_TOKEN_ID"
+          test -n "$MODAL_TOKEN_SECRET"
+          [[ "$RUN_ID" =~ ^[a-zA-Z0-9_-]+$ ]]
+      - name: CPU scientific and execution contract checks
+        run: uv run --extra dev --extra modal pytest -q tests/test_semantic_action_mechanisms.py tests/test_semantic_action_modal.py
+      - name: Run bounded sequential Modal stages
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$PREPARE_ONLY" == "true" ]]; then
+            uv run --extra modal modal run modal_semantic_action_mechanisms.py --run-id "$RUN_ID" --prepare-only
+          else
+            uv run --extra modal modal run modal_semantic_action_mechanisms.py --run-id "$RUN_ID"
+          fi
+      - name: Upload prepared inputs, reservations, raw results and analyses
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: semantic-action-mechanisms-${{ github.run_id }}
+          path: results/semantic_action_mechanisms
+          if-no-files-found: warn
+          retention-days: 90
