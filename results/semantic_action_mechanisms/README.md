@@ -10,6 +10,7 @@ Branch: `codex/semantic-action-mechanisms`.
 | [38143348343](https://github.com/thewildofficial/when-words-override-consequences/actions/runs/38143348343) | Token-matched behavior scored; discovery timed out after 13/14 sites | State effect reproduced with exact length/position matching; preserved 312 completed patch records and exact BF16 states; no complete site-selection verdict yet |
 | [38144881756](https://github.com/thewildofficial/when-words-override-consequences/actions/runs/38144881756) | Recovery CPU validation failed before Modal dispatch | Pytest console-entrypoint import path mismatch; no additional reservation or inference |
 | [38145570702](https://github.com/thewildofficial/when-words-override-consequences/actions/runs/38145570702) | Recovery setup failed before GPU admission | File loader received a string instead of a Path; no additional reservation or inference; covered by the new loading-path test |
+| [38146041969](https://github.com/thewildofficial/when-words-override-consequences/actions/runs/38146041969) | Final-site attempt timed out in weight loading | No final-site inference or capture; failed 120-second reservation retained |
 
 The first run's protocol, provenance, failure and full $0.01635312 CPU reservation
 are retained. The implementation repair adds pinned Jinja2 and a CPU image

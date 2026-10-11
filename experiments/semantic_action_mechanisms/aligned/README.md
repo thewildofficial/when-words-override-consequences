@@ -47,3 +47,15 @@ The first recovery workflow (`38144881756`) stopped in CPU validation because
 the `pytest` console entrypoint omitted the repository root for the recovery
 module's sibling import. It performed no Modal dispatch or new reservation.
 The workflow now uses the same `python -m pytest` invocation tested locally.
+
+The loading-path fix then admitted run `38146041969`, which stalled during weight
+loading and hit its 120-second limit before inference. That full reservation is
+retained. `small_recovery_protocol.json` is a prospective **sample amendment**,
+not a claim that the original 48-pair endpoint ran: it completes the same missing
+site under a 200-second limit, then allows one balanced target/label pair in each
+of the twelve untouched held-out families under a separate 200-second limit.
+The four target/label combinations each occur in three families. Selection is
+fixed before held-out inference; every numerical and endpoint threshold remains
+unchanged. CPU weight-staging threads are capped at four. The maximum cumulative
+reservation is $4.98926208, including the load stall. If any gate or timeout fails,
+the output is reported at its actual stage, not promoted to a neural mechanism.

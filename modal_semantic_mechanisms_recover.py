@@ -20,7 +20,7 @@ from jspace_policy.sprint_runtime import (
 
 SOURCE_RUN = "semantic-mechanisms-qwen36-gha-38143348343"
 SOURCE_ROOT = base.ROOT / SOURCE_RUN
-TIMEOUTS = {"finish": 120, "locked": 400}
+TIMEOUTS = {"finish": 200, "locked": 200}
 CEILINGS = {s: (t + 10) * base.GPU_RATE * 1.2 for s, t in TIMEOUTS.items()}
 app = modal.App("semantic-mechanisms-final-site-recovery")
 image = base.gpu_image.add_local_file(
@@ -63,7 +63,7 @@ def validate_completed(prepared, completed):
     gpu="A100-80GB",
     cpu=8,
     memory=65536,
-    timeout=120,
+    timeout=200,
     retries=0,
     max_containers=1,
     scaledown_window=2,
@@ -80,21 +80,30 @@ def finish_site(prepared: dict, provenance: dict) -> str:
     gpu="A100-80GB",
     cpu=8,
     memory=65536,
-    timeout=400,
+    timeout=200,
     retries=0,
     max_containers=1,
     scaledown_window=2,
     volumes={"/cache": base.cache, "/artifacts": base.artifacts},
 )
 def locked_recovery(prepared: dict, site: dict, provenance: dict) -> str:
-    return base.locked_remote.get_raw_f()(prepared, "state", site, provenance)
+    return json.dumps(
+        base.mechanistic_impl(
+            prepared,
+            "state",
+            [(site["layer"], site["anchor"])],
+            False,
+            provenance,
+            locked_subset=True,
+        )
+    )
 
 
 def load_recovery_inputs():
     prepared = load_json_file(SOURCE_ROOT / "prepared.json.gz")
     completed = load_json_file(SOURCE_ROOT / "recovered_sites.json.gz")
     protocol = load_json_file(
-        Path("experiments/semantic_action_mechanisms/aligned/recovery_protocol.json")
+        Path("experiments/semantic_action_mechanisms/aligned/small_recovery_protocol.json")
     )
     if digest(completed) != protocol["completed_checkpoint_digest"]:
         raise RuntimeError("recovered checkpoint changed")

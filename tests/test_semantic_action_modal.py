@@ -176,3 +176,23 @@ def test_recovery_preserves_all_completed_sites_and_rejects_omission():
     )
     assert protocol["maximum_cumulative_reserved_usd"] < 5
     assert protocol["scientific_changes"] is False
+
+
+def test_limited_heldout_sample_is_balanced_and_uses_every_family(runner):
+    from collections import Counter
+
+    from jspace_policy.semantic_action_mechanisms import paired_rows
+    from jspace_policy.sprint_runtime import load_json_file
+
+    prepared = load_json_file(
+        ROOT / "experiments/semantic_action_mechanisms/aligned/prepared.json.gz"
+    )
+    pairs = runner.balanced_locked_pairs(paired_rows(prepared["locked"]["dataset"], "state"))
+    assert len(pairs) == len({s["family"] for s, _ in pairs}) == 12
+    assert Counter((s["target_index"], s["permutation"]) for s, _ in pairs) == {
+        (0, 0): 3,
+        (0, 1): 3,
+        (1, 0): 3,
+        (1, 1): 3,
+    }
+    assert sum(s["expected_action"] == "A" for s, _ in pairs) == 6

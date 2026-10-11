@@ -155,6 +155,8 @@ def load_model():
     import transformers
 
     torch.manual_seed(101126)
+    # Limit CPU weight-staging threads; GPU precision/settings are unchanged.
+    torch.set_num_threads(4)
     torch.backends.cuda.matmul.allow_tf32 = False
     torch.backends.cudnn.allow_tf32 = False
     model = (
@@ -321,7 +323,16 @@ def behavior_remote(prepared: dict, provenance: dict) -> str:
     )
 
 
-def mechanistic_impl(prepared, contrast, sites, discovery, provenance):
+def balanced_locked_pairs(pairs):
+    return [
+        (s, r)
+        for s, r in pairs
+        if s["target_index"] == int(s["family"].split("-")[-1]) % 2
+        and s["permutation"] == (int(s["family"].split("-")[-1]) // 2) % 2
+    ]
+
+
+def mechanistic_impl(prepared, contrast, sites, discovery, provenance, locked_subset=False):
     import torch
 
     verify_prepared(prepared)
@@ -337,6 +348,8 @@ def mechanistic_impl(prepared, contrast, sites, discovery, provenance):
             if s["target_index"] == int(s["family"].split("-")[-1]) % 2
             and s["permutation"] == 0
         ]
+    elif locked_subset:
+        pairs = balanced_locked_pairs(pairs)
     eligible, excluded = [], []
     for source, recipient in pairs:
         sq, rq = query_map[source["id"] + ":action"], query_map[recipient["id"] + ":action"]
