@@ -65,17 +65,58 @@ minimum eight. The alignment gate therefore withheld **all activation patches
 and held-out causal inference**. This is an instrument-eligibility failure,
 not evidence against an internal mechanism.
 
-A separately frozen token-aligned follow-up re-pairs vocabulary by tokenizer
-length without using model outcomes. It preserves the original gates and causal
-implementation; its discovery words are reused, while held-out vocabulary is
-disjoint and unscored. See
-[`aligned/protocol.json`](../../experiments/semantic_action_mechanisms/aligned/protocol.json).
+A separately frozen token-aligned follow-up re-paired vocabulary by tokenizer
+length without using model outcomes. Its 192 discovery contexts reproduced the
+state effect: assertion accuracy was 48/48 when matching and 11/48 when opposed;
+both opaque cells were 48/48, and overall report accuracy was 99.48%. Every
+source/recipient pair matched in prompt length and anchor position. Discovery
+vocabulary was reused; held-out vocabulary remained disjoint and unscored.
+
+The initial sweep timed out during the final frozen site after completing thirteen
+sites. Its 312 records and exact BF16 states were recovered, and the missing
+layer-56 `policy_end` candidate was completed separately in
+[run 38147047034](https://github.com/thewildofficial/when-words-override-consequences/actions/runs/38147047034).
+All fourteen frozen sites were included before selection, for 336 paired
+forward/reverse records. Numerical identity error was zero. The final-site
+capture/replay error was zero, and a cross-run audit reproduced all 24 baseline
+logit pairs and final-site BF16 vectors bit-for-bit despite the loading-thread
+change. Exact states and the audit are retained with the results.
+
+**No site qualified.** Every site repaired 0/4 selected baseline failures. The
+largest family-mean directional margin change was +0.151 logits at layer 24
+`state_end` (exploratory two-sided sign-flip p≈.075), below the frozen 0.25-logit
+criterion and with no repairs. No held-out inference occurred.
+
+This is a completed negative discovery selection at these two token anchors,
+not a well-powered absence-of-mechanism result. The fixed one-pair-per-family
+sample contained only four failures. Because target was chosen as family-index
+modulo two, the generator also made its options consistently A-first; the full
+behavioral population has more failures and both presentation orders. This
+sampling limitation must accompany the negative result. The test also does not
+cover the actual changed state-word span, multi-token/distributed interventions,
+or every recurrent state of this hybrid model.
+
+A prospective operational/sample amendment had allowed a smaller balanced
+held-out test if a site qualified. Its gates were unchanged, but it was withheld
+because selection failed. The original 48-pair and amended 12-pair confirmation
+are both unexecuted. See
+[`aligned/protocol.json`](../../experiments/semantic_action_mechanisms/aligned/protocol.json)
+and [`small recovery amendment`](../../experiments/semantic_action_mechanisms/aligned/small_recovery_protocol.json).
 
 The leading explanation is context-sensitive selection interference involving
 truth, goals and assertions. Defaulting to the true state as the objective and
 choosing a false assertion remain observationally equivalent under the tested
 contrarian policy. A literal-policy control would distinguish them. Neural
-localization remains a separate claim requiring the gated intervention.
+localization remains unresolved. A neutral mention of the same concept word
+would additionally distinguish a truth-role effect from lexical competition;
+the current state manipulation changes both the fact and concept repetition.
+
+An additional post-hoc association in the token-matched opposed assertion cell is
+presentation sensitivity: A-first options yield 11/24 correct versus 0/24 for
+B-first. This is not an isolated causal order effect because presentation order
+is tied to family and target in the generator. A matched order-only intervention
+should precede an ordinal-binding explanation. It also helps explain why the
+fixed A-first patch sample had fewer failures than the full screen.
 
 ## Artifacts and cost
 

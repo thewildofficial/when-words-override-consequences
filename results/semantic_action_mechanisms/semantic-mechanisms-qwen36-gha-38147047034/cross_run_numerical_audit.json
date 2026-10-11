@@ -1,0 +1,7 @@
+{
+  "final_states_sha256": "fff0bf660db44fdb060a400ceb42851eba0dead701a945e5b3029d8faf133415",
+  "matched_contexts": 24,
+  "maximum_baseline_candidate_logit_difference": 0.0,
+  "maximum_bf16_vector_difference": 0.0,
+  "status": "bitwise_reproduced"
+}
