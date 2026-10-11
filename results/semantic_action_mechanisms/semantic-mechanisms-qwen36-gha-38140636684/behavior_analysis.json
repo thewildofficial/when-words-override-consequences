@@ -1,0 +1,929 @@
+{
+  "cells": {
+    "device/assertion/redundant/matching/prose/False": {
+      "accuracy": 1.0,
+      "mean_margin": 4.296875,
+      "report_accuracy": 1.0,
+      "rows": 16
+    },
+    "device/assertion/redundant/opposed/prose/False": {
+      "accuracy": 0.1875,
+      "mean_margin": -1.15625,
+      "report_accuracy": 1.0,
+      "rows": 16
+    },
+    "device/opaque/redundant/matching/prose/False": {
+      "accuracy": 1.0,
+      "mean_margin": 9.109375,
+      "report_accuracy": 1.0,
+      "rows": 16
+    },
+    "device/opaque/redundant/opposed/prose/False": {
+      "accuracy": 1.0,
+      "mean_margin": 7.2109375,
+      "report_accuracy": 1.0,
+      "rows": 16
+    },
+    "strategic/assertion/none/absent/prose/False": {
+      "accuracy": 0.9166666666666666,
+      "mean_margin": 1.96875,
+      "report_accuracy": 1.0,
+      "rows": 48
+    },
+    "strategic/assertion/none/matching/prose/False": {
+      "accuracy": 1.0,
+      "mean_margin": 4.138020833333333,
+      "report_accuracy": 1.0,
+      "rows": 48
+    },
+    "strategic/assertion/none/neutral/prose/False": {
+      "accuracy": 0.7916666666666666,
+      "mean_margin": 1.7604166666666667,
+      "report_accuracy": 0.9791666666666666,
+      "rows": 48
+    },
+    "strategic/assertion/none/opposed/prose/False": {
+      "accuracy": 0.7083333333333334,
+      "mean_margin": 1.4635416666666667,
+      "report_accuracy": 0.9270833333333334,
+      "rows": 48
+    },
+    "strategic/assertion/redundant/absent/prose/False": {
+      "accuracy": 0.9791666666666666,
+      "mean_margin": 1.484375,
+      "report_accuracy": 1.0,
+      "rows": 48
+    },
+    "strategic/assertion/redundant/matching/prose/False": {
+      "accuracy": 1.0,
+      "mean_margin": 5.71875,
+      "report_accuracy": 1.0,
+      "rows": 48
+    },
+    "strategic/assertion/redundant/neutral/prose/False": {
+      "accuracy": 0.875,
+      "mean_margin": 1.4869791666666667,
+      "report_accuracy": 0.9895833333333334,
+      "rows": 48
+    },
+    "strategic/assertion/redundant/opposed/prose/False": {
+      "accuracy": 0.3125,
+      "mean_margin": -1.2708333333333333,
+      "report_accuracy": 0.9375,
+      "rows": 48
+    },
+    "strategic/assertion/redundant/opposed/prose/True": {
+      "accuracy": 0.6666666666666666,
+      "mean_margin": 1.34375,
+      "report_accuracy": 0.9791666666666666,
+      "rows": 48
+    },
+    "strategic/assertion/redundant/opposed/table/False": {
+      "accuracy": 0.5625,
+      "mean_margin": 0.5052083333333334,
+      "report_accuracy": 0.9895833333333334,
+      "rows": 48
+    },
+    "strategic/assertion/redundant/opposed/table/True": {
+      "accuracy": 0.8333333333333334,
+      "mean_margin": 2.3958333333333335,
+      "report_accuracy": 0.9791666666666666,
+      "rows": 48
+    },
+    "strategic/opaque/none/absent/prose/False": {
+      "accuracy": 1.0,
+      "mean_margin": 9.2109375,
+      "report_accuracy": 1.0,
+      "rows": 48
+    },
+    "strategic/opaque/none/matching/prose/False": {
+      "accuracy": 1.0,
+      "mean_margin": 9.807291666666666,
+      "report_accuracy": 1.0,
+      "rows": 48
+    },
+    "strategic/opaque/none/neutral/prose/False": {
+      "accuracy": 1.0,
+      "mean_margin": 9.341145833333334,
+      "report_accuracy": 1.0,
+      "rows": 48
+    },
+    "strategic/opaque/none/opposed/prose/False": {
+      "accuracy": 1.0,
+      "mean_margin": 6.145833333333333,
+      "report_accuracy": 1.0,
+      "rows": 48
+    },
+    "strategic/opaque/redundant/absent/prose/False": {
+      "accuracy": 1.0,
+      "mean_margin": 9.236979166666666,
+      "report_accuracy": 1.0,
+      "rows": 48
+    },
+    "strategic/opaque/redundant/matching/prose/False": {
+      "accuracy": 1.0,
+      "mean_margin": 9.760416666666666,
+      "report_accuracy": 1.0,
+      "rows": 48
+    },
+    "strategic/opaque/redundant/neutral/prose/False": {
+      "accuracy": 1.0,
+      "mean_margin": 9.028645833333334,
+      "report_accuracy": 1.0,
+      "rows": 48
+    },
+    "strategic/opaque/redundant/opposed/prose/False": {
+      "accuracy": 1.0,
+      "mean_margin": 5.713541666666667,
+      "report_accuracy": 1.0,
+      "rows": 48
+    },
+    "strategic/opaque/redundant/opposed/prose/True": {
+      "accuracy": 1.0,
+      "mean_margin": 5.333333333333333,
+      "report_accuracy": 1.0,
+      "rows": 48
+    },
+    "strategic/opaque/redundant/opposed/table/False": {
+      "accuracy": 1.0,
+      "mean_margin": 5.177083333333333,
+      "report_accuracy": 1.0,
+      "rows": 48
+    },
+    "strategic/opaque/redundant/opposed/table/True": {
+      "accuracy": 1.0,
+      "mean_margin": 5.270833333333333,
+      "report_accuracy": 1.0,
+      "rows": 48
+    }
+  },
+  "competence_gate": true,
+  "contrasts": {
+    "assertion:absent-opposed": {
+      "accuracy_ci95": [
+        0.5625,
+        0.7708333333333334
+      ],
+      "accuracy_difference": 0.6666666666666666,
+      "families": 12,
+      "family_differences": {
+        "discovery-00": [
+          0.5,
+          2.28125
+        ],
+        "discovery-01": [
+          1.0,
+          2.90625
+        ],
+        "discovery-02": [
+          0.5,
+          1.3125
+        ],
+        "discovery-03": [
+          0.5,
+          3.15625
+        ],
+        "discovery-04": [
+          0.75,
+          3.1875
+        ],
+        "discovery-05": [
+          0.75,
+          3.5
+        ],
+        "discovery-06": [
+          0.75,
+          3.09375
+        ],
+        "discovery-07": [
+          0.75,
+          2.34375
+        ],
+        "discovery-08": [
+          0.5,
+          2.34375
+        ],
+        "discovery-09": [
+          0.5,
+          3.21875
+        ],
+        "discovery-10": [
+          0.5,
+          2.65625
+        ],
+        "discovery-11": [
+          1.0,
+          3.0625
+        ]
+      },
+      "margin_ci95": [
+        2.3958333333333335,
+        3.0520833333333335
+      ],
+      "margin_difference": 2.7552083333333335
+    },
+    "assertion:matching-opposed": {
+      "accuracy_ci95": [
+        0.5833333333333334,
+        0.7916666666666666
+      ],
+      "accuracy_difference": 0.6875,
+      "families": 12,
+      "family_differences": {
+        "discovery-00": [
+          0.5,
+          6.78125
+        ],
+        "discovery-01": [
+          1.0,
+          6.28125
+        ],
+        "discovery-02": [
+          0.5,
+          5.03125
+        ],
+        "discovery-03": [
+          0.5,
+          6.875
+        ],
+        "discovery-04": [
+          0.75,
+          8.0
+        ],
+        "discovery-05": [
+          0.75,
+          8.1875
+        ],
+        "discovery-06": [
+          0.75,
+          8.4375
+        ],
+        "discovery-07": [
+          0.75,
+          6.34375
+        ],
+        "discovery-08": [
+          0.5,
+          6.25
+        ],
+        "discovery-09": [
+          0.75,
+          7.90625
+        ],
+        "discovery-10": [
+          0.5,
+          6.28125
+        ],
+        "discovery-11": [
+          1.0,
+          7.5
+        ]
+      },
+      "margin_ci95": [
+        6.4375,
+        7.5287109375
+      ],
+      "margin_difference": 6.989583333333333
+    },
+    "assertion:neutral-opposed": {
+      "accuracy_ci95": [
+        0.5,
+        0.625
+      ],
+      "accuracy_difference": 0.5625,
+      "families": 12,
+      "family_differences": {
+        "discovery-00": [
+          0.5,
+          2.25
+        ],
+        "discovery-01": [
+          0.75,
+          2.71875
+        ],
+        "discovery-02": [
+          0.5,
+          1.21875
+        ],
+        "discovery-03": [
+          0.5,
+          3.28125
+        ],
+        "discovery-04": [
+          0.75,
+          3.28125
+        ],
+        "discovery-05": [
+          0.75,
+          3.59375
+        ],
+        "discovery-06": [
+          0.5,
+          3.15625
+        ],
+        "discovery-07": [
+          0.5,
+          2.28125
+        ],
+        "discovery-08": [
+          0.5,
+          2.6875
+        ],
+        "discovery-09": [
+          0.5,
+          3.34375
+        ],
+        "discovery-10": [
+          0.5,
+          2.6875
+        ],
+        "discovery-11": [
+          0.5,
+          2.59375
+        ]
+      },
+      "margin_ci95": [
+        2.3802083333333335,
+        3.0807291666666665
+      ],
+      "margin_difference": 2.7578125
+    },
+    "assertion:prose:bound-unbound": {
+      "accuracy_ci95": [
+        0.22916666666666666,
+        0.5
+      ],
+      "accuracy_difference": 0.3541666666666667,
+      "families": 12,
+      "family_differences": {
+        "discovery-00": [
+          0.25,
+          1.6875
+        ],
+        "discovery-01": [
+          0.75,
+          3.03125
+        ],
+        "discovery-02": [
+          0.25,
+          1.53125
+        ],
+        "discovery-03": [
+          0.0,
+          2.46875
+        ],
+        "discovery-04": [
+          0.5,
+          3.03125
+        ],
+        "discovery-05": [
+          0.75,
+          4.96875
+        ],
+        "discovery-06": [
+          0.5,
+          3.0
+        ],
+        "discovery-07": [
+          0.25,
+          1.875
+        ],
+        "discovery-08": [
+          0.25,
+          2.0
+        ],
+        "discovery-09": [
+          0.0,
+          2.6875
+        ],
+        "discovery-10": [
+          0.25,
+          2.625
+        ],
+        "discovery-11": [
+          0.5,
+          2.46875
+        ]
+      },
+      "margin_ci95": [
+        2.171875,
+        3.1458984375000005
+      ],
+      "margin_difference": 2.6145833333333335
+    },
+    "assertion:table:bound-unbound": {
+      "accuracy_ci95": [
+        0.1875,
+        0.3541666666666667
+      ],
+      "accuracy_difference": 0.2708333333333333,
+      "families": 12,
+      "family_differences": {
+        "discovery-00": [
+          0.25,
+          0.9375
+        ],
+        "discovery-01": [
+          0.25,
+          2.0
+        ],
+        "discovery-02": [
+          0.25,
+          1.0625
+        ],
+        "discovery-03": [
+          0.25,
+          1.875
+        ],
+        "discovery-04": [
+          0.5,
+          2.0625
+        ],
+        "discovery-05": [
+          0.25,
+          2.59375
+        ],
+        "discovery-06": [
+          0.5,
+          1.53125
+        ],
+        "discovery-07": [
+          0.25,
+          2.125
+        ],
+        "discovery-08": [
+          0.0,
+          2.1875
+        ],
+        "discovery-09": [
+          0.5,
+          2.5
+        ],
+        "discovery-10": [
+          0.0,
+          1.4375
+        ],
+        "discovery-11": [
+          0.25,
+          2.375
+        ]
+      },
+      "margin_ci95": [
+        1.5859375,
+        2.1770833333333335
+      ],
+      "margin_difference": 1.890625
+    },
+    "assertion:unbound:table-prose": {
+      "accuracy_ci95": [
+        0.16666666666666666,
+        0.3333333333333333
+      ],
+      "accuracy_difference": 0.25,
+      "families": 12,
+      "family_differences": {
+        "discovery-00": [
+          0.25,
+          1.71875
+        ],
+        "discovery-01": [
+          0.5,
+          2.3125
+        ],
+        "discovery-02": [
+          0.25,
+          1.3125
+        ],
+        "discovery-03": [
+          0.0,
+          1.53125
+        ],
+        "discovery-04": [
+          0.25,
+          1.625
+        ],
+        "discovery-05": [
+          0.25,
+          2.84375
+        ],
+        "discovery-06": [
+          0.25,
+          2.65625
+        ],
+        "discovery-07": [
+          0.25,
+          1.25
+        ],
+        "discovery-08": [
+          0.25,
+          0.84375
+        ],
+        "discovery-09": [
+          0.0,
+          1.5625
+        ],
+        "discovery-10": [
+          0.25,
+          1.90625
+        ],
+        "discovery-11": [
+          0.5,
+          1.75
+        ]
+      },
+      "margin_ci95": [
+        1.4713541666666667,
+        2.0911458333333335
+      ],
+      "margin_difference": 1.7760416666666667
+    },
+    "opaque:absent-opposed": {
+      "accuracy_ci95": [
+        0.0,
+        0.0
+      ],
+      "accuracy_difference": 0.0,
+      "families": 12,
+      "family_differences": {
+        "discovery-00": [
+          0.0,
+          3.375
+        ],
+        "discovery-01": [
+          0.0,
+          2.9375
+        ],
+        "discovery-02": [
+          0.0,
+          3.65625
+        ],
+        "discovery-03": [
+          0.0,
+          3.78125
+        ],
+        "discovery-04": [
+          0.0,
+          3.21875
+        ],
+        "discovery-05": [
+          0.0,
+          3.90625
+        ],
+        "discovery-06": [
+          0.0,
+          3.3125
+        ],
+        "discovery-07": [
+          0.0,
+          3.9375
+        ],
+        "discovery-08": [
+          0.0,
+          3.59375
+        ],
+        "discovery-09": [
+          0.0,
+          3.65625
+        ],
+        "discovery-10": [
+          0.0,
+          3.59375
+        ],
+        "discovery-11": [
+          0.0,
+          3.3125
+        ]
+      },
+      "margin_ci95": [
+        3.3619791666666665,
+        3.6770833333333335
+      ],
+      "margin_difference": 3.5234375
+    },
+    "opaque:matching-opposed": {
+      "accuracy_ci95": [
+        0.0,
+        0.0
+      ],
+      "accuracy_difference": 0.0,
+      "families": 12,
+      "family_differences": {
+        "discovery-00": [
+          0.0,
+          4.0
+        ],
+        "discovery-01": [
+          0.0,
+          3.46875
+        ],
+        "discovery-02": [
+          0.0,
+          4.0625
+        ],
+        "discovery-03": [
+          0.0,
+          4.3125
+        ],
+        "discovery-04": [
+          0.0,
+          3.78125
+        ],
+        "discovery-05": [
+          0.0,
+          4.65625
+        ],
+        "discovery-06": [
+          0.0,
+          3.5625
+        ],
+        "discovery-07": [
+          0.0,
+          4.71875
+        ],
+        "discovery-08": [
+          0.0,
+          3.78125
+        ],
+        "discovery-09": [
+          0.0,
+          4.46875
+        ],
+        "discovery-10": [
+          0.0,
+          4.0
+        ],
+        "discovery-11": [
+          0.0,
+          3.75
+        ]
+      },
+      "margin_ci95": [
+        3.8280598958333334,
+        4.2734375
+      ],
+      "margin_difference": 4.046875
+    },
+    "opaque:neutral-opposed": {
+      "accuracy_ci95": [
+        0.0,
+        0.0
+      ],
+      "accuracy_difference": 0.0,
+      "families": 12,
+      "family_differences": {
+        "discovery-00": [
+          0.0,
+          3.09375
+        ],
+        "discovery-01": [
+          0.0,
+          2.6875
+        ],
+        "discovery-02": [
+          0.0,
+          3.40625
+        ],
+        "discovery-03": [
+          0.0,
+          3.46875
+        ],
+        "discovery-04": [
+          0.0,
+          3.0
+        ],
+        "discovery-05": [
+          0.0,
+          3.5625
+        ],
+        "discovery-06": [
+          0.0,
+          3.15625
+        ],
+        "discovery-07": [
+          0.0,
+          3.90625
+        ],
+        "discovery-08": [
+          0.0,
+          3.40625
+        ],
+        "discovery-09": [
+          0.0,
+          3.5625
+        ],
+        "discovery-10": [
+          0.0,
+          3.5625
+        ],
+        "discovery-11": [
+          0.0,
+          2.96875
+        ]
+      },
+      "margin_ci95": [
+        3.1276041666666665,
+        3.4947916666666665
+      ],
+      "margin_difference": 3.3151041666666665
+    },
+    "opaque:prose:bound-unbound": {
+      "accuracy_ci95": [
+        0.0,
+        0.0
+      ],
+      "accuracy_difference": 0.0,
+      "families": 12,
+      "family_differences": {
+        "discovery-00": [
+          0.0,
+          0.0
+        ],
+        "discovery-01": [
+          0.0,
+          -0.90625
+        ],
+        "discovery-02": [
+          0.0,
+          -0.59375
+        ],
+        "discovery-03": [
+          0.0,
+          -0.65625
+        ],
+        "discovery-04": [
+          0.0,
+          -1.0
+        ],
+        "discovery-05": [
+          0.0,
+          -0.25
+        ],
+        "discovery-06": [
+          0.0,
+          -0.375
+        ],
+        "discovery-07": [
+          0.0,
+          -0.25
+        ],
+        "discovery-08": [
+          0.0,
+          0.0625
+        ],
+        "discovery-09": [
+          0.0,
+          0.0
+        ],
+        "discovery-10": [
+          0.0,
+          -0.4375
+        ],
+        "discovery-11": [
+          0.0,
+          -0.15625
+        ]
+      },
+      "margin_ci95": [
+        -0.5755208333333334,
+        -0.20052083333333334
+      ],
+      "margin_difference": -0.3802083333333333
+    },
+    "opaque:table:bound-unbound": {
+      "accuracy_ci95": [
+        0.0,
+        0.0
+      ],
+      "accuracy_difference": 0.0,
+      "families": 12,
+      "family_differences": {
+        "discovery-00": [
+          0.0,
+          0.21875
+        ],
+        "discovery-01": [
+          0.0,
+          -0.21875
+        ],
+        "discovery-02": [
+          0.0,
+          0.15625
+        ],
+        "discovery-03": [
+          0.0,
+          -0.125
+        ],
+        "discovery-04": [
+          0.0,
+          0.28125
+        ],
+        "discovery-05": [
+          0.0,
+          0.375
+        ],
+        "discovery-06": [
+          0.0,
+          0.0
+        ],
+        "discovery-07": [
+          0.0,
+          0.34375
+        ],
+        "discovery-08": [
+          0.0,
+          0.34375
+        ],
+        "discovery-09": [
+          0.0,
+          0.09375
+        ],
+        "discovery-10": [
+          0.0,
+          -0.34375
+        ],
+        "discovery-11": [
+          0.0,
+          0.0
+        ]
+      },
+      "margin_ci95": [
+        -0.036458333333333336,
+        0.21614583333333334
+      ],
+      "margin_difference": 0.09375
+    },
+    "opaque:unbound:table-prose": {
+      "accuracy_ci95": [
+        0.0,
+        0.0
+      ],
+      "accuracy_difference": 0.0,
+      "families": 12,
+      "family_differences": {
+        "discovery-00": [
+          0.0,
+          -0.40625
+        ],
+        "discovery-01": [
+          0.0,
+          -0.6875
+        ],
+        "discovery-02": [
+          0.0,
+          -0.5
+        ],
+        "discovery-03": [
+          0.0,
+          -0.5625
+        ],
+        "discovery-04": [
+          0.0,
+          -0.96875
+        ],
+        "discovery-05": [
+          0.0,
+          -0.5
+        ],
+        "discovery-06": [
+          0.0,
+          -0.59375
+        ],
+        "discovery-07": [
+          0.0,
+          -1.0
+        ],
+        "discovery-08": [
+          0.0,
+          -0.1875
+        ],
+        "discovery-09": [
+          0.0,
+          -0.5625
+        ],
+        "discovery-10": [
+          0.0,
+          -0.1875
+        ],
+        "discovery-11": [
+          0.0,
+          -0.28125
+        ]
+      },
+      "margin_ci95": [
+        -0.6796875,
+        -0.3984375
+      ],
+      "margin_difference": -0.5364583333333334
+    }
+  },
+  "dataset_sha256": "0df1901e7435094ea268ea2564df38e0a1aadd0634020da76b3a1492d43d394f",
+  "independent_lexical_families": 12,
+  "opaque_accuracy": 1.0,
+  "report_accuracy": 0.990625,
+  "rows": 1120,
+  "state_surface_interaction": {
+    "accuracy_difference": 0.6875,
+    "margin_difference": 2.942708333333333
+  },
+  "status": "discovery_only"
+}

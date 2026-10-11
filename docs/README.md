@@ -10,6 +10,14 @@ Start with [the next-sprint guide](next-sprint/README.md): it joins the survivin
 claims, second-pass corrections, literature comparison, and proposed $30 plan.
 The versioned documents below retain the historical information state.
 
+The completed [semantic action mechanism investigation](../results/semantic_action_mechanisms/FINDINGS.md)
+isolates private-state, layout and action-label effects behaviorally, with a
+negative fourteen-site discovery patch sweep. Its
+[theory and literature note](next-sprint/semantic-action-mechanisms.md) preserves
+the original rationale; the [protocol](../experiments/semantic_action_mechanisms/README.md)
+and [run/artifact map](../results/semantic_action_mechanisms/README.md) connect
+that rationale to the completed evidence and unopened held-out test.
+
 ## Start with the research question
 
 - [`research-spec.md`](research-spec.md) is the original research ladder: toy behavior, lens readout, causal intervention, fact preservation, and transfer.

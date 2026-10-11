@@ -1,0 +1,128 @@
+{
+  "study_id": "semantic_action_mechanisms",
+  "status": "prospective_before_new_model_inference",
+  "model_id": "Qwen/Qwen3.6-27B",
+  "revision": "6a9e13bd6fc8f0983b9b99948120bc37f49c13e9",
+  "hard_ceiling_usd": 5.0,
+  "resources": {
+    "gpu": "A100-80GB",
+    "cpu_cores": 8,
+    "memory_gib": 64
+  },
+  "timeouts_seconds": {
+    "prepare": 300,
+    "behavior": 1500,
+    "discovery": 1500,
+    "locked": 900
+  },
+  "retries": 0,
+  "discovery": {
+    "lexical_families": 12,
+    "lexical_source": "existing RBG-4 concept pairs, newly balanced target/label conditions",
+    "contexts": 1120,
+    "queries": 3360,
+    "status": "exploratory behavioral localization and site selection"
+  },
+  "locked": {
+    "lexical_families": 12,
+    "lexical_source": "disjoint held-out concept pairs",
+    "scope": "selected matched causal contrast, not a rerun of the entire factorial",
+    "pairs_before_alignment_exclusions": 48
+  },
+  "behavioral_factors": {
+    "state": [
+      "matching",
+      "opposed",
+      "absent",
+      "neutral"
+    ],
+    "layout": [
+      "prose",
+      "table"
+    ],
+    "explicit_label_binding": [
+      false,
+      true
+    ],
+    "history": [
+      "none",
+      "redundant"
+    ],
+    "surfaces": [
+      "assertion",
+      "opaque"
+    ],
+    "frames": "strategic full connected design; device state replication on first four families",
+    "target_and_label_permutation": "both values crossed within every family"
+  },
+  "behavior_gate": {
+    "minimum_opaque_accuracy": 0.95,
+    "minimum_report_accuracy": 0.9,
+    "priority": "state before binding",
+    "state": "assertion-minus-opaque matching/opposed accuracy contrast >= .15, assertion margin contrast >= .5",
+    "binding": "prose bound-minus-unbound assertion accuracy contrast >= .15 and margin contrast >= .5",
+    "otherwise": "stop before causal compute"
+  },
+  "causal_discovery": {
+    "pairs": "one target (family index modulo 2), permutation zero, per family; no error-conditioned selection",
+    "layers": [
+      8,
+      16,
+      24,
+      32,
+      40,
+      48,
+      56
+    ],
+    "state_anchors": [
+      "state_end",
+      "policy_end"
+    ],
+    "binding_anchors": [
+      "policy_end"
+    ],
+    "goal_position": "strictly after every causal anchor; no readout/answer-token patching",
+    "state_alignment": "equal full prompt token length and anchor positions required",
+    "minimum_eligible_families": 8,
+    "identity_and_capture_replay_max_absolute_candidate_logit_error": 1e-05,
+    "selection": "directional mean margin >= .25, >=20% strict repairs, then maximum directional mean margin",
+    "directions": [
+      "rescuing source into recipient",
+      "recipient into source"
+    ]
+  },
+  "locked_endpoint": {
+    "minimum_families": 8,
+    "minimum_baseline_failures": 8,
+    "minimum_repair_fraction": 0.2,
+    "minimum_directional_margin_change": 0.25,
+    "maximum_two_sided_family_sign_flip_p": 0.05,
+    "minimum_forward_minus_wrong_game_margin_change": 0.1,
+    "minimum_patched_report_accuracy": 0.95,
+    "numerical_controls": "capture replay and exact BF16 identity; singleton execution",
+    "claim": "causal contribution under this frozen contrast/site, not a complete algorithm"
+  },
+  "statistics": {
+    "unit": "lexical family; targets/labels/frames are repeated measures",
+    "behavior": "descriptive contrasts and 4000 family-bootstrap draws; no confirmatory behavioral p claims",
+    "locked": "10000 seeded family-level sign flips, plus-one correction; one frozen site",
+    "seed": 101126
+  },
+  "instrument": {
+    "dtype": "bfloat16",
+    "thinking": false,
+    "use_cache": false,
+    "batch_size": 4,
+    "singleton_replay_tolerance": 1e-05,
+    "batch_parity_tolerance": 0.125,
+    "batch_choice_agreement": "all probe choices must agree",
+    "batch_failure": "predeclared singleton fallback within same invocation",
+    "singleton_failure": "stop and retain full reservation"
+  },
+  "accounting": "one persisted coordinator ledger; reserve full timeout plus buffer before each dispatch; unknown/failed charges retain reservation; no automatic retries",
+  "pricing_checked": "2026-10-11 https://modal.com/pricing",
+  "dataset_sha256": {
+    "discovery": "0df1901e7435094ea268ea2564df38e0a1aadd0634020da76b3a1492d43d394f",
+    "locked": "233b7139650700ad25774be1657ee4ef3374802375bc69c254081beb1e2988f9"
+  }
+}

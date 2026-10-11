@@ -1,0 +1,9 @@
+{
+  "ceiling_usd": 1.7048745599999997,
+  "global_ceiling_usd": 5.0,
+  "ledger_path": "results/semantic_action_mechanisms/reservations.jsonl",
+  "run_id": "semantic-mechanisms-qwen36-gha-38140636684:discovery",
+  "stage": "mechanistic",
+  "status": "reserved_unreconciled",
+  "total_reserved_usd": 3.4424553599999994
+}

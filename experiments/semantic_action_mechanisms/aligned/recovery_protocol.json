@@ -1,0 +1,26 @@
+{
+  "accounting": "Retain the full failed 400-second reservation. No runtime-estimate refunds. Locked timeout reduced from 500 to 400 seconds to admit full salvage under the same cumulative cap.",
+  "completed_checkpoint_digest": "a9d08e70cc68f76d4c80363e2b4c9fedb7a28cd613502b804e33599dedcc7bd7",
+  "completed_sites": 13,
+  "hard_cumulative_ceiling_usd": 5.0,
+  "incremental_ceiling_usd": 0.6096902399999999,
+  "maximum_cumulative_reserved_usd": 4.977971519999999,
+  "missing_frozen_site": {
+    "anchor": "policy_end",
+    "layer": 56
+  },
+  "prepared_sha256": {
+    "discovery": "d70f8f92e3b942e39742035c9ab2fbe502b7ba585bf0579822faeb35061dddab",
+    "locked": "5029d6c7d0d9bc7e5fc9ee4bd1d2d0d2dc54b283a860d4eb490e1767288db4e9"
+  },
+  "prior_reserved_usd": 4.368281279999999,
+  "scientific_changes": false,
+  "selection": "Merge all fourteen frozen sites before selection. Recompute only the censored site, preserving source population, paired directions, identity controls and thresholds. Heldout site frozen before any locked inference.",
+  "source_run": "semantic-mechanisms-qwen36-gha-38143348343",
+  "status": "implementation_only_before_missing_site_and_heldout_inference",
+  "study_id": "semantic_action_mechanisms_aligned_final_site_recovery",
+  "timeouts_seconds": {
+    "finish": 120,
+    "locked": 400
+  }
+}

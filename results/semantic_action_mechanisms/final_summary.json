@@ -1,0 +1,16 @@
+{
+  "aligned_assertion_matching_accuracy": 1.0,
+  "aligned_assertion_opposed_accuracy": 0.22916666666666666,
+  "heldout_inference_occurred": false,
+  "maximum_directional_margin_change": 0.15104166666666666,
+  "numerical_identity_error": 0.0,
+  "parent_action_accuracy_opposed": 0.3125,
+  "parent_action_accuracy_state_removed": 0.9791666666666666,
+  "reservation_ceiling_usd": 5.0,
+  "reservation_total_usd": 4.75216032,
+  "sampling_limitation": "Fixed discovery sample was A-first with only four failures; negative does not exclude a mechanism.",
+  "selected_baseline_failures": 4,
+  "sites_tested": 14,
+  "status": "completed_behavior_and_negative_discovery_selection",
+  "strict_repairs_per_site": 0
+}

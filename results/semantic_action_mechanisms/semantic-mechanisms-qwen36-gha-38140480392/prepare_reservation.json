@@ -1,0 +1,9 @@
+{
+  "ceiling_usd": 0.01635312,
+  "global_ceiling_usd": 5.0,
+  "ledger_path": "results/semantic_action_mechanisms/reservations.jsonl",
+  "run_id": "semantic-mechanisms-qwen36-gha-38140480392:prepare",
+  "stage": "preflight",
+  "status": "reserved_unreconciled",
+  "total_reserved_usd": 0.01635312
+}

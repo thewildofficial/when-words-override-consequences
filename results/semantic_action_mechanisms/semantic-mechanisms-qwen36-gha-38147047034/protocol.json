@@ -1,0 +1,31 @@
+{
+  "accounting": "Retain all previous reservations; total stays below $5. Final-site and limited held-out test each have 200-second timeout; no retries.",
+  "amendment": "Before any held-out model inference: one balanced pair per each of twelve held-out lexical families, rather than four pairs per family. All fourteen discovery sites must finish before selection; minimum eight baseline failures and all other numerical/repair/margin/significance/report/specificity gates unchanged. Original 48-pair confirmation remains unexecuted.",
+  "completed_checkpoint_digest": "a9d08e70cc68f76d4c80363e2b4c9fedb7a28cd613502b804e33599dedcc7bd7",
+  "completed_sites": 13,
+  "hard_cumulative_ceiling_usd": 5.0,
+  "heldout_families": 12,
+  "heldout_pairs": 12,
+  "heldout_selection": "target_index = family_index % 2; label_permutation = (family_index // 2) % 2. Each of four target/label combinations occurs in three families. No selection on held-out outcomes.",
+  "incremental_ceiling_usd": 0.47420351999999993,
+  "maximum_cumulative_reserved_usd": 4.989262079999999,
+  "missing_frozen_site": {
+    "anchor": "policy_end",
+    "layer": 56
+  },
+  "prepared_sha256": {
+    "discovery": "d70f8f92e3b942e39742035c9ab2fbe502b7ba585bf0579822faeb35061dddab",
+    "locked": "5029d6c7d0d9bc7e5fc9ee4bd1d2d0d2dc54b283a860d4eb490e1767288db4e9"
+  },
+  "prior_reserved_usd": 4.515058559999999,
+  "reason": "Final-site 120-second attempt stalled in model loading before any inference. Full reservation retained. Cap loading threads at four.",
+  "scientific_changes": true,
+  "selection": "Merge all fourteen frozen sites before selection. Recompute only the censored site, preserving source population, paired directions, identity controls and thresholds. Heldout site frozen before any locked inference.",
+  "source_run": "semantic-mechanisms-qwen36-gha-38143348343",
+  "status": "implementation_only_before_missing_site_and_heldout_inference",
+  "study_id": "semantic_action_mechanisms_small_heldout_amendment",
+  "timeouts_seconds": {
+    "finish": 200,
+    "locked": 200
+  }
+}
