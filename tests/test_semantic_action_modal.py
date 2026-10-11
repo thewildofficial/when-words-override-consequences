@@ -97,3 +97,6 @@ def test_workflow_always_archives_and_does_not_reset_ledger():
     assert "cancel-in-progress: false" in workflow
     assert "retention-days: 90" in workflow
     assert "rm " not in workflow
+    source = (ROOT / "modal_semantic_action_mechanisms.py").read_text()
+    cpu_definition = source.split("cpu_image =", 1)[1].split("gpu_image =", 1)[0]
+    assert '"jinja2==3.1.6"' in cpu_definition

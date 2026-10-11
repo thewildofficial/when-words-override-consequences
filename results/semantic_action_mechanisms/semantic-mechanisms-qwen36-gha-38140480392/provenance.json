@@ -1,0 +1,10 @@
+{
+  "code_sha256": {
+    "/home/runner/work/when-words-override-consequences/when-words-override-consequences/modal_semantic_action_mechanisms.py": "0b9b87151d43d9848594fd4da477a646c2db24f1895dc93cb9cf4a35caf3e81e",
+    "src/jspace_policy/semantic_action_mechanisms.py": "2d81c38ecaaf183e6c41d10b6e000fbea8ea5297ffae57366464553c781b1563"
+  },
+  "created_at": "2026-10-11T12:45:52.892234+00:00",
+  "git_commit": "211528fcd1ab82a6930e8216052957166b47a428",
+  "protocol_sha256": "299d415e47db1d5bd606d58f915a0d2a63dacf26e2dc30880ae6e59adb15ab39",
+  "run_id": "semantic-mechanisms-qwen36-gha-38140480392"
+}

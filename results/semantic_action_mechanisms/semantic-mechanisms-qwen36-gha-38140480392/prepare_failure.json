@@ -1,0 +1,5 @@
+{
+  "message": "apply_chat_template requires jinja2 to be installed. Please install it using `pip install jinja2`.",
+  "reservation_retained": true,
+  "type": "ImportError"
+}

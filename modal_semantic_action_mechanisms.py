@@ -50,7 +50,9 @@ artifacts = modal.Volume.from_name(
 )
 cpu_image = (
     modal.Image.debian_slim(python_version="3.13")
-    .uv_pip_install("transformers==5.15.1", "huggingface_hub==1.30.0", "numpy>=2")
+    .uv_pip_install(
+        "transformers==5.15.1", "huggingface_hub==1.30.0", "numpy>=2", "jinja2==3.1.6"
+    )
     .env({"HF_HOME": "/cache/huggingface", "TOKENIZERS_PARALLELISM": "false"})
     .add_local_dir("src/jspace_policy", remote_path="/root/jspace_policy")
 )
