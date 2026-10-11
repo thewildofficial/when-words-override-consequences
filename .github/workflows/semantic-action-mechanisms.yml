@@ -48,7 +48,7 @@ jobs:
           test -n "$MODAL_TOKEN_SECRET"
           [[ "$RUN_ID" =~ ^[a-zA-Z0-9_-]+$ ]]
       - name: CPU scientific and execution contract checks
-        run: uv run --extra dev --extra modal pytest -q tests/test_semantic_action_mechanisms.py tests/test_semantic_action_modal.py
+        run: uv run --extra dev --extra modal python -m pytest -q tests/test_semantic_action_mechanisms.py tests/test_semantic_action_modal.py
       - name: Run bounded sequential Modal stages
         shell: bash
         run: |

@@ -42,3 +42,8 @@ limit, not its sample, metric, or gates. `[recover-mechanisms]` dispatches this
 specific salvage. It validates every recovered source/destination/direction pair
 and identity control before GPU admission. A timeout is infrastructure censoring,
 not a negative causal endpoint.
+
+The first recovery workflow (`38144881756`) stopped in CPU validation because
+the `pytest` console entrypoint omitted the repository root for the recovery
+module's sibling import. It performed no Modal dispatch or new reservation.
+The workflow now uses the same `python -m pytest` invocation tested locally.
