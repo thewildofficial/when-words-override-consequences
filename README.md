@@ -43,6 +43,28 @@ Every row below was decided *before* the data was opened. Failures count as resu
 
 Full ledger: [results/README.md](results/README.md) · Every decision: [decision log](docs/v5/decision-log.md).
 
+## Latest mechanism investigation — 11 October 2026
+
+Changing a task-irrelevant private-state sentence while keeping the correct
+action fixed strongly changes the model's choice. In the opposed-state,
+assertion/prose condition, removing that sentence raised accuracy from
+**15/48 (31.25%) to 47/48 (97.92%)**. Explicit A/B labels and table layout each
+helped independently; together they reached 40/48 (83.33%). These are discovery
+results from twelve lexical families, with repeated conditions within families.
+
+A token-matched follow-up reproduced the state effect. Fourteen internal patch
+sites produced **zero repairs of four selected failures**; no site qualified for
+held-out confirmation. The small, consistently A-first patch sample limits that
+negative result. We have localized a behavioral cause of errors, while the
+neural mechanism and the distinction between truth-role and lexical interference
+remain open.
+
+Read the [findings and figure](results/semantic_action_mechanisms/FINDINGS.md),
+[artifact map and offline reproduction](results/semantic_action_mechanisms/README.md),
+and [theory and literature](docs/next-sprint/semantic-action-mechanisms.md).
+The completed study reserved $4.75216032 under its $5 admission cap, including
+failed attempts; this is a reservation ledger, not a provider invoice.
+
 ## Where things stand right now
 
 A second-pass audit found a scoring bug (a skipped normalization step) in one secondary readout, fixed the calculator ([parity gate passed on the real model](results/research_audit/readout_parity_af81d642.json)), and quarantined the old numbers ([erratum](results/research_audit/rbg5b_readout_erratum.json)). The main results above are unaffected.
@@ -85,11 +107,12 @@ model forwards have occurred on that branch yet.
 | New epistemic/ToM/strategy branch | [V6.1-ES-2 protocol](docs/v6.1/README.md) |
 | Reasoning-capability control | [V6.2 protocol](docs/v6.2/README.md) |
 | V7 epistemic agentic strategy | [V7-EAS-1 protocol](docs/v7/README.md) · [preflight record](results/v7_epistemic_agentic_strategy/README.md) |
+| Semantic action mechanisms | [findings](results/semantic_action_mechanisms/FINDINGS.md) · [protocol](experiments/semantic_action_mechanisms/README.md) · [offline reproduction](results/semantic_action_mechanisms/README.md#offline-reproduction) |
 Reproduce the lightweight checks (committed GPU outputs are immutable; these verify everything else):
 
 ```bash
 uv sync --extra dev --extra modal
-uv run pytest
+uv run python -m pytest
 ```
 
 Paid GPU runs are gated: manual GitHub Actions workflows, frozen hashes, overwrite refusal, hard budget ceiling. A failed gate stops later compute.

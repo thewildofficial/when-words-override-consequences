@@ -1,9 +1,14 @@
 # Explaining the semantic action gap
 
 Research synthesis and proposed discriminating experiments, 11 October 2026.
-**Design only.** No new model inference, activation collection, or paid run.
-The added raw-data summaries below are exploratory; historical endpoints and
-preregistrations remain unchanged. Checkout inspected: `80787bf5382aeb7e16bd08dd8b7bc0d7977ba634`.
+This note preserves the **pre-run rationale** written against checkout
+`80787bf5382aeb7e16bd08dd8b7bc0d7977ba634`; its historical raw-data summaries
+are exploratory. The subsequently completed study is documented separately in
+the [final findings](../../results/semantic_action_mechanisms/FINDINGS.md) and
+[run/artifact map](../../results/semantic_action_mechanisms/README.md).
+Private-state and layout/binding interventions changed behavior; the fourteen-site
+patch sweep selected no site, and held-out inference remained unopened.
+Historical endpoints and preregistrations remain unchanged.
 
 The leading working hypothesis is **competition between an outcome-based
 computation and a context-triggered assertion shortcut**. An action query can
@@ -58,8 +63,9 @@ change it while holding the correct action fixed.
 
 Raw source: `results/v5_inverse_evidence/raw/behavior_v1.json`, SHA-256
 `4e7ba1d0dc16e1fe231d7fe312e77dbede14e33e5db2eca2c6e030ed9237b4f9`.
-The existing [review](../research-review-2026-09-09.md) separately records the
-layout/binding confound and the changes hidden by equal table accuracies.
+The subsequent [layout/binding factorial](../../results/semantic_action_mechanisms/FINDINGS.md#layout-and-explicit-ab-binding-both-contribute)
+separates those two treatments behaviorally. Equal aggregate accuracies alone
+do not establish that individual choices or margins stay unchanged.
 
 ## What the literature contributes
 

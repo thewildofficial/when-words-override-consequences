@@ -3,6 +3,12 @@
 Prospective investigation, 11 October 2026. Branch:
 `codex/semantic-action-mechanisms`. No outcome is implied by this protocol.
 
+**Completed-study status:** behavioral discovery and the token-aligned
+fourteen-site patch sweep are archived. No site qualified; held-out inference
+did not occur. See the [final findings](../../results/semantic_action_mechanisms/FINDINGS.md)
+and [offline reproduction](../../results/semantic_action_mechanisms/README.md#offline-reproduction).
+The protocol and amendments below retain their prospective information state.
+
 The behavioral screen holds the correct action fixed while manipulating an
 irrelevant private-state sentence. A second connected factorial separates
 prose/table layout from explicit A/B binding in the consequence mapping.
@@ -76,7 +82,7 @@ only. Ordinary pushes skip the job. Neither marker is an automatic retry.
 Local equivalent:
 
 ```sh
-uv run --extra dev --extra modal pytest -q tests/test_semantic_action_mechanisms.py tests/test_semantic_action_modal.py
+uv run --extra dev --extra modal python -m pytest -q tests/test_semantic_action_mechanisms.py tests/test_semantic_action_modal.py
 uv run --extra modal modal run modal_semantic_action_mechanisms.py --run-id UNIQUE_RUN_ID
 ```
 

@@ -32,6 +32,21 @@ interference and report-conditioned action, rather than autonomous scheming.
 J-lens readouts are a candidate instrument for that question, not the research
 objective themselves.
 
+## Completed semantic action mechanism follow-up
+
+On 11 October 2026, a separate $5-capped investigation tested why the semantic
+action gap appears. Removing an irrelevant opposed-state sentence raised
+assertion/prose accuracy from 15/48 to 47/48; explicit A/B labels and table layout
+each helped independently. The token-matched follow-up reproduced the state
+effect, but no site in the fourteen-site patch sweep qualified for confirmation.
+The patch sample contained only four failures and consistently A-first options.
+Held-out inference did not occur.
+
+Read the [completed findings](../../results/semantic_action_mechanisms/FINDINGS.md),
+[offline reproduction and run history](../../results/semantic_action_mechanisms/README.md),
+and [pre-run theory/literature note](semantic-action-mechanisms.md). This result
+is separate from the historical $30 proposal above.
+
 ## Evidence map
 
 | Track | Best-supported conclusion | What remains open |

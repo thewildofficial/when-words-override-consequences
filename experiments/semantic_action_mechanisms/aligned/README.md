@@ -1,5 +1,13 @@
 # Token-aligned state follow-up
 
+**Final status:** discovery completed across all fourteen frozen sites after
+recovery in run `38147047034`. Every site repaired 0/4 selected baseline failures;
+no site qualified, so both the original and amended held-out tests remain
+unexecuted. The consistently A-first, four-failure patch sample limits the
+negative result. Read the [final findings](../../../results/semantic_action_mechanisms/FINDINGS.md)
+and [artifact map](../../../results/semantic_action_mechanisms/README.md).
+The following paragraphs retain the sequence of prospective freezes and repairs.
+
 Prospectively frozen after parent run `38140636684`, before any inference on
 these re-paired stimuli. The parent identified a large irrelevant-state effect,
 but its causal alignment gate had only five eligible families. No patch was run.
