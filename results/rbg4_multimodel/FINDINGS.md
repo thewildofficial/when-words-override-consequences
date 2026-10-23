@@ -225,3 +225,46 @@ and cannot isolate semantic interference. Related follow-up: run the RBG-6
 self-report-card trajectory arm on the comparators (RBG-6 on Qwen3.6-27B:
 46/46 conditional on both reports correct, 46/48 = 95.83% across all primary
 trajectories, 0/48 dissociation) to test whether the rescue transfers.
+
+## J-lens decisive test: prompt-local Jacobians vs the averaged lens
+
+The external review note (`docs/reviews/jlens-failure-diagnosis-2026-10-23.md`)
+proposed a smallest decisive test of the estimator-mismatch hypothesis: if the
+averaged J-lens is the bottleneck for interventions, per-prompt Jacobians at
+the same write site should convert far better than the 24/33 (72.7%) H0
+country-facts baseline.
+
+Method (`modal_jlens_local_test.py`): the H0 country category (4 countries x
+4 functions x 3 targets = 48 trials), single write site layer 40, all
+positions, alpha=1.0, identical swap code path. Every baseline-eligible trial
+ran twice in the same process: once with average-lens directions (matched
+internal baseline) and once with directions derived from a per-prompt Jacobian
+computed with upstream `jacobian_for_prompt` at the pinned jlens commit.
+Prompts are 8-12 tokens, shorter than the fitting default skip_first=16, so
+only the BOS position was skipped (noted as a reduction caveat).
+
+Result (36 eligible trials):
+
+| Directions | Target top-1 | Mean target log-odds |
+|---|---|---|
+| Average lens (matched H0 baseline) | 25/36 (69.4%) | -0.97 |
+| Prompt-local Jacobian | 3/36 (8.3%) | -5.31 |
+
+Per-function: capital avg 12/12 local 0/12; continent avg 9/12 local 0/12;
+language avg 4/9 local 3/9; currency avg 0/3 local 0/3.
+
+Verdict, per the review note's own decision rule ("big jump = estimator
+mismatch confirmed; no jump = deeper subspace-write limitation, close the
+J-lens intervention branch"): the hypothesis is REJECTED. Prompt-local
+Jacobians convert dramatically worse, not better. The averaged lens is not the
+bottleneck at this site; the limitation lies deeper in the subspace-write
+approach itself. The internal baseline (25/36, 69.4%) closely replicates the
+H0 reference (24/33, 72.7%), so the comparison is matched and the negative
+result is not an artifact of a broken setup. Caveat: the local Jacobians used
+skip_first=1 because the country prompts are shorter than the fitting default;
+a different position reduction could shift numbers, but the 8x gap leaves
+little room for that to flip the verdict. This supports the review note's
+fallback recommendation: keep J-lens as a descriptive readout, and do not
+rebuild the program's causal spine on it.
+
+Cost: $0.379 measured (463.4s A100-80GB).
