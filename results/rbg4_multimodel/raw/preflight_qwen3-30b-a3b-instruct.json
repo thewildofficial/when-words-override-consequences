@@ -1,0 +1,13 @@
+{
+  "created_at": "2026-10-23T02:22:36.024051+00:00",
+  "enable_thinking": false,
+  "maximum_tokens": 297,
+  "minimum_tokens": 156,
+  "model_id": "Qwen/Qwen3-30B-A3B-Instruct-2507",
+  "model_key": "qwen3-30b-a3b-instruct",
+  "model_revision": "0d7cf23991f47feeb3a57ecb4c9cee8ea4a17bfe",
+  "queries_checked": 2304,
+  "schema_version": 1,
+  "source_dataset_sha256": "3fdc9977f03700dbfb2118414ec9602a4e76d9d6e2b35788a81bc6acf4a1f5d1",
+  "status": "all_prompt_and_one_token_continuation_checks_passed"
+}

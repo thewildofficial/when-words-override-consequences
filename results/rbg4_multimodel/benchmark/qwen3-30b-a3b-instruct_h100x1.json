@@ -1,0 +1,17 @@
+{
+  "created_at": "2026-10-23T03:20:08.756000+00:00",
+  "estimated_full_run_gpu_cost_buffered_usd": 0.3062856079382314,
+  "estimated_full_run_gpu_cost_usd": 0.25523800661519286,
+  "extrapolated_full_run_seconds": 232.66910356899984,
+  "gpu_actual": "NVIDIA H100 80GB HBM3",
+  "gpu_usd_per_second": 0.001097,
+  "load_seconds": 148.951267465,
+  "model_id": "Qwen/Qwen3-30B-A3B-Instruct-2507",
+  "model_key": "qwen3-30b-a3b-instruct",
+  "n_queries": 96,
+  "query_seconds": 3.4882431709999935,
+  "schema_version": 1,
+  "seconds_per_query": 0.03633586636458327,
+  "source_dataset_sha256": "3fdc9977f03700dbfb2118414ec9602a4e76d9d6e2b35788a81bc6acf4a1f5d1",
+  "tier": "H100x1"
+}
