@@ -1,0 +1,93 @@
+{
+  "diagnostics": {
+    "aligned_assertion_action_accuracy": 0.9739583333333334,
+    "both_reports_correct_but_action_wrong": 51,
+    "of_those_selected_content_equals_target": 51,
+    "opposed_assertion_accuracy_by_mapping_and_history": {
+      "prose:none": 0.75,
+      "prose:redundant": 0.2708333333333333,
+      "table:none": 0.8333333333333334,
+      "table:redundant": 0.8541666666666666
+    }
+  },
+  "h1_control_competence": {
+    "all_option_report_accuracy": 0.9895833333333334,
+    "opaque_action_accuracy": 1.0,
+    "passed": true
+  },
+  "h2_inverse_evidence": {
+    "action_gap": 0.22916666666666663,
+    "cluster_values": [
+      0.0,
+      0.25,
+      0.5,
+      0.25,
+      0.25,
+      0.0,
+      0.0,
+      0.25,
+      0.0,
+      0.25,
+      0.5,
+      0.5,
+      -0.25,
+      0.5,
+      0.25,
+      0.5,
+      0.25,
+      0.5,
+      0.0,
+      0.0,
+      0.5,
+      0.0,
+      0.5,
+      0.0
+    ],
+    "no_history_assertion_opposed_accuracy": 0.7916666666666666,
+    "option_report_accuracy_gap": 0.0,
+    "promoted": true,
+    "redundant_history_assertion_opposed_accuracy": 0.5625,
+    "two_sided_exact_cluster_sign_flip_p": 0.000274658203125
+  },
+  "h3_semantic_specificity": {
+    "cluster_values": [
+      0.25,
+      0.0,
+      0.0,
+      -0.25,
+      0.0,
+      0.25,
+      0.25,
+      0.5,
+      0.0,
+      0.5,
+      0.5,
+      0.25,
+      0.0,
+      0.25,
+      0.0,
+      0.5,
+      0.5,
+      0.25,
+      0.0,
+      0.5,
+      0.25,
+      0.5,
+      0.0,
+      0.5
+    ],
+    "history_harm_assertion_minus_opaque": 0.22916666666666666,
+    "promoted": true,
+    "two_sided_exact_cluster_sign_flip_p": 0.000274658203125
+  },
+  "h4_rbg2_cell_replication": {
+    "matched_opaque_action_accuracy": 1.0,
+    "option_report_accuracy": 0.9166666666666666,
+    "passed": true,
+    "strategic_opposed_redundant_prose_assertion_accuracy": 0.375
+  },
+  "n": 768,
+  "schema_version": 1,
+  "source_run_id": "7a09f5170cc44a019e07af7f242ef991",
+  "study_id": "V5-RBG-4"
+}

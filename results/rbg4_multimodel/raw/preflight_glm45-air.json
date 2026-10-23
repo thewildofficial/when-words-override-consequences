@@ -1,0 +1,13 @@
+{
+  "created_at": "2026-10-23T02:23:38.745342+00:00",
+  "enable_thinking": false,
+  "maximum_tokens": 294,
+  "minimum_tokens": 153,
+  "model_id": "zai-org/GLM-4.5-Air",
+  "model_key": "glm45-air",
+  "model_revision": "a24ceef6ce4f3536971efe9b778bdaa1bab18daa",
+  "queries_checked": 2304,
+  "schema_version": 1,
+  "source_dataset_sha256": "3fdc9977f03700dbfb2118414ec9602a4e76d9d6e2b35788a81bc6acf4a1f5d1",
+  "status": "all_prompt_and_one_token_continuation_checks_passed"
+}

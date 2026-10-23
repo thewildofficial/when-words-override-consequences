@@ -1,0 +1,93 @@
+{
+  "diagnostics": {
+    "aligned_assertion_action_accuracy": 0.3177083333333333,
+    "both_reports_correct_but_action_wrong": 2,
+    "of_those_selected_content_equals_target": 2,
+    "opposed_assertion_accuracy_by_mapping_and_history": {
+      "prose:none": 0.6666666666666666,
+      "prose:redundant": 0.6458333333333334,
+      "table:none": 0.6458333333333334,
+      "table:redundant": 0.7083333333333334
+    }
+  },
+  "h1_control_competence": {
+    "all_option_report_accuracy": 0.5592447916666666,
+    "opaque_action_accuracy": 0.5078125,
+    "passed": false
+  },
+  "h2_inverse_evidence": {
+    "action_gap": -0.02083333333333337,
+    "cluster_values": [
+      -0.75,
+      0.0,
+      0.5,
+      -0.25,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.5,
+      0.25,
+      0.0,
+      0.0,
+      -0.25,
+      0.25,
+      0.25,
+      0.75,
+      0.0,
+      0.0,
+      -0.5,
+      -0.75,
+      0.5,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "no_history_assertion_opposed_accuracy": 0.65625,
+    "option_report_accuracy_gap": 0.02083333333333337,
+    "promoted": false,
+    "redundant_history_assertion_opposed_accuracy": 0.6770833333333334,
+    "two_sided_exact_cluster_sign_flip_p": 0.88916015625
+  },
+  "h3_semantic_specificity": {
+    "cluster_values": [
+      -0.25,
+      -0.75,
+      -0.5,
+      0.0,
+      0.0,
+      0.25,
+      0.0,
+      0.0,
+      0.0,
+      0.5,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.25,
+      -0.75,
+      0.75,
+      0.0,
+      0.0,
+      -0.25,
+      0.5
+    ],
+    "history_harm_assertion_minus_opaque": -0.010416666666666666,
+    "promoted": false,
+    "two_sided_exact_cluster_sign_flip_p": 1.0
+  },
+  "h4_rbg2_cell_replication": {
+    "matched_opaque_action_accuracy": 0.6666666666666666,
+    "option_report_accuracy": 0.5,
+    "passed": false,
+    "strategic_opposed_redundant_prose_assertion_accuracy": 0.6666666666666666
+  },
+  "n": 768,
+  "schema_version": 1,
+  "source_run_id": "215d04afb4f44cabbcc9f2192c2ef578",
+  "study_id": "V5-RBG-4"
+}

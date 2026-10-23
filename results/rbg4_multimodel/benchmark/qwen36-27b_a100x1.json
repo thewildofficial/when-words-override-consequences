@@ -1,0 +1,17 @@
+{
+  "created_at": "2026-10-23T03:18:24.395427+00:00",
+  "estimated_full_run_gpu_cost_buffered_usd": 0.23305258287998631,
+  "estimated_full_run_gpu_cost_usd": 0.19421048573332195,
+  "extrapolated_full_run_seconds": 279.84219846299993,
+  "gpu_actual": "NVIDIA A100-SXM4-80GB",
+  "gpu_usd_per_second": 0.000694,
+  "load_seconds": 40.423357407,
+  "model_id": "Qwen/Qwen3.6-27B",
+  "model_key": "qwen36-27b",
+  "n_queries": 96,
+  "query_seconds": 9.975785043999998,
+  "schema_version": 1,
+  "seconds_per_query": 0.10391442754166665,
+  "source_dataset_sha256": "3fdc9977f03700dbfb2118414ec9602a4e76d9d6e2b35788a81bc6acf4a1f5d1",
+  "tier": "A100-80GBx1"
+}

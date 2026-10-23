@@ -1,0 +1,13 @@
+{
+  "created_at": "2026-10-23T02:22:04.936804+00:00",
+  "enable_thinking": null,
+  "maximum_tokens": 310,
+  "minimum_tokens": 169,
+  "model_id": "mistralai/Mistral-Small-3.2-24B-Instruct-2506",
+  "model_key": "mistral-small-32-24b",
+  "model_revision": "95a6d26c4bfb886c58daf9d3f7332c857cb27b43",
+  "queries_checked": 2304,
+  "schema_version": 1,
+  "source_dataset_sha256": "3fdc9977f03700dbfb2118414ec9602a4e76d9d6e2b35788a81bc6acf4a1f5d1",
+  "status": "all_prompt_and_one_token_continuation_checks_passed"
+}

@@ -1,0 +1,17 @@
+{
+  "created_at": "2026-10-23T03:18:22.917584+00:00",
+  "estimated_full_run_gpu_cost_buffered_usd": 0.38916669176416196,
+  "estimated_full_run_gpu_cost_usd": 0.32430557647013497,
+  "extrapolated_full_run_seconds": 257.18126603499996,
+  "gpu_actual": "NVIDIA H200",
+  "gpu_usd_per_second": 0.001261,
+  "load_seconds": 39.190966675000006,
+  "model_id": "Qwen/Qwen3.6-27B",
+  "model_key": "qwen36-27b",
+  "n_queries": 96,
+  "query_seconds": 9.082929139999997,
+  "schema_version": 1,
+  "seconds_per_query": 0.09461384520833331,
+  "source_dataset_sha256": "3fdc9977f03700dbfb2118414ec9602a4e76d9d6e2b35788a81bc6acf4a1f5d1",
+  "tier": "H200x1"
+}

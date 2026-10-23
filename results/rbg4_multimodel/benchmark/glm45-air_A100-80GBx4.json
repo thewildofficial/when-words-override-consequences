@@ -1,0 +1,17 @@
+{
+  "created_at": "2026-10-23T03:27:02.113842+00:00",
+  "estimated_full_run_gpu_cost_buffered_usd": 1.3759575511840985,
+  "estimated_full_run_gpu_cost_usd": 1.1466312926534155,
+  "extrapolated_full_run_seconds": 413.05161839099986,
+  "gpu_actual": "NVIDIA A100-SXM4-80GB",
+  "gpu_usd_per_second": 0.002776,
+  "load_seconds": 277.485913335,
+  "model_id": "zai-org/GLM-4.5-Air",
+  "model_key": "glm45-air",
+  "n_queries": 96,
+  "query_seconds": 5.648571043999993,
+  "schema_version": 1,
+  "seconds_per_query": 0.05883928170833327,
+  "source_dataset_sha256": "3fdc9977f03700dbfb2118414ec9602a4e76d9d6e2b35788a81bc6acf4a1f5d1",
+  "tier": "A100-80GBx4"
+}
