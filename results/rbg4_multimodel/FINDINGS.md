@@ -226,45 +226,56 @@ self-report-card trajectory arm on the comparators (RBG-6 on Qwen3.6-27B:
 46/46 conditional on both reports correct, 46/48 = 95.83% across all primary
 trajectories, 0/48 dissociation) to test whether the rescue transfers.
 
-## J-lens decisive test: prompt-local Jacobians vs the averaged lens
+## J-lens controlled comparison: prompt-local Jacobians vs the averaged lens
 
 The external review note (`docs/reviews/jlens-failure-diagnosis-2026-10-23.md`)
-proposed a smallest decisive test of the estimator-mismatch hypothesis: if the
-averaged J-lens is the bottleneck for interventions, per-prompt Jacobians at
-the same write site should convert far better than the 24/33 (72.7%) H0
-country-facts baseline.
+proposed a small controlled test of one specific rescue path for J-space
+interventions: replacing the averaged-lens directions with per-prompt
+Jacobians at the same write site. This is a comparison of two direction
+estimators under one fixed implementation and topology, not a general verdict
+on subspace-write interventions.
 
 Method (`modal_jlens_local_test.py`): the H0 country category (4 countries x
-4 functions x 3 targets = 48 trials), single write site layer 40, all
-positions, alpha=1.0, identical swap code path. Every baseline-eligible trial
-ran twice in the same process: once with average-lens directions (matched
-internal baseline) and once with directions derived from a per-prompt Jacobian
-computed with upstream `jacobian_for_prompt` at the pinned jlens commit.
-Prompts are 8-12 tokens, shorter than the fitting default skip_first=16, so
-only the BOS position was skipped (noted as a reduction caveat).
+4 functions x 3 targets = 48 trials, none dropped for tokenization), single
+write site layer 40, all positions, alpha=1.0, identical swap code path and
+direction formula (normalized W_U[t] @ J) for both estimators. Eligibility
+(baseline top-1 equals the source answer) was computed from the baseline
+forward BEFORE either intervention: 36 of 48 trials eligible (capital 12/12,
+continent 12/12, language 9/12, currency 3/12). The H0 reference run had 33
+eligible country trials; the small difference is attributable to baseline
+forward nondeterminism across kernels/runs. Every eligible trial ran both
+conditions in the same process. Prompt-local Jacobians used upstream
+`jacobian_for_prompt` at the pinned jlens commit (dim_batch=64); because the
+country prompts are 8-12 tokens (shorter than the fitting default
+skip_first=16), only the BOS position was skipped.
 
-Result (36 eligible trials):
+Result (36 eligible trials, paired):
 
 | Directions | Target top-1 | Mean target log-odds |
 |---|---|---|
 | Average lens (matched H0 baseline) | 25/36 (69.4%) | -0.97 |
 | Prompt-local Jacobian | 3/36 (8.3%) | -5.31 |
 
-Per-function: capital avg 12/12 local 0/12; continent avg 9/12 local 0/12;
-language avg 4/9 local 3/9; currency avg 0/3 local 0/3.
+Paired counts: both succeed 3, average-only 22, local-only 0, neither 11
+(discordant 22, all favoring the average lens; exact two-sided p=4.8e-07).
+The internal baseline (25/36, 69.4%) closely replicates the H0 reference
+(24/33, 72.7%), so the comparison setup is sound. Per-function: capital avg
+12/12 local 0/12; continent 9/12 vs 0/12; language 4/9 vs 3/9; currency
+0/3 vs 0/3.
 
-Verdict, per the review note's own decision rule ("big jump = estimator
-mismatch confirmed; no jump = deeper subspace-write limitation, close the
-J-lens intervention branch"): the hypothesis is REJECTED. Prompt-local
-Jacobians convert dramatically worse, not better. The averaged lens is not the
-bottleneck at this site; the limitation lies deeper in the subspace-write
-approach itself. The internal baseline (25/36, 69.4%) closely replicates the
-H0 reference (24/33, 72.7%), so the comparison is matched and the negative
-result is not an artifact of a broken setup. Caveat: the local Jacobians used
-skip_first=1 because the country prompts are shorter than the fitting default;
-a different position reduction could shift numbers, but the 8x gap leaves
-little room for that to flip the verdict. This supports the review note's
-fallback recommendation: keep J-lens as a descriptive readout, and do not
-rebuild the program's causal spine on it.
+Interpretation, scoped: under THIS implementation (position reduction with
+skip_first=1, shared normalization with clamp_min(1e-12), raw lm_head weights
+without the final RMSNorm in both direction sets, single site, alpha=1.0),
+prompt-local directions convert far worse than the averaged lens. This removes
+one specific rescue path as implemented; it does NOT establish that the
+averaged estimator is never a bottleneck, that subspace writes are
+fundamentally limited, or that the intervention branch should be closed.
+Unmeasured factors that could materially change the outcome include the
+position reduction (skip_first=1 here vs 16 in the released lens fitting),
+per-prompt J conditioning and direction norm distributions (not recorded in
+this run), and direction scaling/swap conditioning. The result is consistent
+with the review note's strategic recommendation (keep J-lens as a descriptive
+readout; do not rebuild the causal spine on it) but does not by itself settle
+the branch's fate.
 
 Cost: $0.379 measured (463.4s A100-80GB).
