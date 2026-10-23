@@ -113,12 +113,15 @@ def estimate_cost(
     cpu_cores: float = 4.0,
     memory_gib: float = 16.0,
     uncertainty_fraction: float = 0.20,
+    gpu_count: int = 1,
 ) -> CostEstimate:
     if gpu is not None and gpu not in GPU_USD_PER_SECOND:
         raise ValueError(f"unknown GPU: {gpu}")
+    if isinstance(gpu_count, bool) or not isinstance(gpu_count, int) or gpu_count < 1:
+        raise ValueError("gpu_count must be a positive integer")
     if seconds < 0:
         raise ValueError("seconds must be non-negative")
-    gpu_cost = 0.0 if gpu is None else GPU_USD_PER_SECOND[gpu] * seconds
+    gpu_cost = 0.0 if gpu is None else GPU_USD_PER_SECOND[gpu] * seconds * gpu_count
     cpu_cost = CPU_CORE_USD_PER_SECOND * cpu_cores * seconds
     memory_cost = MEMORY_GIB_USD_PER_SECOND * memory_gib * seconds
     subtotal = gpu_cost + cpu_cost + memory_cost

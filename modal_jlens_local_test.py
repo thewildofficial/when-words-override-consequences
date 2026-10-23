@@ -1,13 +1,14 @@
-"""Decisive test: prompt-local Jacobians vs the averaged J-lens at one write site.
+"""Implementation-scoped prompt-local vs averaged J-lens comparison.
 
 Context: the V2 H0 smoke test reached 24/33 target top-1 conversions on the
 country-facts category with the *average* J-lens directions at the
 single_layer_all_positions topology (layer 40, alpha=1.0), while the 8-layer
 band topology got 0/90. The external review (docs/reviews/jlens-failure-diagnosis-2026-10-23.md)
 proposes the smallest decisive test: rerun the identical swap with per-prompt
-Jacobians (upstream jlens jacobian_for_prompt) at the same single site. A big
-conversion jump confirms estimator mismatch (average-J is the bottleneck);
-no jump indicates a deeper subspace-write limitation.
+Jacobians (upstream jlens jacobian_for_prompt) at the same single site.
+A conversion difference compares these two implemented estimators only.
+Position reduction, output-map handling, conditioning, and scaling remain
+unmeasured; a null or negative result cannot identify a deeper limitation.
 
 Design: matched internal baseline. Every eligible trial is run twice in the
 same process, once with average-lens directions (the H0 condition, replicating

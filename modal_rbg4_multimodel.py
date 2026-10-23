@@ -279,6 +279,8 @@ def _load_model(spec: dict[str, Any]) -> Any:
         "dtype": torch.bfloat16,
         "low_cpu_mem_usage": True,
     }
+    if spec["gpu_count"] > 1:
+        kwargs["device_map"] = "auto"
     try:
         model = transformers.AutoModelForCausalLM.from_pretrained(
             spec["model_id"], **kwargs
@@ -287,13 +289,7 @@ def _load_model(spec: dict[str, Any]) -> Any:
         model = transformers.AutoModelForImageTextToText.from_pretrained(
             spec["model_id"], **kwargs
         )
-    if spec["gpu_count"] > 1:
-        import accelerate  # noqa: F401
-
-        model = type(model).from_pretrained(
-            spec["model_id"], **kwargs, device_map="auto"
-        )
-    else:
+    if spec["gpu_count"] == 1:
         model = model.cuda()
     model.eval()
     return model
@@ -495,7 +491,8 @@ def behavior(model_key: str) -> None:
     ledger = RESULT_ROOT / "cost_ledger.jsonl"
     estimate = estimate_cost(
         spec["gpu"],
-        float(spec["timeout"]) * spec["gpu_count"],
+        float(spec["timeout"]),
+        gpu_count=spec["gpu_count"],
         cpu_cores=spec["cpu"],
         memory_gib=spec["memory"] / 1024,
     )
@@ -512,7 +509,8 @@ def behavior(model_key: str) -> None:
     _write_new(target, json.dumps(payload, indent=2, sort_keys=True) + "\n")
     measured = estimate_cost(
         spec["gpu"],
-        float(payload["metadata"]["elapsed_seconds"]) * spec["gpu_count"],
+        float(payload["metadata"]["elapsed_seconds"]),
+        gpu_count=spec["gpu_count"],
         cpu_cores=spec["cpu"],
         memory_gib=spec["memory"] / 1024,
     )

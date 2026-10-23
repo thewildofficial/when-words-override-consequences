@@ -14,20 +14,20 @@
    - Qwen/Qwen3-30B-A3B-Instruct-2507 @ `0d7cf239` and Qwen/Qwen3-30B-A3B-Base @ `1b75feb7` (base-vs-instruct arm; no official Qwen3.6 base exists)
    - zai-org/GLM-4.5-Air @ `a24ceef6`
 
-2. **Harness parity verification.** The Qwen3.6-27B re-run reproduces the committed payload: 2/768 near-tie action flips (kernel nondeterminism), 0/1536 report flips, identical overall accuracy, all four frozen gates pass on the fresh payload (H2 gap 22.92 pts, p=.000275).
+2. **Harness parity verification.** The Qwen3.6-27B re-run reproduces the committed payload: 2/768 near-tie action flips (consistent with numerical variation; cause not established), 0/1536 report flips, identical overall accuracy, all four frozen gates pass on the fresh payload (H2 gap 22.92 pts, p=.000275).
 
-3. **GPU tier cost/perf benchmarks** across A100-80GB / H100 / H200 for the ~24-30B class and 4xA100-80GB vs 2xH200 for the ~106B class, with explicit cold-load/warm-run boundaries.
+3. **GPU tier cost/perf benchmarks** across A100-80GB / H100 / H200 for the ~24-30B class and 4xA100-80GB vs 2xH200 for the ~106B class, with historical load/query timing boundaries. GLM load-time comparisons are affected by the double-load bug and corrected-load claims are withdrawn pending remeasurement.
 
 4. **J-lens artifacts**: the external failure diagnosis filed verbatim (`docs/reviews/jlens-failure-diagnosis-2026-10-23.md`) and its proposed controlled comparison implemented and run (`modal_jlens_local_test.py`).
 
 ## Headline results (full detail in `results/rbg4_multimodel/FINDINGS.md`)
 
-- **Directional replication in every instruction-tuned model.** Opposed-assertion action accuracy drops after four redundant *correct* demonstrations in Qwen3.6-27B (-22.9 pts overall), Mistral-24B (-65.6), Qwen3-30B-A3B-Instruct (-29.2), GLM-4.5-Air (-40.6); all significant by the frozen exact cluster sign-flip test. Prose-mapping harm: Mistral 79.2 pts > GLM 58.3 > Qwen3.6 47.9 > Qwen3-30B-Instruct 27.1.
+- **Directional history harm under the frozen bare-token scorer.** Opposed-assertion action accuracy drops after four redundant *correct* demonstrations in Qwen3.6-27B (-22.9 pts overall), Mistral-24B (-65.6), Qwen3-30B-A3B-Instruct (-29.2), GLM-4.5-Air (-40.6); all significant by the frozen exact cluster sign-flip test. These remain descriptive: Mistral whitespace-aware sensitivity is pending and all comparators fail H1. Prose-mapping harm: Mistral 79.2 pts > GLM 58.3 > Qwen3.6 47.9 > Qwen3-30B-Instruct 27.1.
 - **Table protection observed only for Qwen3.6 in these cells.** Qwen3.6 shows no table harm in this sample (83.3% -> 85.4%); under the identical table Mistral loses 52.1 pts, GLM 22.9 pts, and Qwen3-30B-Instruct 31.2 pts. Observed cell behavior in the tested models, not an established invariance of the format.
-- **Base vs instruct.** Qwen3-30B-A3B-Base cannot play (opaque 50.8% = chance) and shows no effect (-2.1 pts, p=.89); its instruct sibling plays partially and shows the effect. In this pair, the instruct model shows the directional effect while the near-chance base model does not; the design cannot separate post-training effects from differences in task competence.
+- **Base vs instruct.** Qwen3-30B-A3B-Base performs near chance under this chat-format evaluation (opaque 50.8%) and has a near-zero observed history contrast (-2.1 pts, p=.89); its instruct sibling plays partially and shows the effect. In this pair, the instruct model shows the directional effect while the near-chance base model does not; the design cannot separate post-training effects from differences in task competence or evaluation-format fit; a base-appropriate continuation evaluation was not run.
 - **Gate-level replication does not transfer.** Only Qwen3.6 passes the frozen H1 competence gate (opaque >=95%, reports >=95%). GLM passes reports (96.8%) but fails opaque (86.5%); Mistral fails both. Effect sizes remain large but H2/H3 are formally not promoted for comparators.
 - **Semantic interference vs general difficulty (descriptive).** The structurally matched (not token-matched) opaque-token surface *improves* with redundant history in Mistral (+40.6 pts) and GLM (+18.8) while assertions collapse - inconsistent with a simple monotone prompt-load account, not decisive against all difficulty accounts (learning benefit vs interference can trade off at different baselines).
-- **J-lens controlled comparison: one rescue path fails as implemented.** Prompt-local Jacobians at the H0 single write site (layer 40, all positions, alpha=1.0) convert 3/36 (8.3%) vs a matched internal average-lens baseline of 25/36 (69.4%), which closely replicates the H0 reference 24/33 (72.7%). Paired: both 3, average-only 22, local-only 0, neither 11 (exact two-sided p=4.8e-07). Scoped read: replacing the averaged lens with naive per-prompt Jacobians does not rescue interventions under this implementation; this is not a general verdict on estimator mismatch or subspace writes (position reduction, output-map/final-norm chain-rule handling, J conditioning, and direction scaling were not varied). Consistent with, but does not by itself settle, the review note's keep-as-readout recommendation.
+- **J-lens controlled comparison: one rescue path fails as implemented.** Prompt-local Jacobians at the H0 single write site (layer 40, all positions, alpha=1.0) convert 3/36 (8.3%) vs a matched internal average-lens baseline of 25/36 (69.4%), which closely replicates the H0 reference 24/33 (72.7%). Paired: both 3, average-only 22, local-only 0, neither 11 (12 eligible source-prompt clusters, 9 nonzero differences all favoring average; exact two-sided prompt-cluster sign-flip p=0.00390625, superseding the dependent trial-level p=4.8e-07). Scoped read: replacing the averaged lens with naive per-prompt Jacobians does not rescue interventions under this implementation; this is not a general verdict on estimator mismatch or subspace writes (position reduction, output-map/final-norm chain-rule handling, J conditioning, and direction scaling were not varied). Consistent with, but does not by itself settle, the review note's keep-as-readout recommendation.
 
 ## Interpretation boundary
 
@@ -53,3 +53,27 @@ Coverage: the append-only ledger (`results/rbg4_multimodel/cost_ledger.jsonl`) r
 - Analyses: `results/rbg4_multimodel/analysis/` (unmodified `scripts/analyze_v5_inverse_evidence.py`)
 - Benchmarks: `results/rbg4_multimodel/benchmark/`
 - Harness: `modal_rbg4_multimodel.py` (new; model as runtime parameter, frozen hash verification retained, per-model preflight, volume-backed persistence)
+
+## Review corrections and pending validation
+
+The frozen payloads/analyses are preserved. Mistral's natural space-prefixed
+top answers disagree with restricted bare-token choices on 8 actions and 34
+reports. Complete whitespace-aware scores are not recoverable from saved
+top-1 and bare logits, including 143 EOS-top action rows. Tokenizer-robust
+Mistral replication is not claimed pending a separately authorized sensitivity
+run. No new inference or spending occurred for these corrections.
+
+The accounting fix applies GPU count only to GPU charges, changing
+GLM's empty-ledger timeout estimate from $22.9796352 to $14.7391488 buffered.
+The existing GLM ledger row was already correct; archived cost estimates are
+unchanged. Historical execution records confirm that GLM was launched directly through
+the deployed remote behavior function, bypassing the local entrypoint and its
+admission check; the correct cost ledger was recorded separately. This
+explains the payload but leaves an enforcement/reproducibility gap.
+
+The loader now selects placement before loading, retaining the model-class
+fallback. This is an unmeasured code fix, not a refresh of historical timings.
+GLM load-time dominance claims are withdrawn. Subtracting load time estimates
+a resident-model run, not merely a cached-weight invocation; device_map auto
+is model dispatch, not explicit tensor parallelism. Single-GPU projections
+remain workload-specific measurements, not a general tier recommendation.

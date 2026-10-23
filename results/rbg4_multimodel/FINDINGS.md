@@ -1,7 +1,7 @@
 # RBG-4 multi-model replication findings
 
 **Date:** 2026-10-23
-**Status:** Complete (5 models + parity re-run + GPU tier benchmarks)
+**Status:** Frozen runs archived; code/documentation review corrections applied, Mistral scoring sensitivity and corrected multi-GPU load benchmarks pending (not run)
 **Dataset:** frozen V5-RBG-4 inverse-evidence dataset, regenerated from the
 committed generator; content SHA-256 verified against
 `configs/v5/inverse_evidence/dataset_manifest.json`
@@ -34,14 +34,13 @@ Qwen3.6-27B was re-run at the frozen revision
 (`6a9e13bd...`) and compared row-by-row against the committed
 `results/v5_inverse_evidence/raw/behavior_v1.json`:
 
-- Action choice mismatches: 2/768 (0.26%), near-tie argmax flips attributable
-  to GPU kernel nondeterminism; overall action accuracy identical (0.9128 both)
+- Action choice mismatches: 2/768 (0.26%), near-tie argmax flips consistent with numerical variation; cause not established; overall action accuracy identical (0.9128 both)
 - Report choice mismatches: 0/1,536
 - Maximum absolute logit difference: 0.75, confined to the flip rows
 - All four frozen gates reproduced on the fresh payload (H1, H2, H3, H4 all
   pass; H2 gap 22.92 pts, p=0.000275)
 
-The harness is faithful; downstream cross-model numbers are trustworthy.
+The parity check validates the Qwen3.6 path, not equivalent answer scoring across tokenizers. Cross-model scores below use the frozen bare-token scorer; Mistral sensitivity remains unresolved.
 
 ## Cross-model scoreboard
 
@@ -60,7 +59,7 @@ table. Gates marked PASS/FAIL are the frozen RBG-4 gates applied verbatim.
 
 ## Findings
 
-### 1. The inverse-evidence effect replicates across families
+### 1. Directional history harm under the frozen bare-token scorer
 
 Every instruction-tuned model tested shows worse opposed-assertion action
 accuracy after four redundant *correct* demonstrations than with no history:
@@ -76,24 +75,21 @@ Qwen3-30B-A3B-Instruct loses 31.2 pts. The table protection observed for
 Qwen3.6-27B in RBG-4 is, in this sample, an observed behavior of the tested
 model and cells, not an established invariance of the representation format.
 
-### 3. Base vs instruct pair: effect only where the game is played
+### 3. Base vs instruct pair under this chat-format evaluation
 
-The base model (Qwen3-30B-A3B-Base) cannot play the game at all: opaque-token
+Under this chat-format evaluation, Qwen3-30B-A3B-Base performs near chance: opaque-token
 actions at 50.8% (coin flip), reports at 55.9%, aligned-goal assertion
-accuracy 31.8%. With no competent play, redundant evidence harms nothing
-(-2.1 pts, p=.89). Its instruction-tuned sibling plays partially and shows
+accuracy 31.8%. The history contrast is -2.1 pts (p=.89) in this evaluation, not evidence that redundant history has no effect generally. Its top token is `user` on 761/768 action queries; no action or report top tokens are legal candidates. A base-appropriate continuation evaluation was not run. Its instruction-tuned sibling plays partially and shows
 the failure. In this pair, the instruct model shows the directional effect
 while the near-chance base model does not; the design cannot separate
-post-training effects from differences in task competence.
+post-training effects from differences in task competence or evaluation-format fit.
 
 ### 4. Gate-level replication is Qwen3.6-specific
 
 Only Qwen3.6-27B passes the H1 competence gate (opaque >=95%, reports >=95%).
 Mistral and Qwen3-30B-A3B-Instruct show larger history harm but fail H1, so
 H2/H3 are formally "not promoted" under the frozen gates. This is expected:
-gates frozen on one model's competence profile do not transfer verbatim. The
-directional replication (#1) is robust to this; the gate verdicts are not
-comparable across models.
+gates frozen on one model's competence profile do not transfer verbatim. The directional results remain descriptive under the frozen scorer; failed competence gates and unresolved scoring sensitivity prevent promoting them to gate-level replication.
 
 
 
@@ -109,10 +105,7 @@ higher-competence replication.
 
 ### 6. Semantic interference vs general difficulty: the sign-flip control
 
-The assertion and opaque-token surfaces use demonstrations identical in
-structure, length, correctness, and position; they differ only in whether the
-demonstrated content is meaningful. General task-following difficulty is
-monotone in prompt load and cannot flip sign across these surfaces. The
+The assertion and opaque-token surfaces use structurally matched demonstrations with the same correctness and placement, but are not token- or character-length matched. The sign contrast tests a simple monotone prompt-load account, not general difficulty accounts as a class. The
 history effect (opposed rows, no-history accuracy minus redundant-history):
 
 | Model | Assertion harm | Opaque-token harm |
@@ -148,6 +141,33 @@ the target response by construction. The N/N counts (Qwen3.6 51/51, Mistral
 49/49, Qwen3-30B-Instruct 26/26, GLM 97/97) are therefore a consistency
 property of the game, not independent mechanistic evidence. The base model had
 only 2 such rows.
+
+## Review correction: answer scoring and reproducibility
+
+The frozen bare-token results are preserved unchanged. Mistral's global top
+answer is space-prefixed A/B on 625/768 actions and EOS on 143; all 1,536
+report top tokens are space-prefixed X/Y. Stripping the legal global top token
+disagrees with the bare scorer on 8 actions and 34 reports. This verifies an
+answer-format sensitivity, not a complete alternative scorer. Saved payloads
+contain only bare candidate logits and global top-1, so a full comparison of
+whitespace candidate scores, particularly the 143 EOS-top action rows, cannot
+be recovered offline. A separate whitespace-aware sensitivity analysis remains
+pending; no new inference was run. Do not promote Mistral to tokenizer-robust
+cross-model replication from these scores alone.
+
+The committed behavior entrypoint multiplied host CPU/memory charges by GPU
+count: its GLM timeout estimate was $22.9796352 buffered even with an empty
+ledger. Applying GPU count only to GPU charges gives $14.7391488 before
+adding existing ledger spend. The archived GLM ledger row already uses the
+correct elapsed-rate accounting ($1.7398002 unbuffered); no historical row or
+raw payload is rewritten. The GLM payload records the then-main commit, not
+a reproducible invocation of this previously blocked entrypoint. Historical
+execution records confirm that GLM was launched directly through the deployed
+remote behavior function, bypassing the local entrypoint and its admission
+check; the correct ledger row was recorded separately. This explains the
+payload despite the entrypoint bug, but is a reproducibility and enforcement
+gap, not evidence that the local guard worked. The code correction
+is not a new GPU validation.
 
 ## Cost
 
@@ -196,8 +216,7 @@ charges.
 Method: 96 action queries (uniformly sampled by sequence length from the 768)
 timed per tier after weight load; full-run estimate = load_seconds +
 query_seconds x (2304/96). Costs are GPU-only at verified Modal list rates
-(2026-10-23). The extrapolation includes a one-time cold load; a warm re-run
-(weights already in the volume) subtracts load_seconds. Benchmark payloads in
+(2026-10-23). `load_seconds` includes tokenizer loading, model deserialization and device transfer. A cached-weight invocation still pays those costs; subtracting them estimates a resident-model run, not a warm-cache invocation. GLM multi-GPU load measurements include an avoidable CPU load followed by a second dispatched load. Preserve these historical measurements but withdraw corrected-load performance claims pending a separately authorized rerun. Benchmark payloads in
 `results/rbg4_multimodel/benchmark/`.
 
 | Model (class) | Tier | Load (s) | ms/query | Full-run est. (s) | GPU cost |
@@ -211,14 +230,17 @@ query_seconds x (2304/96). Costs are GPU-only at verified Modal list rates
 | GLM-4.5-Air (~106B MoE) | A100-80GB x4 | 277.5 | 58.8 | 413.1 | $1.147 |
 | GLM-4.5-Air | H200 x2 | 144.1 | 51.9 | 263.7 | $0.665 |
 
-Readout: for this workload (short prompts, single-position argmax scoring,
-no sampling), A100-80GB x1 is the cost-optimal tier for ~24-30B models: the
-H100/H200 tiers buy 8-26% wall-clock at 48-67% higher GPU cost. At ~106B
-(bf16 does not fit one 80GB card), 2xH200 dominates 4xA100-80GB on both axes:
-1.57x faster and 1.72x cheaper, because tensor-parallel overhead and load
-time both shrink on fewer, larger-memory GPUs. Measured behavior-run costs
-agree with the extrapolations within 15% where directly comparable
-(qwen36-27b: $0.194 estimated vs $0.206 measured GPU share).
+Readout: these are single 96-action-query samples, extrapolated to 2,304
+queries including reports, not repeated production measurements. Single-GPU
+results are workload-specific: A100 is cheapest in the measured configurations,
+but H100/H200 do not consistently improve wall-clock time (the Qwen3-30B
+samples are slower). The GLM historical projections favor 2xH200 but their
+load terms include the double-load bug; withdraw any claim of corrected-load
+dominance or a causal explanation for the difference until remeasured.
+Placement uses `device_map="auto"`, not explicit tensor parallelism. The
+Qwen3.6 GPU projection $0.194 vs measured $0.206 is about 6% apart; that
+single comparison does not validate all projections within 15%.
+
 
 
 ## Interpretation boundary
@@ -273,9 +295,15 @@ Result (36 eligible trials, paired):
 | Prompt-local Jacobian | 3/36 (8.3%) | -5.31 |
 
 Paired counts: both succeed 3, average-only 22, local-only 0, neither 11
-(discordant 22, all favoring the average lens; exact two-sided p=4.8e-07).
+(discordant 22, all favoring the average lens). Targets share each source
+prompt's baseline and local Jacobian, so trial-level independence is not
+appropriate. Aggregate paired success differences by source prompt: 12
+eligible prompt clusters, 9 nonzero, all favoring the average lens; exact
+two-sided prompt-cluster sign-flip p=0.00390625. This assumes prompt-cluster
+sign exchangeability; shared country/function structure and small scope limit
+generalization. The earlier trial-level p=4.8e-07 is superseded.
 The internal baseline (25/36, 69.4%) closely replicates the H0 reference
-(24/33, 72.7%), so the comparison setup is sound. Per-function: capital avg
+(24/33, 72.7%), which is a baseline consistency check, not validation of all implementation choices. Per-function: capital avg
 12/12 local 0/12; continent 9/12 vs 0/12; language 4/9 vs 3/9; currency
 0/3 vs 0/3.
 
@@ -290,9 +318,9 @@ position reduction (skip_first=1 here vs 16 in the released lens fitting),
 per-prompt J conditioning and direction norm distributions (not recorded in
 this run), direction scaling/swap conditioning, and the output-map chain
 rule: both direction sets use raw lm_head weights without the final RMSNorm.
-That is a shared implementation choice, so it does not differentially bias
-the local-vs-average comparison, but it is NOT a ruled-out concern for the
-local estimator's validity: a correct per-prompt logit Jacobian at the write
+That is a shared implementation choice, but it can affect the validity of
+local and averaged directions differently and is NOT a ruled-out concern for
+the local estimator's validity: a correct per-prompt logit Jacobian at the write
 site must compose through the final norm (and any bias/softcap, per the
 upstream unembed), and its omission may degrade naive per-prompt directions
 disproportionately relative to the doubly-averaged directions. The result is consistent
