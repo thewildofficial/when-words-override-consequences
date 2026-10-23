@@ -151,22 +151,34 @@ only 2 such rows.
 
 ## Cost
 
-Measured Modal charges (verified list rates 2026-10-23: A100-80GB
-$0.000694/s, H100 $0.001097/s, H200 $0.001261/s):
+All figures are elapsed-time estimates (measured seconds x Modal list rates
+verified 2026-10-23: A100-80GB $0.000694/s, H100 $0.001097/s, H200
+$0.001261/s), not provider-billed amounts; Modal billing was not retrieved
+and actual charges may differ. GPU, CPU, and memory are metered separately
+(CPU/memory are not multiplied by GPU count).
 
-| Item | Cost (measured) |
-|---|---|
-| qwen36-27b parity behavior | $0.258 |
-| mistral-small-32-24b behavior | $0.146 |
-| qwen3-30b-a3b-instruct behavior | $0.097 |
-| qwen3-30b-a3b-base behavior | $0.086 |
-| glm45-air behavior (4xA100-80GB, 509.9s) | $1.740 |
-| 6 GPU tier benchmarks (small models) | $0.593 |
-| glm45-air benchmarks (4xA100-80GB, 2xH200) | $1.437 |
-| Weight downloads + preflights (CPU) | ~$0.16 |
-| Cancelled/failed attempts | ~$0.41 |
-| Cancelled/failed attempts (est.) | ~$0.41 |
-| **Total** | **~$5.66** |
+| Item | Basis | Cost |
+|---|---|---|
+| qwen36-27b parity behavior | measured | $0.258 |
+| mistral-small-32-24b behavior | measured | $0.146 |
+| qwen3-30b-a3b-instruct behavior | measured | $0.097 |
+| qwen3-30b-a3b-base behavior | measured | $0.086 |
+| glm45-air behavior (4xA100-80GB, 509.9s) | measured | $1.740 |
+| 6 GPU tier benchmarks (small models) | measured | $0.593 |
+| glm45-air benchmarks (4xA100-80GB, 2xH200) | measured | $1.437 |
+| J-lens local test (A100-80GB, 463.4s) | measured | $0.379 |
+| Weight downloads + preflights (CPU) | estimated | ~$0.16 |
+| Cancelled/failed attempts | estimated | ~$0.41 |
+| **Total (measured $4.74 + estimated incidentals $0.57)** | | **~$5.31** |
+
+Reconciliation with earlier progress figures: the ~$5.3 total above is
+unbuffered. The repo cost convention adds a 20% uncertainty buffer on
+metered rows; the buffered append-only ledger
+(`results/rbg4_multimodel/cost_ledger.jsonl`) sums to $4.97 and covers only
+metered runs. Applying the buffer to metered compute plus estimated
+incidentals gives the conservative planning figure ~$5.7 quoted earlier.
+Both figures are elapsed-rate estimates against the user's $27.69 Modal
+credit, not billed charges.
 
 ## Provenance
 
@@ -242,8 +254,8 @@ direction formula (normalized W_U[t] @ J) for both estimators. Eligibility
 (baseline top-1 equals the source answer) was computed from the baseline
 forward BEFORE either intervention: 36 of 48 trials eligible (capital 12/12,
 continent 12/12, language 9/12, currency 3/12). The H0 reference run had 33
-eligible country trials; the small difference is attributable to baseline
-forward nondeterminism across kernels/runs. Every eligible trial ran both
+eligible country trials; the +3 difference is an observed discrepancy whose
+cause was not established (no repeated-baseline diagnostic was run here). Every eligible trial ran both
 conditions in the same process. Prompt-local Jacobians used upstream
 `jacobian_for_prompt` at the pinned jlens commit (dim_batch=64); because the
 country prompts are 8-12 tokens (shorter than the fitting default
@@ -264,18 +276,24 @@ The internal baseline (25/36, 69.4%) closely replicates the H0 reference
 0/3 vs 0/3.
 
 Interpretation, scoped: under THIS implementation (position reduction with
-skip_first=1, shared normalization with clamp_min(1e-12), raw lm_head weights
-without the final RMSNorm in both direction sets, single site, alpha=1.0),
-prompt-local directions convert far worse than the averaged lens. This removes
+skip_first=1, shared normalization with clamp_min(1e-12), single site,
+alpha=1.0), prompt-local directions convert far worse than the averaged lens. This removes
 one specific rescue path as implemented; it does NOT establish that the
 averaged estimator is never a bottleneck, that subspace writes are
 fundamentally limited, or that the intervention branch should be closed.
 Unmeasured factors that could materially change the outcome include the
 position reduction (skip_first=1 here vs 16 in the released lens fitting),
 per-prompt J conditioning and direction norm distributions (not recorded in
-this run), and direction scaling/swap conditioning. The result is consistent
+this run), direction scaling/swap conditioning, and the output-map chain
+rule: both direction sets use raw lm_head weights without the final RMSNorm.
+That is a shared implementation choice, so it does not differentially bias
+the local-vs-average comparison, but it is NOT a ruled-out concern for the
+local estimator's validity: a correct per-prompt logit Jacobian at the write
+site must compose through the final norm (and any bias/softcap, per the
+upstream unembed), and its omission may degrade naive per-prompt directions
+disproportionately relative to the doubly-averaged directions. The result is consistent
 with the review note's strategic recommendation (keep J-lens as a descriptive
 readout; do not rebuild the causal spine on it) but does not by itself settle
 the branch's fate.
 
-Cost: $0.379 measured (463.4s A100-80GB).
+Cost: $0.379 elapsed-rate estimate (463.4s A100-80GB).

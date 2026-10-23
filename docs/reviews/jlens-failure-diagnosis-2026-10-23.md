@@ -40,3 +40,19 @@ As an INTERVENTION instrument: not in its current average-Jacobian coordinate-sw
 STRATEGIC RECOMMENDATION: even if that test passes, keep J-lens as a descriptive readout; natural-state residual interchange and contrast-derived steering (RBG-5B, the 14-site sweep) are better-validated intervention families. Don't rebuild the program's causal spine on J-lens.
 
 CAVEAT: could not verify what intervention topology the Global Workspace paper itself validated; if the paper never validated band-wide coordinate swaps, the "reference topology" was a translation artifact and the design-flaw verdict strengthens.
+
+---
+
+## Addendum (2026-10-23): test outcome supersedes the binary decision rule
+
+The controlled test proposed above was implemented and run on 2026-10-23 (36
+eligible trials; see `results/rbg4_multimodel/FINDINGS.md`). Prompt-local
+directions converted 3/36 (8.3%) vs a matched internal average-lens baseline
+of 25/36 (69.4%). Under the scoped interpretation recorded there, this
+removes one specific rescue path AS IMPLEMENTED but does not warrant
+permanently closing the J-lens intervention branch: position reduction,
+output-map/final-norm chain-rule handling, per-prompt J conditioning, and
+direction scaling were not varied. The "no jump = ... close the J-lens
+intervention branch permanently" wording above is retained verbatim as the
+reviewer's original text; the scoped verdict in FINDINGS.md supersedes it as
+the working interpretation. Historical content above is preserved unchanged.
