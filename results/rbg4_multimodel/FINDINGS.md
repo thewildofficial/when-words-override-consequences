@@ -70,21 +70,21 @@ each is significant by the exact cluster sign-flip test.
 
 ### 2. The consequence table is not universally protective
 
-Qwen3.6-27B was exactly table-immune (83.3% -> 85.4%). Neither comparator
-shows this protection: Mistral loses 52.1 pts under a table,
-Qwen3-30B-A3B-Instruct loses 31.2 pts. The RBG-4 table-immunity finding is a
-property of Qwen3.6-27B, not of the representation format per se.
+In these cells, Qwen3.6-27B shows no table harm (83.3% -> 85.4%). The other
+tested models show no such protection: Mistral loses 52.1 pts under a table,
+Qwen3-30B-A3B-Instruct loses 31.2 pts. The table protection observed for
+Qwen3.6-27B in RBG-4 is, in this sample, an observed behavior of the tested
+model and cells, not an established invariance of the representation format.
 
-### 3. Effect size tracks instruction-tuned game competence
+### 3. Base vs instruct pair: effect only where the game is played
 
 The base model (Qwen3-30B-A3B-Base) cannot play the game at all: opaque-token
 actions at 50.8% (coin flip), reports at 55.9%, aligned-goal assertion
 accuracy 31.8%. With no competent play, redundant evidence harms nothing
 (-2.1 pts, p=.89). Its instruction-tuned sibling plays partially and shows
-the failure. Note the confound: "base vs instruct" here is also "incompetent
-vs partially competent"; the clean claim is that the failure requires
-instruction-tuned play competence, not that base models are immune in
-principle.
+the failure. In this pair, the instruct model shows the directional effect
+while the near-chance base model does not; the design cannot separate
+post-training effects from differences in task competence.
 
 ### 4. Gate-level replication is Qwen3.6-specific
 
@@ -169,16 +169,20 @@ and actual charges may differ. GPU, CPU, and memory are metered separately
 | J-lens local test (A100-80GB, 463.4s) | measured | $0.379 |
 | Weight downloads + preflights (CPU) | estimated | ~$0.16 |
 | Cancelled/failed attempts | estimated | ~$0.41 |
-| **Total (measured $4.74 + estimated incidentals $0.57)** | | **~$5.31** |
+| **Total (unbuffered estimate)** | | **~$5.31** |
 
-Reconciliation with earlier progress figures: the ~$5.3 total above is
-unbuffered. The repo cost convention adds a 20% uncertainty buffer on
-metered rows; the buffered append-only ledger
-(`results/rbg4_multimodel/cost_ledger.jsonl`) sums to $4.97 and covers only
-metered runs. Applying the buffer to metered compute plus estimated
-incidentals gives the conservative planning figure ~$5.7 quoted earlier.
-Both figures are elapsed-rate estimates against the user's $27.69 Modal
-credit, not billed charges.
+Coverage and uncertainty: the append-only ledger
+(`results/rbg4_multimodel/cost_ledger.jsonl`) records 8 of the 14 metered
+runs (5 behavior runs, 2 GLM benchmarks, the J-lens test): measured
+subtotals $4.14, conventionally buffered (1.2x) rows $4.97. The 6
+small-model benchmarks ($0.59) were not written to the ledger; their cost is
+computed from the benchmark payloads' timed seconds at the same list rates.
+The ~$0.57 incidentals are coarse estimates, included once, unbuffered. The
+unbuffered total above (~$5.31) is the headline estimate; applying the
+repo's 20% uncertainty convention to all metered compute plus incidentals
+would give a conservative planning envelope of ~$6.3. Both figures are
+elapsed-rate estimates within the pre-approved $20 spend cap, not billed
+charges.
 
 ## Provenance
 
