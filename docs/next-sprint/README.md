@@ -55,7 +55,7 @@ is separate from the historical $30 proposal above.
 | V2 Stage 1 | State decodable with residual probes; frozen J-lens state criterion failed | Relational encoding versus the limitations of selected token scores |
 | V2 atlas / trajectories | Generic optimization and late answer preparation; weak strategy specificity | Same-action, different-reason monitoring with stronger relational readouts |
 | V4 | Trajectory-dependent report degradation, exploratory framing effects | Replication beyond specific lexical and formatting choices |
-| V5 RBG-4 / 5B | Meaningful action vulnerable to redundant correct history; tables/opaque interfaces protect behavior | Why, and whether it transfers to real tool interfaces |
+| V5 RBG-4 / 5B | Meaningful action vulnerable to repeated mapping demonstrations (balanced across actions); tables/opaque interfaces protect behavior | Why, and whether it transfers to real tool interfaces |
 | V5 RBG-5B patch | 2/50 repairs; frozen causal endpoint and identity control failed | A reliable intervention on an identified relation |
 | V5 RBG-6 | Correct report transcripts strongly improve subsequent action; swapped reports strongly misdirect it | Content, recency, instruction, and internal routing contributions |
 
