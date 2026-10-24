@@ -40,7 +40,7 @@ To make sure it's really about words, we replay the identical game with the word
 
 ## What this is NOT
 
-Not consciousness. Not deception. Not "all AI safety tests are broken." It's one narrow, preregistered check: *do represented consequences actually steer the choice when the wording points the other way?* Full boundary: [literature positioning](docs/v5/literature-positioning.md).
+Not consciousness. Not deception. Not "all AI safety tests are broken." It's one narrow, preregistered check: *do represented consequences actually steer the choice when the wording points the other way?* Full boundary: [literature positioning](docs/v5/literature-positioning.md). Closest related work (label fixation, say-do consistency): [related-work note](docs/v5/literature-positioning.md#related-work-added-2026-10-24-label-fixation-and-the-say-do-gap).
 
 ## Scoreboard
 
