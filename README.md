@@ -2,6 +2,23 @@
 
 **The one-sentence version:** we check whether an AI chooses actions by what they *do*, or by what they *say*.
 
+## Claims that currently survive
+
+Status as of the audit at commit `56e5aea`. "Supported" means the artifact exists and the limit column is part of the claim. Details: [claim ledger](docs/next-sprint/claim-ledger.md), [audit](docs/next-sprint/audit.md).
+
+| Claim | Standing | Limit |
+|---|---|---|
+| Qwen3.6-27B reports consequences ~99% accurately, yet action accuracy drops for meaningful actions under an opposed incentive | Supported (prospective RBG-4) | Original model plus one contrarian-receiver game template |
+| Removing the irrelevant private-state sentence: 15/48 -> 47/48 (opposed, assertion, prose) | Supported at discovery level; token-matched follow-up reproduced it (11/48 vs 48/48) | 12 lexical families, repeated conditions, descriptive family bootstrap, one model |
+| Explicit A/B labels and table layout each help (prose 31 -> 67%, table 56 -> 83%) | Supported behaviorally | Does not isolate a neural binding representation |
+| The drop appears in Mistral-Small-24B, GLM-4.5-Air, Qwen3-30B-Instruct | Qualitative only | All comparators failed the competence gates; floor effects possible |
+| Own consequence reports before acting give 46/46 correct (RBG-6) | Shows dependence on the transcript only | The reported-trajectory arm also adds turns, text and an instruction to use the reports ([audit A3](docs/next-sprint/audit.md)) |
+| Copying a "good" state into failing runs repairs 2/50 (RBG-5B) | **Not established either way** | The identity control failed (shift 0.5 vs 1e-4 tolerance, [audit A2](docs/next-sprint/audit.md)); this does not show that no mechanism exists |
+| Candidate J-lens readout aggregates (old 54.69%) | Quarantined | Missing final normalization; see [errata](#errata-and-quarantine-status) |
+| Token-aligned follow-up: 14 patch sites, 0 repairs of 4 selected failures | Weak negative | Tiny, mostly A-first sample; no held-out confirmation |
+| V6-ES-1 higher-order results | Quarantined | Values were absent from the rendered prompts |
+
+
 ## The game in 30 seconds
 
 Imagine two buttons:
@@ -17,13 +34,13 @@ To make sure it's really about words, we replay the identical game with the word
 
 ## What we found (3 things)
 
-1. **It knows, but doesn't always act.** The model reports consequences at 98.96% accuracy — yet piling on extra correct examples drops its action accuracy from 79% to 55% for wordy actions. Tables and `X`/`Y` buttons are immune. ([Frozen RBG-4 findings](results/v5_inverse_evidence/FINDINGS.md))
-2. **Reading its own report card fixes it.** When the model sees its own correct consequence reports before acting, it chooses correctly 46/46 times. (Caveat: the setup also gave it extra instructions and turns, so it's not purely "the words did it." [Corrections](docs/next-sprint/audit.md))
-3. **We couldn't find the glitch in the brain.** Copying a "good" brain state into a failing run fixed only 2/50 cases — a negative result. There is no transferable internal cause at this spot, by this test. ([RBG-5B preregistration](docs/v5/mechanistic-decomposition-b-preregistration.md))
+1. **It knows, but doesn't always act.** The model reports consequences at 98.96% accuracy — yet adding four prior-round demonstrations of the action-to-response mapping (balanced across the two actions, not label-unanimous) drops its action accuracy from 79% to 55% for wordy actions. Tables and `X`/`Y` buttons are immune. ([Frozen RBG-4 findings](results/v5_inverse_evidence/FINDINGS.md))
+2. **Action depends on the transcript, including its own reports.** In the report-then-act trajectory the model chooses correctly 46/46 times. That trajectory also adds extra turns, text and an instruction to use the reports, so this shows transcript dependence. It does not show that the reports themselves are the cause. ([Audit A3](docs/next-sprint/audit.md))
+3. **One internal repair test failed, and its control failed too.** Copying a "good" internal state into failing runs fixed 2/50 cases. The identity control for that test did not pass, so this does not show that no internal mechanism exists. ([RBG-5B preregistration](docs/v5/mechanistic-decomposition-b-preregistration.md), [audit A2](docs/next-sprint/audit.md))
 
 ## What this is NOT
 
-Not consciousness. Not deception. Not "all AI safety tests are broken." It's one narrow, preregistered check: *do represented consequences actually steer the choice when the wording points the other way?* Full boundary: [literature positioning](docs/v5/literature-positioning.md).
+Not consciousness. Not deception. Not "all AI safety tests are broken." It's one narrow, preregistered check: *do represented consequences actually steer the choice when the wording points the other way?* Full boundary: [literature positioning](docs/v5/literature-positioning.md). Closest related work (label fixation, say-do consistency): [related-work note](docs/v5/literature-positioning.md#related-work-added-2026-10-24-label-fixation-and-the-say-do-gap).
 
 ## Scoreboard
 
@@ -36,10 +53,10 @@ Every row below was decided *before* the data was opened. Failures count as resu
 | J-space instrument | Can our brain-edit tool reliably work? | No: 0/90, then 4/125 |
 | Strategic atlas | Is the brain signal strategy-specific? | No, generic only |
 | RBG-1 – RBG-3 | Does the know/act gap show up and replicate? | Yes, then weakened |
-| RBG-4 | Can *more correct evidence* make action worse? | Yes (prospective) |
+| RBG-4 | Do *additional mapping demonstrations* make action worse? | Yes (prospective) |
 | RBG-5 | Can we open the activations? | Behavior yes; one gate missed by 0.2 pts |
-| RBG-5B | Can a good brain state repair failures? | No: 2/50, `p=.429` |
-| RBG-6 | Do its own reports rescue the action? | Yes, 0/48 dissociation; see caveat above |
+| RBG-5B | Can a good brain state repair failures? | Not established: 2/50 repaired, `p=.429`, identity control failed |
+| RBG-6 | Do its own reports rescue the action? | Transcript dependence only (0/48 dissociation); confounded, see finding 2 |
 
 Full ledger: [results/README.md](results/README.md) · Every decision: [decision log](docs/v5/decision-log.md).
 
@@ -65,20 +82,18 @@ and [theory and literature](docs/next-sprint/semantic-action-mechanisms.md).
 The completed study reserved $4.75216032 under its $5 admission cap, including
 failed attempts; this is a reservation ledger, not a provider invoice.
 
-## Where things stand right now
+## Errata and quarantine status
 
-A second-pass audit found a scoring bug (a skipped normalization step) in one secondary readout, fixed the calculator ([parity gate passed on the real model](results/research_audit/readout_parity_af81d642.json)), and quarantined the old numbers ([erratum](results/research_audit/rbg5b_readout_erratum.json)). The main results above are unaffected.
+| Item | Status | Record |
+|---|---|---|
+| Candidate J-lens readout (omitted final normalization) | Calculator fixed, parity gate passed on the real model; old numbers quarantined; archived scores not recomputed | [erratum](results/research_audit/rbg5b_readout_erratum.json), [parity](results/research_audit/readout_parity_af81d642.json) |
+| RBG-5B identity control | Failed; causal interpretation limited | [audit A2](docs/next-sprint/audit.md) |
+| RBG-6 trajectory confounds | Open; matched-control design proposed, not run | [audit A3](docs/next-sprint/audit.md), [design](docs/next-sprint/experiments.md) |
+| V6-ES-1 | Run retained; higher-order values missing from prompts, trajectory supplied missing information, policy test supplied a derived response; affected interpretations quarantined | [erratum](docs/v6/erratum-prompt-completeness.md) |
 
-Next up is a proposed ~$30 follow-up asking whether reports *reveal* or *change* the information behind actions: [the next-sprint plan](docs/next-sprint/README.md) ([audit](docs/next-sprint/audit.md) · [literature](docs/next-sprint/literature.md) · [design](docs/next-sprint/experiments.md)).
+The main results in the table above are not affected by the readout erratum.
 
-The V6-ES-1 run is retained, but a post-run stimulus audit found that its
-higher-order values were absent from the rendered prompts, its action→report
-trajectory supplied missing information, and its core policy test supplied a
-derived receiver response. Those affected interpretations are quarantined in
-the [erratum](docs/v6/erratum-prompt-completeness.md). The corrective
-[V6.1-ES-2 protocol](docs/v6.1/README.md) now has a passing CPU audit and is
-the active research branch; its model stages are dispatched manually through
-GitHub Actions.
+Next up is a proposed ~$30 follow-up asking whether reports *reveal* or *change* the information behind actions: [the next-sprint plan](docs/next-sprint/README.md) ([audit](docs/next-sprint/audit.md) · [literature](docs/next-sprint/literature.md) · [design](docs/next-sprint/experiments.md)). The corrective [V6.1-ES-2 protocol](docs/v6.1/README.md) has a passing CPU audit and is the active research branch; its model stages are dispatched manually through GitHub Actions.
 
 The prospective [V6.2 reasoning-capability control](docs/v6.2/README.md) is
 also CPU-frozen on its dedicated branch. It compares Qwen3.8 direct logits

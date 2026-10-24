@@ -179,3 +179,17 @@ The current novelty target is the conjunction of:
 This remains a literature-shaped hypothesis rather than a priority claim. The
 direct tool-calling and motivated-mislabeling translations are prospective
 follow-ups and are not evidence from the present game corpus.
+
+
+## Related work added 2026-10-24: label fixation and the say-do gap
+
+Both papers were read from their arXiv full texts (not only abstracts); sections on methods, results and limitations were checked. Neither is replicated here.
+
+**In-Context Fixation** (Liu, May 2026, [arXiv 2605.08295](https://arxiv.org/abs/2605.08295)). On few-shot single-token classification with base models (0.8B-8B), demonstrations whose labels are all the same (or drawn from a small nonsense set) collapse accuracy to 12% or below. The authors argue the trigger is the content of the label slot, and report activation patching on Pythia-1B recovering 98.4% of the gap and a logit lens showing the correct answer encoded mid-stack, then overridden.
+- Shared: a correct internal answer that fails to reach the output; input-driven override of semantics.
+- Different: the trigger there is label unanimity or a restricted label vocabulary. The RBG-4 "redundant" history is a balanced mapping demonstration (actions in the order 0,1,1,0 with their receiver responses), so unanimity is absent. The levers we have evidence for are the irrelevant private-state sentence and mapping layout/binding, which that paper does not test. Their circuit localization succeeded; ours did not (and the RBG-5B control failed).
+- Open: whether label-slot fixation contributes to our history effects is untested here. A homogeneous-versus-balanced history control would test it.
+
+**Large Language Models Often Say One Thing and Do Another** (Xu et al., Mar 2025, [arXiv 2503.07003](https://arxiv.org/abs/2503.07003)). The Words and Deeds Consistency Test pairs a word question with a deed question across 12 LLMs and finds widespread inconsistency. Aligning only words or only deeds with SFT/DPO affects the other poorly and unpredictably, which the authors read as the two being guided by different knowledge.
+- Shared: a dissociation between what a model says and what it does, treated as an evaluation problem.
+- Different: their items concern opinions and values, where the "right" deed is not defined by a payoff. Here payoffs are exact, the correct action is verifiable, and a word-versus-opaque-label contrast isolates wording. Their training-intervention arm has no counterpart here.
