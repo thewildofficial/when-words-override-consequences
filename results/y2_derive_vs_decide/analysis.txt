@@ -1,0 +1,8 @@
+C1_poker_outs          V1_plain    acc 68/120=0.57 CI(0.48, 0.65) balacc 0.57 majority-class 0.50 recall {'Fold': '8/60', 'Call': '60/60'} gold-letter recall A 22/46 B 46/74 predA 0.42
+C1_poker_outs          V2_prefill  acc 60/120=0.50 CI(0.41, 0.59) balacc 0.50 majority-class 0.50 recall {'Fold': '0/60', 'Call': '60/60'} gold-letter recall A 22/46 B 38/74 predA 0.48
+C2_urn_outs            V1_plain    acc 92/120=0.77 CI(0.68, 0.83) balacc 0.77 majority-class 0.50 recall {'Pass': '34/60', 'Play': '58/60'} gold-letter recall A 28/51 B 64/69 predA 0.28
+C2_urn_outs            V2_prefill  acc 71/120=0.59 CI(0.5, 0.68) balacc 0.59 majority-class 0.50 recall {'Pass': '11/60', 'Play': '60/60'} gold-letter recall A 25/51 B 46/69 predA 0.40
+C3_poker_stated        V1_plain    acc 93/120=0.78 CI(0.69, 0.84) balacc 0.77 majority-class 0.50 recall {'Fold': '59/60', 'Call': '34/60'} gold-letter recall A 35/52 B 58/68 predA 0.38
+C3_poker_stated        V2_prefill  acc 105/120=0.88 CI(0.8, 0.92) balacc 0.88 majority-class 0.50 recall {'Fold': '58/60', 'Call': '47/60'} gold-letter recall A 39/52 B 66/68 predA 0.34
+C4_prob_vs_threshold   V1_plain    acc 101/120=0.84 CI(0.77, 0.9) balacc 0.84 majority-class 0.50 recall {'Lower': '59/60', 'Higher': '42/60'} gold-letter recall A 55/56 B 46/64 predA 0.61
+C4_prob_vs_threshold   V2_prefill  acc 99/120=0.82 CI(0.75, 0.88) balacc 0.82 majority-class 0.50 recall {'Lower': '53/60', 'Higher': '46/60'} gold-letter recall A 56/56 B 43/64 predA 0.64

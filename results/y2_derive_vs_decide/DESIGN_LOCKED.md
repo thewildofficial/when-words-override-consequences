@@ -1,0 +1,4 @@
+# Y2 design (locked before run, ~04:57 IST Oct 29)
+Question: why does Y1 outs_draw collapse to always-Call? Balanced gold (50/50 Call/Fold), same numbers across conditions: C1 poker with outs, C2 neutral urn framing with outs (play/pass), C3 poker with the equity stated as a rounded percent, C4 derivation only (is outs/unseen higher or lower than the pot-odds threshold percent). Same scorer as Y1 (A/B logit), two renderings.
+Predictions: C3 >=80%; C1 near 50% with Call rate >0.85 (replicates Y1); C2 shows less call-bias than C1 if the "draw" framing is the cause; C4 >=85% if derivation is intact. Interpretation: C4 high and C1 low => derivation fine, integration/framing prior is the failure. C4 low => cannot derive probability from counts without CoT.
+Estimated cost ~$0.3. Same deployed function (y1-game-battery).
