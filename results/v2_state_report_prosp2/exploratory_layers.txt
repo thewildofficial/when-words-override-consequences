@@ -1,0 +1,24 @@
+EXPLORATORY (not locked). moved n=288, same n=96. J-lens per layer at final position, mean K/Q (moved) and K=Q (same)
+36 moved K +0.039 Q +0.039 | same K +0.359 | logit moved K +0.021 Q +0.236
+37 moved K +0.040 Q +0.016 | same K +0.386 | logit moved K +0.029 Q +0.227
+38 moved K +0.047 Q +0.010 | same K +0.356 | logit moved K +0.019 Q +0.190
+39 moved K +0.179 Q +0.118 | same K +0.635 | logit moved K +0.078 Q +0.233
+40 moved K +0.198 Q +0.103 | same K +0.635 | logit moved K +0.073 Q +0.184
+41 moved K +0.184 Q +0.085 | same K +0.607 | logit moved K +0.065 Q +0.185
+42 moved K +0.181 Q +0.120 | same K +0.561 | logit moved K +0.070 Q +0.191
+43 moved K +0.186 Q +0.161 | same K +0.670 | logit moved K +0.064 Q +0.195
+
+band J K,Q by offset from end (moved), offsets 0-12
+0 K +0.132 Q +0.081
+1 K +0.012 Q +0.073
+2 K +0.002 Q -0.023
+3 K +0.063 Q -0.071
+4 K +0.047 Q +0.576
+5 K -0.006 Q -0.042
+6 K -0.029 Q -0.051
+7 K +0.144 Q +0.182
+8 K -0.016 Q -0.091
+9 K +0.169 Q +0.152
+10 K -0.060 Q -0.066
+11 K -0.005 Q -0.032
+12 K -0.023 Q -0.054
