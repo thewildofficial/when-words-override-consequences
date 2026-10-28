@@ -1,0 +1,7 @@
+elapsed 106.215013423
+recon_B7_36_42_all_prompt_positions                n=33 top1 24/33 top1&KL<1 1 KL med 3.43 dRMS med 0.100 gain med 9.38
+recon_B7_36_42_argument_through_end                n=33 top1 25/33 top1&KL<1 1 KL med 3.42 dRMS med 0.143 gain med 9.38
+recon_B8_36_43_all_prompt_positions                n=33 top1 0/33 top1&KL<1 0 KL med 0.00 dRMS med 0.096 gain med 0.97
+recon_B8_36_43_argument_through_end                n=33 top1 0/33 top1&KL<1 0 KL med 0.00 dRMS med 0.137 gain med 1.00
+recon_L40_all_prompt_positions                     n=33 top1 24/33 top1&KL<1 1 KL med 3.64 dRMS med 0.119 gain med 9.78
+recon_L40_argument_through_end                     n=33 top1 24/33 top1&KL<1 1 KL med 3.64 dRMS med 0.180 gain med 9.78
