@@ -1,0 +1,30 @@
+n 384 elapsed 173.086403264
+GATE report acc s!=0: 0.253 (n=288)
+ s=0 report acc 0.312  state-pick rate 0.312
+ s=1 report acc 0.240  state-pick rate 0.271
+ s=2 report acc 0.260  state-pick rate 0.292
+ s=3 report acc 0.260  state-pick rate 0.312
+top1 outside candidates: 0
+
+ all s!=0 288
+  P1 J-lens Q-K        -0.036 [-0.293, +0.211]
+  P2 logit-lens Q-K    +0.378 [+0.097, +0.675]
+  J K                  +0.052 [-0.106, +0.222]
+  J Q                  +0.016 [-0.109, +0.150]
+  J A(control)         -0.012 [-0.143, +0.122]
+  logit K              -0.172 [-0.327, -0.012]
+  logit Q              +0.206 [+0.056, +0.382]
+
+ gate-correct s!=0 73
+  P1 J-lens Q-K        +0.351 [-0.179, +0.833]
+  P2 logit-lens Q-K    -0.006 [-0.334, +0.493]
+  J K                  -0.208 [-0.422, +0.081]
+  J Q                  +0.142 [-0.166, +0.485]
+  J A(control)         -0.153 [-0.369, +0.178]
+  logit K              -0.118 [-0.440, +0.131]
+  logit Q              -0.124 [-0.279, +0.116]
+
+s=0 sanity J K 0.003 Q 0.003
+s=1 J K -0.073 Q -0.025 A +0.031
+s=2 J K +0.258 Q -0.134 A +0.021
+s=3 J K -0.030 Q +0.207 A -0.088
