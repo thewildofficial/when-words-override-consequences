@@ -4,7 +4,7 @@ Status: exploratory. Run on the already-opened Stage 1 locked rows (480 prompts,
 
 Method: same forward pass, lens, normalization (model.unembed incl. final norm) and K/Q/M definitions as modal_stage1.py, but evidence is computed at every prompt position, not only the final one. Offsets are counted back from the final prompt token (0 = final).
 
-Sanity: the final-position band K reproduces stored band_K, max abs difference 0.057, mean 0.016 (batch/bf16 numeric noise, not exact equality). GPU run 137 s inside the function, estimated cost about $0.25 incl. load (public rates, bill not read).
+Sanity: the final-position band K reproduces stored band_K, max abs difference 0.057, mean 0.016 (observed discrepancy; batching/bf16 is a proposed cause, not verified, no tolerance or precision diagnostic was run). GPU run 137 s inside the function, estimated cost about $0.25 incl. load (public rates, bill not read).
 
 Measured (band mean J-lens, 120 prompts per cell):
 - Final position (0), policy M: report/transformed candidate M=Q is +0.551 (1A) and +0.263 (1B); K is -0.108 and -0.017. Same as the earlier reanalysis.
