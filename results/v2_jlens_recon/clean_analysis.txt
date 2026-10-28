@@ -1,0 +1,12 @@
+elapsed 205.076169049
+clean_B7_36_42_a0.5                                n=33 top1 32/33 top1&KL<1 1 KL med 7.35 dRMS med 0.084 gain med 18.12
+clean_B7_36_42_a0.75                               n=33 top1 31/33 top1&KL<1 0 KL med 7.14 dRMS med 0.125 gain med 18.88
+clean_B7_36_42_a1                                  n=33 top1 29/33 top1&KL<1 0 KL med 7.05 dRMS med 0.167 gain med 18.91
+clean_B8_36_43_a0.5                                n=33 top1 32/33 top1&KL<1 1 KL med 7.41 dRMS med 0.083 gain med 18.50
+clean_B8_36_43_a0.75                               n=33 top1 31/33 top1&KL<1 0 KL med 7.28 dRMS med 0.124 gain med 19.16
+clean_B8_36_43_a1                                  n=33 top1 29/33 top1&KL<1 0 KL med 7.04 dRMS med 0.165 gain med 19.11
+clean_L40_a1                                       n=33 top1 26/33 top1&KL<1 1 KL med 3.67 dRMS med 0.180 gain med 9.78
+recur_B7_36_42_a0.5                                n=33 top1 1/33 top1&KL<1 1 KL med 0.09 dRMS med 0.016 gain med 4.19
+recur_B7_36_42_a0.75                               n=33 top1 1/33 top1&KL<1 1 KL med 0.09 dRMS med 0.032 gain med 4.31
+recur_B8_36_43_a0.5                                n=33 top1 1/33 top1&KL<1 1 KL med 0.08 dRMS med 0.015 gain med 4.19
+recur_B8_36_43_a0.75                               n=33 top1 1/33 top1&KL<1 1 KL med 0.09 dRMS med 0.029 gain med 4.25

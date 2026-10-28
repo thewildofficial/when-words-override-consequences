@@ -31,3 +31,16 @@ What this supports and does not support:
 - Does not support: that healing, off-manifold drift or other mechanisms are excluded, that the model's J-space is irrelevant to the historical failure, or that the cause is general beyond this operation, alpha, category and prompt set.
 - On the gate: under the actual preregistered protocol (8-layer band, this per-layer operation) the gate failed and that record stands. This analysis shows that result depends on the protocol's layer-count parity. Whether the gate protocol should be adapted is a decision, and any adapted protocol is a new post hoc design, not a retroactive change of the preregistered outcome.
 - Not tested: even-count bands at other alphas, other categories, a single-pass patch computed once from clean states (the J-space paper's protocol is not verified here), strength-matched controls for the parity comparison. The earlier KL finding (1/33 under 1 nat) stands.
+
+## Clean-state delta vs recurrent (design: DESIGN_CLEANSTATE.md, 65d923f; 205 s in function, est ~$0.2)
+Countries, 33 prompts, argument_through_end. "clean" = each layer's coordinate change computed from the unedited run's activation at that layer and added once (modal_h0r_clean.py, clean_delta). "recur" = existing protocol.
+| config | alpha | top-1 | top-1 and KL<1 | median KL | median dRMS |
+|---|---:|---:|---:|---:|---:|
+| clean band 36-43 (8) | 0.5 / 0.75 / 1.0 | 32 / 31 / 29 | 1 / 0 / 0 | 7.41 / 7.28 / 7.04 | 0.083 / 0.124 / 0.165 |
+| clean band 36-42 (7) | 0.5 / 0.75 / 1.0 | 32 / 31 / 29 | 1 / 0 / 0 | 7.35 / 7.14 / 7.05 | 0.084 / 0.125 / 0.167 |
+| recurrent band 36-43 | 0.5 / 0.75 | 1 / 1 | 1 / 1 | 0.08 / 0.09 | 0.015 / 0.029 |
+| recurrent band 36-42 | 0.5 / 0.75 | 1 / 1 | 1 / 1 | 0.09 / 0.09 | 0.016 / 0.032 |
+| clean L40 (control) | 1.0 | 26 | 1 | 3.67 | 0.180 |
+(recurrent alpha 1.0: 8 layers 0/33, 7 layers 24-25/33, from the earlier table.)
+Measured: with the clean-state delta, the 7- and 8-layer bands behave the same (no parity effect) and reach the target on 29-32/33. So the repeated-flip protocol is a protocol-dependent factor for the recurrent result in these configs. The clean-delta edit is not low-KL: median KL 7 nats and at most 1/33 prompts are top-1 and under 1 nat at alpha 0.5-1.0 (stronger than the single-layer edit, KL ~3.7). Alpha below 0.5 not yet tested for clean-delta.
+Caveats: same op/model/category/prompts; the clean-delta is my own variant, not verified to equal the J-space paper's protocol; top-1 flips at 7 nats are drastic output changes, not a clean edit.
