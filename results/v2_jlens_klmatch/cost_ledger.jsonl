@@ -1,0 +1,1 @@
+{"run_id": "fc-01M6265T5SKJ68W8TEN5ECQ6G1", "stage": "v2-jlens-klmatch", "elapsed_seconds": 707.344627958, "estimated_usd": 0.578, "note": "estimate from public Modal rates; provider bill not read; two earlier failed launches (killed client ~1min, OOM ~1min) not included, est <=0.3 total"}
