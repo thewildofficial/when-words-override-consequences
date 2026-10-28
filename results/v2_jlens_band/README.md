@@ -12,3 +12,9 @@ Measured (top-1 target of 33; median output KL in nats):
 Reading (provisional): no evidence here that band editing per se cancels the single-layer effect at matched alpha; the earlier "band fails" contrast looks like a strength-scale issue (alpha applied per layer, summed over layers, saturating around alpha 1 to 1.5). Target-specific flips exist at alpha 0.75 for single layers, but only on a heavy-tailed subset whose mean KL (~2 nats) is still above the repo's 1-nat validity limit. Nothing here shows a valid, low-disruption editing instrument. Caveats: one model, one category, 33 prompts per cell, one unrelated-control family, and the band comparison varies layer count and total delta-RMS together. The original H0 band run (0/90) used its own scaling and is not re-derived here.
 
 Cost: 317.6 s on A100-80GB, estimated about $0.26 (public Modal rates; provider bill not read).
+
+## CPU follow-up on the same raw rows (alpha 0.75, single layers L32/L34/L40, semantic; 27 flips of 99 eligible rows)
+- Baseline target-vs-source log-odds does not separate flips from non-flips (median -8.31 vs -8.34).
+- Output KL is bimodal: flips median 6.7 nats, non-flips median 0.15. Only 3 of 27 flips have KL < 1 nat (0.30, 0.43, 0.44).
+- The same 8 (scenario, target) items flip at all three layers (9 per layer). Flips by function: capital 13/36, continent 8/36, language 6/27.
+Reading (provisional): the edit behaves like a threshold, not a smooth dial. Prompts either barely move or jump into a high-KL regime, and the set that jumps is shared across layers. This is descriptive on 33 prompts per layer and one model.
