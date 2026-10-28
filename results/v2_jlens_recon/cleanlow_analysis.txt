@@ -1,0 +1,24 @@
+elapsed 250.647887636
+clean_B7_36_42_a0.05                               n=33 top1 1/33 top1&KL<1 1 KL med 0.00 dRMS med 0.008 gain med 1.47
+clean_B7_36_42_a0.1                                n=33 top1 5/33 top1&KL<1 1 KL med 0.26 dRMS med 0.017 gain med 4.94
+clean_B7_36_42_a0.15                               n=33 top1 25/33 top1&KL<1 1 KL med 3.56 dRMS med 0.025 gain med 9.25
+clean_B7_36_42_a0.2                                n=33 top1 32/33 top1&KL<1 1 KL med 6.88 dRMS med 0.033 gain med 14.00
+clean_B7_36_42_a0.3                                n=33 top1 32/33 top1&KL<1 1 KL med 7.27 dRMS med 0.050 gain med 16.62
+clean_B7_36_42_a0.4                                n=33 top1 32/33 top1&KL<1 1 KL med 7.21 dRMS med 0.067 gain med 17.69
+clean_B8_36_43_a0.05                               n=33 top1 1/33 top1&KL<1 1 KL med 0.00 dRMS med 0.008 gain med 1.75
+clean_B8_36_43_a0.1                                n=33 top1 9/33 top1&KL<1 1 KL med 0.88 dRMS med 0.017 gain med 6.09
+clean_B8_36_43_a0.15                               n=33 top1 29/33 top1&KL<1 1 KL med 5.67 dRMS med 0.025 gain med 11.69
+clean_B8_36_43_a0.2                                n=33 top1 32/33 top1&KL<1 1 KL med 7.09 dRMS med 0.033 gain med 14.16
+clean_B8_36_43_a0.3                                n=33 top1 32/33 top1&KL<1 1 KL med 7.29 dRMS med 0.050 gain med 17.19
+clean_B8_36_43_a0.4                                n=33 top1 32/33 top1&KL<1 1 KL med 7.21 dRMS med 0.066 gain med 18.12
+cleanunrel_B8_36_43_a0.1                           n=33 top1 0/33 top1&KL<1 0 KL med 0.88 dRMS med 0.016 gain med 0.94
+cleanunrel_B8_36_43_a0.2                           n=33 top1 0/33 top1&KL<1 0 KL med 7.17 dRMS med 0.032 gain med 8.25
+cleanunrel_B8_36_43_a0.3                           n=33 top1 0/33 top1&KL<1 0 KL med 7.36 dRMS med 0.048 gain med 10.00
+
+per-prompt: smallest KL among its top-1 events across the alpha grid (semantic, clean-delta)
+B8_36_43 prompts ever top-1: 32 min-KL quantiles [0.1, 3.18, 5.5, 7.69, 11.84] under 1 nat: 1
+  alpha 0.1 flip KL med 4.61 nonflip KL med 0.43
+  alpha 0.15 flip KL med 5.93 nonflip KL med 2.34
+B7_36_42 prompts ever top-1: 32 min-KL quantiles [0.07, 3.06, 5.23, 7.43, 11.78] under 1 nat: 1
+  alpha 0.1 flip KL med 6.0 nonflip KL med 0.15
+  alpha 0.15 flip KL med 4.51 nonflip KL med 1.72
