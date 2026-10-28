@@ -1,0 +1,6 @@
+# Y6 design (locked before run, ~05:12 IST Oct 29)
+Question: is the Y3 pattern (D1 100%, D2 ~88%, D3/D4 near chance + always-Call) specific to the forced A/B letter format? Same pinned Qwen3.6-27B. First 60 items from each of D1-D4 (240 prompts, same items as Y3, no letters), two native generation modes, greedy:
+ (i) free_word: "Reply with exactly one word: Call or Fold." max 8 new tokens;
+ (ii) cot: thinking template off but an explicit instruction to think step by step briefly and end with "Final answer: X", max 400 new tokens (truncated answers count as unparsed, reported separately).
+Scoring: parse first occurrence of Call/Fold (free_word) or the last "Final answer:" label (cot). Per-class recall + Wilson CI. No sampling (greedy), so no sampling-variance estimate; label order is not counterbalanced here because there is no letter position, and the label order in the instruction line follows the randomised A/B option order of each item (so it is counterbalanced across items, not fixed).
+Predictions: free_word D1 >=95%, D3/D4 within 10 points of the A/B results with Call-heavy policy; cot improves D3/D4 substantially (>=75%) if the A/B collapse is a no-CoT limit rather than a format artifact. Est cost ~$0.5 (240 x 400-token greedy generations, batch 6). Running total after ~ $6.0.

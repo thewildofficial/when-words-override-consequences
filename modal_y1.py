@@ -196,3 +196,90 @@ def y5_remote(rows: list, model_id: str, mode: str) -> str:
         for i, r in enumerate(part):
             r.setdefault("v", {})[mode] = {"A": float(lg[i, A]), "B": float(lg[i, B]), "top1": tok.decode([int(lg[i].argmax())])}
     return json.dumps({"elapsed": time.perf_counter() - started, "rows": rows, "model_id": model_id, "sha": sha, "mode": mode})
+
+
+@app.function(image=image, volumes={"/cache": cache}, cpu=8.0, memory=65536, gpu="A100-80GB", timeout=2400, max_containers=1, retries=0)
+def y6_remote(rows: list) -> str:
+    """Native generation (no A/B letters) for the pinned 27B: modes free_word (greedy, <=8 new tokens) and cot (greedy, <=400 new tokens, thinking template off but explicit step-by-step instruction)."""
+    import torch, transformers
+    started = time.perf_counter()
+    model, _, metadata = _load_model(with_lens=False)
+    hf = model._hf_model
+    tok = transformers.AutoTokenizer.from_pretrained(MODEL_ID, revision=MODEL_REVISION); tok.padding_side = "left"
+    def prompt(r, mode):
+        q = r["question"]; a, b = r["labels"]
+        if mode == "free_word": t = f"{q}\n\nReply with exactly one word: {a} or {b}."
+        else: t = f"{q}\n\nThink step by step briefly, then finish with the line 'Final answer: {a}' or 'Final answer: {b}'."
+        return tok.apply_chat_template([{"role": "user", "content": t}], tokenize=False, add_generation_prompt=True, enable_thinking=False)
+    for mode, mx in (("free_word", 8), ("cot", 400)):
+        for start in range(0, len(rows), 8 if mode == "free_word" else 6):
+            part = rows[start:start + (8 if mode == "free_word" else 6)]
+            enc = tok([prompt(r, mode) for r in part], return_tensors="pt", padding=True, add_special_tokens=False).to("cuda")
+            with torch.inference_mode():
+                out = hf.generate(**enc, max_new_tokens=mx, do_sample=False)
+            for i, r in enumerate(part):
+                r.setdefault("gen", {})[mode] = tok.decode(out[i, enc["input_ids"].shape[1]:], skip_special_tokens=True)
+    return json.dumps({"elapsed": time.perf_counter() - started, "rows": rows, "meta": metadata})
+
+
+@app.function(image=image, volumes={"/cache": cache}, cpu=8.0, memory=65536, gpu="A100-80GB", timeout=2400, max_containers=1, retries=0)
+def y7_remote(rows: list) -> str:
+    """WWOC tool-use: A/B letter logits for 'ab' rows; for tool rows, summed log-prob of each tool name after the prefill '<tool_call>\\n<function=' (separately tokenised continuation), plus greedy free generation for a syntax gate on the first 64 tool rows."""
+    import torch, transformers
+    started = time.perf_counter()
+    model, _, metadata = _load_model(with_lens=False)
+    hf = model._hf_model
+    tok = transformers.AutoTokenizer.from_pretrained(MODEL_ID, revision=MODEL_REVISION)
+    ctx0 = tok.apply_chat_template([{"role": "user", "content": "x"}], tokenize=False, add_generation_prompt=True, enable_thinking=False)
+    A = _continuation_id(tok, ctx0, "A"); B = _continuation_id(tok, ctx0, "B")
+    def ctx_for(r):
+        return tok.apply_chat_template([{"role": "user", "content": r["user"]}], tools=r["tools"], tokenize=False, add_generation_prompt=True, enable_thinking=False)
+    prefill = "<tool_call>\n<function="
+    ntool = 0
+    for r in rows:
+        if r["fmt"] == "ab":
+            text = tok.apply_chat_template([{"role": "user", "content": r["prompt"]}], tokenize=False, add_generation_prompt=True, enable_thinking=False)
+            ids = torch.tensor([tok.encode(text, add_special_tokens=False)], device="cuda")
+            with torch.inference_mode():
+                lg = hf(ids, logits_to_keep=1).logits[0, -1].float()
+            r["score"] = {"A": float(lg[A]), "B": float(lg[B])}
+        else:
+            base = tok.encode(ctx_for(r) + prefill, add_special_tokens=False)
+            sc = {}
+            for label, nm in r["names"].items():
+                cont = tok.encode(nm + ">", add_special_tokens=False)
+                ids = torch.tensor([base + cont], device="cuda")
+                with torch.inference_mode():
+                    logits = hf(ids).logits[0].float().log_softmax(-1)
+                lp = 0.0
+                for k, t in enumerate(cont):
+                    lp += float(logits[len(base) - 1 + k, t])
+                sc[label] = lp
+            r["score"] = sc
+            if ntool < 64:
+                ntool += 1
+                enc = tok(ctx_for(r), return_tensors="pt", add_special_tokens=False).to("cuda")
+                with torch.inference_mode():
+                    o = hf.generate(**enc, max_new_tokens=60, do_sample=False)
+                r["gen"] = tok.decode(o[0, enc["input_ids"].shape[1]:], skip_special_tokens=False)
+    return json.dumps({"elapsed": time.perf_counter() - started, "rows": rows, "meta": metadata})
+
+
+@app.function(image=image, volumes={"/cache": cache}, cpu=8.0, memory=65536, gpu="A100-80GB", timeout=3000, max_containers=1, retries=0)
+def y8_remote(rows: list) -> str:
+    """Native tool-call generation for tool rows (greedy, <=80 new tokens, no prefill, thinking off). Raw text returned; parsing/mock execution done offline."""
+    import torch, transformers
+    started = time.perf_counter()
+    model, _, metadata = _load_model(with_lens=False)
+    hf = model._hf_model
+    tok = transformers.AutoTokenizer.from_pretrained(MODEL_ID, revision=MODEL_REVISION); tok.padding_side = "left"
+    def ctx(r):
+        return tok.apply_chat_template([{"role": "user", "content": r["user"]}], tools=r["tools"], tokenize=False, add_generation_prompt=True, enable_thinking=False)
+    for s in range(0, len(rows), 8):
+        part = rows[s:s + 8]
+        enc = tok([ctx(r) for r in part], return_tensors="pt", padding=True, add_special_tokens=False).to("cuda")
+        with torch.inference_mode():
+            out = hf.generate(**enc, max_new_tokens=80, do_sample=False)
+        for i, r in enumerate(part):
+            r["gen"] = tok.decode(out[i, enc["input_ids"].shape[1]:], skip_special_tokens=False)
+    return json.dumps({"elapsed": time.perf_counter() - started, "rows": rows, "meta": metadata})
