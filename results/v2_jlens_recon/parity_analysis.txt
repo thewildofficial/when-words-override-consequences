@@ -1,0 +1,5 @@
+elapsed 86.602453042
+parity_L36_40                                      n=33 top1 25/33 top1&KL<1 1 KL med 3.43 dRMS med 0.145 gain med 9.25
+parity_L36_41                                      n=33 top1 0/33 top1&KL<1 0 KL med 0.01 dRMS med 0.145 gain med 1.00
+parity_L37_43                                      n=33 top1 25/33 top1&KL<1 1 KL med 3.52 dRMS med 0.150 gain med 9.25
+parity_L38_43                                      n=33 top1 0/33 top1&KL<1 0 KL med 0.00 dRMS med 0.141 gain med 0.81
