@@ -1,0 +1,4 @@
+# Y3 design (locked before run, ~04:58 IST Oct 29)
+Same 120 balanced items in four conditions, each supplying a different subset of the two quantities needed for the call/fold decision: D1 equity% and break-even% both stated; D2 equity stated, break-even derived from pot and bet; D3 equity derived from outs, break-even stated; D4 both derived (as Y2 C1). Items require |round(equity%)-round(break-even%)|>=4. Same scorer, two renderings, Wilson CIs, per-class recall.
+Predictions: D1 >=90%. D2 and D3 each between D1 and D4. D4 ~50-60% with Call-heavy policy. If D2 high and D3 low => equity-from-counts derivation is the bottleneck; if D3 high and D2 low => break-even derivation is the bottleneck; if both are low => needs multi-step integration beyond a single derivation. Differences of <10 points between conditions are within noise at n=120.
+Est cost ~$0.3. Running total after Y3 ~$4.9.
