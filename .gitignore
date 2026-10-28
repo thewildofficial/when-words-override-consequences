@@ -36,3 +36,4 @@ results/v6_2_reasoning_capability_control/subset_manifest.json
 # generator. The CPU control step regenerates it and records its hash in the
 # lightweight manifest before any Modal stage.
 configs/v7/epistemic_agentic_strategy/dataset.json
+results/y4_probe/raw/*.npz

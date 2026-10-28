@@ -129,3 +129,35 @@ def y1_remote(rows: list) -> str:
             for i, r in enumerate(part):
                 r.setdefault("v", {})[vname] = {"A": float(lg[i, A]), "B": float(lg[i, B]), "top1": tok.decode([int(lg[i].argmax())])}
     return json.dumps({"elapsed": time.perf_counter() - started, "rows": rows, "meta": metadata})
+
+
+@app.function(image=image, volumes={"/cache": cache}, cpu=8.0, memory=65536, gpu="A100-80GB", timeout=1200, max_containers=1, retries=0)
+def y4_remote(rows: list) -> str:
+    """Final-prompt-position residual stream at every 4th layer (plain rendering), as base64 float16 npz, plus A/B logits."""
+    import base64, io, numpy as np, torch, transformers
+    started = time.perf_counter()
+    model, _, metadata = _load_model(with_lens=False)
+    tok = transformers.AutoTokenizer.from_pretrained(MODEL_ID, revision=MODEL_REVISION)
+    ctx = tok.apply_chat_template([{"role": "user", "content": "x"}], tokenize=False, add_generation_prompt=True, enable_thinking=False)
+    A = _continuation_id(tok, ctx, "A"); B = _continuation_id(tok, ctx, "B")
+    n_layers = None; feats = {}; ab = []
+    for start in range(0, len(rows), 8):
+        part = rows[start:start + 8]
+        ids = [tok.encode(tok.apply_chat_template([{"role": "user", "content": r["prompt"]}], tokenize=False, add_generation_prompt=True, enable_thinking=False), add_special_tokens=False) for r in part]
+        w = max(map(len, ids))
+        x = torch.zeros((len(part), w), dtype=torch.long, device="cuda"); m = torch.zeros_like(x)
+        for i, t in enumerate(ids):
+            x[i, w - len(t):] = torch.tensor(t, device="cuda"); m[i, w - len(t):] = 1
+        with torch.inference_mode():
+            out = model._hf_model(x, attention_mask=m, output_hidden_states=True, logits_to_keep=1)
+        hs = out.hidden_states
+        n_layers = len(hs)
+        sel = list(range(0, n_layers, 4)) + ([n_layers - 1] if (n_layers - 1) % 4 else [])
+        for L in sel:
+            feats.setdefault(L, []).append(hs[L][:, -1].float().cpu().numpy().astype("float16"))
+        lg = out.logits[:, -1].float()
+        for i in range(len(part)):
+            ab.append([float(lg[i, A]), float(lg[i, B])])
+    buf = io.BytesIO()
+    np.savez_compressed(buf, ab=np.array(ab, dtype="float32"), **{f"L{L}": np.concatenate(v) for L, v in feats.items()})
+    return json.dumps({"elapsed": time.perf_counter() - started, "n_layers": n_layers, "npz_b64": base64.b64encode(buf.getvalue()).decode(), "meta": metadata})
