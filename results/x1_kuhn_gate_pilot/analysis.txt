@@ -1,0 +1,19 @@
+n 480 elapsed 97.447276066
+top1 in A/B: 0.00625
+overall acc 0.527
+pick A rate 0.30  best==A rate 0.51
+rendering {'r0': (0.685, 111), 'r1': (0.607, 107), 'r2': (0.492, 124), 'r3': (0.37, 138)}
+obs {'bet': (0.773, 229), 'check': (0.303, 251)}
+card {1: (0.568, 169), 2: (0.483, 151), 3: (0.525, 160)}
+advantage [0.0,0.1) n=6 acc 0.000
+advantage [0.1,0.3) n=48 acc 0.333
+advantage [0.3,0.7) n=119 acc 0.429
+advantage [0.7,9.0) n=307 acc 0.606
+composition baseline (majority best action by card,obs) acc 0.915
+model action by (card,obs) vs best:
+(1, 'bet') n 84 acc 0.83 model-picks {'call': 14, 'fold': 70} best {'fold': 84}
+(1, 'check') n 85 acc 0.31 model-picks {'check': 72, 'bet': 13} best {'bet': 68, 'check': 17}
+(2, 'bet') n 73 acc 0.73 model-picks {'call': 58, 'fold': 15} best {'call': 56, 'fold': 17}
+(2, 'check') n 78 acc 0.26 model-picks {'bet': 13, 'check': 65} best {'bet': 71, 'check': 7}
+(3, 'bet') n 72 acc 0.75 model-picks {'fold': 18, 'call': 54} best {'call': 72}
+(3, 'check') n 88 acc 0.34 model-picks {'check': 58, 'bet': 30} best {'bet': 88}
