@@ -37,3 +37,9 @@ Prior art, abstracts read plus partial full text: arXiv 2605.00226 (Kuhn, belief
 ## D. Scope
 
 No GPU run, no spend. Branch contains this note only.
+
+## E. Update 2026-10-29 03:05 IST
+
+- PR #48 (KL-matched control) result: semantic swap top-1 75/83 vs unrelated-category swap 0/83 on KL-matched accepted pairs; norm-matched random basis is inert (KL <= 0.001 nat) so no random KL match was possible. This partly retracts the section A hypothesis that alpha >= 1 flips are generic disruption; they are target-specific relative to the tested control, still in a ~5-nat regime outside the repo's 1-nat validity limit. Selection caveat: matching is conditioned on KL.
+- epistemic-steering docs/evidence-ledger.md (read in full): within-task held-out probes AUROC 0.712-0.950, but leave-one-domain-out universal probe 0.4777 (a 0.9962 result was retired as train-at-eval leakage), rank-3 PLS-DA strict transfer 0.358, and the repo marks "universal correctness direction" and "hidden-state steering improves correctness" as claims on hold. Consequence for X1: any decoded-EV result needs policy- and rendering-held-out splits, since within-condition decodability is known to overstate transfer in this project's own history.
+- Still unread: docs/next-sprint/claim-ledger.md, V2-E1 atlas raw rows.
