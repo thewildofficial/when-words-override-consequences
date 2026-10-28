@@ -161,3 +161,38 @@ def y4_remote(rows: list) -> str:
     buf = io.BytesIO()
     np.savez_compressed(buf, ab=np.array(ab, dtype="float32"), **{f"L{L}": np.concatenate(v) for L, v in feats.items()})
     return json.dumps({"elapsed": time.perf_counter() - started, "n_layers": n_layers, "npz_b64": base64.b64encode(buf.getvalue()).decode(), "meta": metadata})
+
+
+@app.function(image=image, volumes={"/cache": cache}, cpu=8.0, memory=65536, gpu="A100-80GB", timeout=1500, max_containers=1, retries=0)
+def y5_remote(rows: list, model_id: str, mode: str) -> str:
+    """Base-vs-instruct comparison on the same items. mode='chat' (thinking off) or 'raw' (plain text + 'Answer:')."""
+    import torch, transformers
+    from huggingface_hub import model_info
+    started = time.perf_counter()
+    tok = transformers.AutoTokenizer.from_pretrained(model_id)
+    hf = transformers.AutoModelForCausalLM.from_pretrained(model_id, dtype=torch.bfloat16, low_cpu_mem_usage=True).cuda().eval()
+    sha = model_info(model_id).sha
+    def build(text):
+        if mode == "chat":
+            return tok.apply_chat_template([{"role": "user", "content": text}], tokenize=False, add_generation_prompt=True, enable_thinking=False)
+        return text.replace("Answer with a single letter.", "") .rstrip() + "\nAnswer:"
+    sp = "" if mode == "chat" else " "
+    ctx = build("x")
+    def tid(s):
+        pre = tok.encode(ctx, add_special_tokens=False); full = tok.encode(ctx + s, add_special_tokens=False)
+        assert full[:len(pre)] == pre and len(full) == len(pre) + 1, s
+        return full[-1]
+    A = tid(sp + "A"); B = tid(sp + "B")
+    tok.padding_side = "left"
+    for start in range(0, len(rows), 8):
+        part = rows[start:start + 8]
+        ids = [tok.encode(build(r["prompt"]), add_special_tokens=False) for r in part]
+        w = max(map(len, ids))
+        x = torch.zeros((len(part), w), dtype=torch.long, device="cuda"); m = torch.zeros_like(x)
+        for i, t in enumerate(ids):
+            x[i, w - len(t):] = torch.tensor(t, device="cuda"); m[i, w - len(t):] = 1
+        with torch.inference_mode():
+            lg = hf(x, attention_mask=m, logits_to_keep=1).logits[:, -1].float()
+        for i, r in enumerate(part):
+            r.setdefault("v", {})[mode] = {"A": float(lg[i, A]), "B": float(lg[i, B]), "top1": tok.decode([int(lg[i].argmax())])}
+    return json.dumps({"elapsed": time.perf_counter() - started, "rows": rows, "model_id": model_id, "sha": sha, "mode": mode})

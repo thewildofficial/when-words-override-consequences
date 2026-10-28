@@ -1,0 +1,20 @@
+== raw/qwen3_8b_chat.json
+Qwen/Qwen3-8B b968826d9c46dd6066d109eabc6255188de91218 80
+C1_poker_outs          chat        acc 73/120=0.61 CI(0.52, 0.69) balacc 0.61 majority-class 0.50 recall {'Fold': '13/60', 'Call': '60/60'} gold-letter recall A 35/46 B 38/74 
+C2_urn_outs            chat        acc 51/120=0.42 CI(0.34, 0.51) balacc 0.43 majority-class 0.50 recall {'Pass': '28/60', 'Play': '23/60'} gold-letter recall A 51/51 B 0/69 p
+C3_poker_stated        chat        acc 66/120=0.55 CI(0.46, 0.64) balacc 0.55 majority-class 0.50 recall {'Fold': '24/60', 'Call': '42/60'} gold-letter recall A 48/52 B 18/68 
+C4_prob_vs_threshold   chat        acc 57/120=0.47 CI(0.39, 0.56) balacc 0.47 majority-class 0.50 recall {'Lower': '27/60', 'Higher': '30/60'} gold-letter recall A 54/56 B 3/6
+D1_both_stated         chat        acc 82/120=0.68 CI(0.6, 0.76) balacc 0.68 majority-class 0.50 recall {'Fold': '44/60', 'Call': '38/60'} gold-letter recall A 25/63 B 57/57 p
+D2_equity_stated_thr_derived chat        acc 86/120=0.72 CI(0.63, 0.79) balacc 0.72 majority-class 0.50 recall {'Fold': '27/60', 'Call': '59/60'} gold-letter recall A 50/59 B 
+D3_equity_derived_thr_stated chat        acc 58/120=0.48 CI(0.4, 0.57) balacc 0.48 majority-class 0.50 recall {'Fold': '20/60', 'Call': '38/60'} gold-letter recall A 51/58 B 7
+D4_both_derived        chat        acc 76/120=0.63 CI(0.54, 0.71) balacc 0.63 majority-class 0.50 recall {'Fold': '16/60', 'Call': '60/60'} gold-letter recall A 43/56 B 33/64 
+== raw/qwen3_8b_base_raw.json
+Qwen/Qwen3-8B-Base 49e3418fbbbca6ecbdf9608b4d22e5a407081db4 77
+C1_poker_outs          raw         acc 60/120=0.50 CI(0.41, 0.59) balacc 0.50 majority-class 0.50 recall {'Fold': '0/60', 'Call': '60/60'} gold-letter recall A 22/46 B 38/74 p
+C2_urn_outs            raw         acc 72/120=0.60 CI(0.51, 0.68) balacc 0.60 majority-class 0.50 recall {'Pass': '12/60', 'Play': '60/60'} gold-letter recall A 25/51 B 47/69 
+C3_poker_stated        raw         acc 62/120=0.52 CI(0.43, 0.6) balacc 0.52 majority-class 0.50 recall {'Fold': '2/60', 'Call': '60/60'} gold-letter recall A 26/52 B 36/68 pr
+C4_prob_vs_threshold   raw         acc 79/120=0.66 CI(0.57, 0.74) balacc 0.66 majority-class 0.50 recall {'Lower': '48/60', 'Higher': '31/60'} gold-letter recall A 15/56 B 64/
+D1_both_stated         raw         acc 71/120=0.59 CI(0.5, 0.68) balacc 0.59 majority-class 0.50 recall {'Fold': '18/60', 'Call': '53/60'} gold-letter recall A 24/63 B 47/57 p
+D2_equity_stated_thr_derived raw         acc 62/120=0.52 CI(0.43, 0.6) balacc 0.52 majority-class 0.50 recall {'Fold': '2/60', 'Call': '60/60'} gold-letter recall A 26/59 B 36
+D3_equity_derived_thr_stated raw         acc 60/120=0.50 CI(0.41, 0.59) balacc 0.50 majority-class 0.50 recall {'Fold': '0/60', 'Call': '60/60'} gold-letter recall A 31/58 B 2
+D4_both_derived        raw         acc 60/120=0.50 CI(0.41, 0.59) balacc 0.50 majority-class 0.50 recall {'Fold': '0/60', 'Call': '60/60'} gold-letter recall A 27/56 B 33/64 p
