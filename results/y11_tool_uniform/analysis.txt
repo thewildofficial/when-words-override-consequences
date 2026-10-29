@@ -1,0 +1,15 @@
+cap 400 rows 512
+tool_opaque 128 {'right': 128} acc 1.0 cells(none/prose,none/table,red/prose,red/table) [32, 32, 32, 32] capHit nocall 0 median ntok 16
+tool_assertion_name 128 {'right': 119, 'wrong': 9} acc 0.93 cells(none/prose,none/table,red/prose,red/table) [29, 32, 31, 27] capHit nocall 0 median ntok 117
+tool_assertion_desc 128 {'right': 89, 'wrong': 39} acc 0.695 cells(none/prose,none/table,red/prose,red/table) [24, 14, 28, 23] capHit nocall 0 median ntok 15
+tool_desc_named 128 {'right': 86, 'wrong': 42} acc 0.672 cells(none/prose,none/table,red/prose,red/table) [26, 14, 23, 23] capHit nocall 0 median ntok 15
+tool_assertion_name - tool_opaque all -7.0 pts [-10.9,-3.9]
+tool_assertion_desc - tool_opaque all -30.5 pts [-38.3,-22.7]
+tool_desc_named - tool_opaque all -32.8 pts [-45.3,-21.1]
+tool_desc_named - tool_assertion_desc all -2.3 pts [-9.4,5.5]
+tool_desc_named - tool_assertion_desc prose -4.7 pts [-18.8,10.9]
+tool_desc_named - tool_assertion_desc table 0.0 pts [0.0,0.0]
+tool_assertion_name expected_action=A share 0.31
+tool_assertion_desc expected_action=A share 0.31
+tool_desc_named expected_action=A share 0.31
+tool_opaque expected_action=A share 0.31
