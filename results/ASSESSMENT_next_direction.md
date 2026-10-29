@@ -1,0 +1,8 @@
+# Honest assessment of next direction (07:30, CPU only; no run proposed)
+Read depth: repo v5 FINDINGS/prereg FULL; 2411.16353 PART; 2502.13913 PART (Sections 1-3); Hopping Too Late ABS+intro; filler tokens / compositionality gap cited only.
+What current evidence says (scoped, one model Qwen3.6-27B, one generator family):
+- Wording attracts: opaque 100% vs meaningful 55-79% (RBG-4); irrelevant state sentence moves action 31% vs 100%; tool names cost ~6-7 points (Y11/Y12).
+- Written intermediate steps rescue (RBG-6 46/48 vs 18/48; Y6/Y10 CoT), so the failure is a no-written-step readout phenomenon.
+- Y15 shows the A/B readout is unreliable for chained maps (letter-A bias), so an inversion-count question cannot be answered with that format.
+Alternatives for the same data: (1) semantic attraction to goal-matching content; (2) distractor-like harm from redundant history (cf. 2502.13913 reports random-guess behaviour under distractors in a pretrained 7B); (3) format/position bias. Existing data separates (1) from generic context cost (opaque control) but not (1) from (2): RBG-4 redundant history is both. A table format abolishes the harm, which fits neither pure explanation cleanly.
+Verdict: no interesting new direction is established by current evidence. The only well-posed, non-variant question left is (1) vs (2): does history harm depend on history CONTENT matching the goal vs being same-length irrelevant demonstrations? That is a readout-preserving control on the frozen RBG-4 generator, not a new readout, but it is still incremental and I am not proposing a launch. Best honest outcome: report the scoped findings and stop manufacturing variants.
