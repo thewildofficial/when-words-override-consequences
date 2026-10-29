@@ -1,0 +1,4 @@
+D1_both_stated A/B plain same 60 items: 60/60; Call recall 28/28, Fold recall 32/32
+D2_equity_stated_thr_derived A/B plain same 60 items: 54/60; Call recall 28/28, Fold recall 26/32
+D3_equity_derived_thr_stated A/B plain same 60 items: 36/60; Call recall 28/28, Fold recall 8/32
+D4_both_derived A/B plain same 60 items: 32/60; Call recall 28/28, Fold recall 4/32

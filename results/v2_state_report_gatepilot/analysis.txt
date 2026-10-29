@@ -1,0 +1,24 @@
+elapsed 97.526281395
+F1_orig            n=96 gate acc 0.396  pick==s 0.54 pick==a 0.24 top1-is-candidate-word 1.00 gen_ok 0/6
+F2_idx_plus_off    n=96 gate acc 0.479  pick==s 0.47 pick==a 0.43 top1-is-candidate-word 1.00 gen_ok 0/6
+F3_sum_only        n=96 gate acc 0.594  pick==s 0.12 pick==a 0.33 top1-is-candidate-word 0.97 gen_ok 0/6
+F4_idx_only        n=96 gate acc 1.000  pick==s 0.27 pick==a 1.00 top1-is-candidate-word 1.00 gen_ok 0/6
+F5_shift_words     n=96 gate acc 0.542  pick==s 0.51 pick==a 0.49 top1-is-candidate-word 1.00 gen_ok 0/6
+F1_orig a 2 s 0 words ['red', 'green', 'blue', 'black'] gold red gen 'blue<|im_end|>' pick blue
+F1_orig a 0 s 0 words ['iron', 'gold', 'tin', 'lead'] gold iron gen 'iron<|im_end|>' pick iron
+F1_orig a 2 s 2 words ['dog', 'fish', 'bird', 'cat'] gold bird gen 'bird<|im_end|>' pick bird
+F1_orig a 3 s 2 words ['east', 'north', 'west', 'south'] gold north gen 'west<|im_end|>' pick west
+F1_orig a 2 s 0 words ['cloud', 'sun', 'star', 'moon'] gold sun gen 'star<|im_end|>' pick star
+F1_orig a 3 s 1 words ['moon', 'star', 'sun', 'cloud'] gold sun gen 'sun<|im_end|>' pick sun
+F4_idx_only a 1 s 0 words ['blue', 'red', 'black', 'green'] gold red gen 'red<|im_end|>' pick red
+F4_idx_only a 2 s 0 words ['green', 'red', 'black', 'blue'] gold black gen 'black<|im_end|>' pick black
+F4_idx_only a 0 s 0 words ['blue', 'black', 'green', 'red'] gold blue gen 'blue<|im_end|>' pick blue
+F4_idx_only a 1 s 0 words ['iron', 'lead', 'gold', 'tin'] gold lead gen 'lead<|im_end|>' pick lead
+F4_idx_only a 2 s 0 words ['north', 'east', 'west', 'south'] gold west gen 'west<|im_end|>' pick west
+F4_idx_only a 1 s 0 words ['lead', 'tin', 'gold', 'iron'] gold tin gen 'tin<|im_end|>' pick tin
+F1_orig {0: 0.42, 1: 0.37, 2: 0.48, 3: 0.32}
+F2_idx_plus_off {0: 1.0, 1: 0.43, 2: 0.18, 3: 0.21}
+F5_shift_words {0: 1.0, 1: 0.43, 2: 0.29, 3: 0.32}
+elapsed 77.871904451
+F6_perm_table n 96 gate acc 0.990 pick==state 0.27 state==report frac 0.26
+F7_two_tables n 96 gate acc 0.365 pick==state 0.69 state==report frac 0.15

@@ -1,0 +1,8 @@
+blackjack              V1_plain    acc 88/100=0.88 CI(0.8, 0.93) balacc 0.80 majority-class 0.70 recall {'Hit': '70/70', 'Stand': '18/30'} gold-letter recall A 42/47 B 46/53 predA 0.49
+blackjack              V2_prefill  acc 87/100=0.87 CI(0.79, 0.92) balacc 0.78 majority-class 0.70 recall {'Hit': '70/70', 'Stand': '17/30'} gold-letter recall A 42/47 B 45/53 predA 0.50
+gamble                 V1_plain    acc 79/100=0.79 CI(0.7, 0.86) balacc 0.79 majority-class 0.51 recall {'Option 1': '30/51', 'Option 2': '49/49'} gold-letter recall A 43/49 B 36/51 predA 0.58
+gamble                 V2_prefill  acc 86/100=0.86 CI(0.78, 0.91) balacc 0.86 majority-class 0.51 recall {'Option 1': '37/51', 'Option 2': '49/49'} gold-letter recall A 43/49 B 43/51 predA 0.51
+outs_draw              V1_plain    acc 22/100=0.22 CI(0.15, 0.31) balacc 0.52 majority-class 0.81 recall {'Fold': '3/81', 'Call': '19/19'} gold-letter recall A 8/46 B 14/54 predA 0.48
+outs_draw              V2_prefill  acc 19/100=0.19 CI(0.13, 0.28) balacc 0.50 majority-class 0.81 recall {'Fold': '0/81', 'Call': '19/19'} gold-letter recall A 8/46 B 11/54 predA 0.51
+pot_odds_stated        V1_plain    acc 87/100=0.87 CI(0.79, 0.92) balacc 0.86 majority-class 0.54 recall {'Call': '51/54', 'Fold': '36/46'} gold-letter recall A 38/48 B 49/52 predA 0.41
+pot_odds_stated        V2_prefill  acc 86/100=0.86 CI(0.78, 0.91) balacc 0.85 majority-class 0.54 recall {'Call': '54/54', 'Fold': '32/46'} gold-letter recall A 39/48 B 47/52 predA 0.44

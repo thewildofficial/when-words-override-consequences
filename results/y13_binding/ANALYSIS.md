@@ -1,0 +1,12 @@
+# Y13 binding vs generic-deliberation (Qwen3.6-27B, greedy, thinking off, fresh games 296-327, uniform cap 400, one pass, no reruns)
+Design and decision rule locked before the run (DESIGN_LOCKED.md). 1024 rows = 32 games x 2 history x 2 mapping x 4 conditions x 2 tool-list orders. 0 no-call, 0 bad-name, 0 cap-hit in all conditions. Raw raw/y13.json; scripts/analyze_y13.py; analysis.txt (confusion, swap pairs, game-cluster bootstrap 2000 resamples). Note the analyzer script was adapted from Y12 by text substitution; the printed conditions are tool_desc, tool_desc_restate, tool_desc_generic, tool_optok_worded in that order.
+| condition | right/256 | acc | right swap0/swap1 | chose first/second | median new tokens |
+|---|---|---|---|---|---|
+| desc (neutral names tool_one/two bound to list position; worded descriptions) | 191 | 74.6% | 76/115 | 149/107 | 15 |
+| desc + 'state which tool reaches the target' (restate) | 250 | 97.7% | 122/128 | 134/122 | 48 |
+| desc + 'restate policy and payoff in your own words' (generic) | 237 | 92.6% | 111/126 | 143/113 | 54 |
+| opaque-token names (fixed per concept) + worded descriptions, no deliberation | 238 | 93.0% | 115/123 | 122/134 | 16 |
+Game-cluster 95% differences: restate - desc +23.0 pts [18.4,28.1]; generic - desc +18.0 [13.3,22.7]; restate - generic +5.1 [1.6,8.6]; optok_worded - desc +18.4 [14.1,23.0].
+Decision rule outcome: generic deliberation rescues most of the loss (generic ~ 92.6% vs desc 74.6%); the explicit which-tool sentence adds ~5 pts over generic (97.7%), not separable from 'answer computed when stated'. The pattern (2) >> (3) ~= (1) is NOT observed. A name that stays bound to the same concept across list orders recovers 93% with no deliberation at all (16 tokens), so most of the neutral-name desc deficit tracks the re-bound tool_one/tool_two names (confounded with first-position pull, since name == position there), not the worded description by itself.
+Not established: whether position or name re-binding is the active factor (cannot be separated in condition 1 by construction); anything about mechanism; any wording-vs-consequence claim (wrong == target-claiming tool by construction; no matched meaningless-description control).
+Scoped finding so far (one model, one generator family, greedy): worded names cost ~6-7 pts vs opaque; worded descriptions with stable opaque names cost ~7 pts (93%); neutral position-bound names cost ~25 pts; deliberation text recovers most of it. Cost est ~$1.5 (long-output rows); total est ~$11 (bill not read).

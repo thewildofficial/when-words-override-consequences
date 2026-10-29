@@ -1,0 +1,13 @@
+import json, subprocess, sys
+from pathlib import Path
+import modal
+fn = modal.Function.from_name("jspace-state-report-prosp2", "run_remote")
+if sys.argv[1] == "spawn":
+    commit = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
+    print(fn.spawn(4, [36,37,38,39,40,41,42,43], commit).object_id)
+else:
+    call = modal.FunctionCall.from_id(sys.argv[2])
+    try: out = call.get(timeout=float(sys.argv[3]))
+    except TimeoutError: print("pending"); sys.exit(0)
+    Path("results/v2_state_report_prosp2/raw").mkdir(parents=True, exist_ok=True)
+    Path("results/v2_state_report_prosp2/raw/state_report_raw.json").write_text(out); print("saved", len(out))

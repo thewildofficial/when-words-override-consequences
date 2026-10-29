@@ -1,0 +1,6 @@
+games 32 32 overlap 0
+Y11 game-level mean diff -7.03 CI -10.94 -3.12
+Y12 game-level mean diff -6.25 CI -10.16 -2.73
+Concatenated 64 games, equal game weight, study-stratified bootstrap: -6.64 CI -9.38 -4.10
+sd of per-game diffs Y11 11.4 Y12 10.5
+games with name<opaque / equal / name>opaque: 19 45 0

@@ -1,0 +1,55 @@
+meta 6a9e13bd6fc8f0983b9b99948120bc37f49c13e9 NVIDIA A100 80GB PCIe elapsed_s 135 n 768
+surface tok h s n acc [wilson] literal_acc predA_rate meanTokens
+lex meaningful 3 0 32 1.000 [0.89,1.00] lit=1.00 A=0.50 tok=138
+lex meaningful 3 1 32 0.312 [0.18,0.49] lit=0.00 A=0.81 tok=140
+lex meaningful 3 2 32 0.531 [0.36,0.69] lit=1.00 A=0.97 tok=142
+lex meaningful 3 3 32 0.500 [0.34,0.66] lit=0.00 A=1.00 tok=144
+lex opaque 3 0 32 1.000 [0.89,1.00] lit=1.00 A=0.50 tok=130
+lex opaque 3 1 32 0.156 [0.07,0.32] lit=0.00 A=0.66 tok=132
+lex opaque 3 2 32 0.594 [0.42,0.74] lit=1.00 A=0.91 tok=134
+lex opaque 3 3 32 0.438 [0.28,0.61] lit=0.00 A=0.94 tok=136
+table meaningful 1 0 32 1.000 [0.89,1.00] lit=1.00 A=0.50 tok=140
+table meaningful 1 1 32 0.438 [0.28,0.61] lit=0.00 A=0.94 tok=140
+table meaningful 3 0 32 0.969 [0.84,0.99] lit=1.00 A=0.47 tok=215
+table meaningful 3 1 32 0.188 [0.09,0.35] lit=0.00 A=0.62 tok=215
+table meaningful 3 2 32 0.781 [0.61,0.89] lit=1.00 A=0.59 tok=215
+table meaningful 3 3 32 0.312 [0.18,0.49] lit=0.00 A=0.81 tok=215
+table meaningful 5 1 32 0.125 [0.05,0.28] lit=0.00 A=0.56 tok=290
+table meaningful 5 3 32 0.062 [0.02,0.20] lit=0.00 A=0.50 tok=290
+table opaque 1 0 32 0.594 [0.42,0.74] lit=1.00 A=0.78 tok=123
+table opaque 1 1 32 0.438 [0.28,0.61] lit=0.00 A=0.94 tok=123
+table opaque 3 0 32 0.719 [0.55,0.84] lit=1.00 A=0.66 tok=182
+table opaque 3 1 32 0.312 [0.18,0.49] lit=0.00 A=0.81 tok=182
+table opaque 3 2 32 0.656 [0.48,0.80] lit=1.00 A=0.78 tok=182
+table opaque 3 3 32 0.312 [0.18,0.49] lit=0.00 A=0.81 tok=182
+table opaque 5 1 32 0.281 [0.16,0.45] lit=0.00 A=0.78 tok=240
+table opaque 5 3 32 0.219 [0.11,0.39] lit=0.00 A=0.66 tok=240
+
+DIFFS (game-cluster bootstrap 95%), points
+opaque P1 h3 s1-s3 +0.0 [-15.6,+15.6]
+opaque P1 h3 s0-s2 +6.2 [-9.4,+25.0]
+opaque P2 s1 h1-h3 +12.5 [-3.1,+28.1]
+opaque P2 s1 h3-h5 +3.1 [-12.5,+18.8]
+opaque s3 h3-h5 +9.4 [-6.2,+25.0]
+opaque P4 s1 table-lex h3 +15.6 [+0.0,+28.1]
+opaque P4 s3 table-lex h3 -12.5 [-25.0,+0.0]
+meaningful P1 h3 s1-s3 -12.5 [-25.0,+3.1]
+meaningful P1 h3 s0-s2 +18.8 [+6.2,+31.2]
+meaningful P2 s1 h1-h3 +25.0 [+12.5,+37.5]
+meaningful P2 s1 h3-h5 +6.2 [-9.4,+21.9]
+meaningful s3 h3-h5 +25.0 [+12.5,+37.5]
+meaningful P4 s1 table-lex h3 -12.5 [-28.1,+3.1]
+meaningful P4 s3 table-lex h3 -18.8 [-31.2,-6.2]
+P5 meaningful-opaque by table cell
+1 0 +40.6 [+31.2,+50.0]
+1 1 +0.0 [-12.5,+12.5]
+3 0 +25.0 [+9.4,+37.5]
+3 1 -12.5 [-28.1,+3.1]
+3 2 +12.5 [-6.2,+31.2]
+3 3 +0.0 [-12.5,+12.5]
+5 1 -15.6 [-28.1,+0.0]
+5 3 -15.6 [-28.1,+0.0]
+recall opaque A 0.745 192
+recall opaque B 0.208 192
+recall meaningful A 0.708 192
+recall meaningful B 0.328 192

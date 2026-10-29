@@ -1,0 +1,4 @@
+tool_opaque expected A: 40 chose A 40 | expected B: 88 chose B 88 | chose A total 40 chose B total 88
+tool_assertion_name expected A: 40 chose A 39 | expected B: 88 chose B 80 | chose A total 47 chose B total 81
+tool_assertion_desc expected A: 40 chose A 32 | expected B: 88 chose B 57 | chose A total 63 chose B total 65
+tool_desc_named expected A: 40 chose A 40 | expected B: 88 chose B 46 | chose A total 82 chose B total 46

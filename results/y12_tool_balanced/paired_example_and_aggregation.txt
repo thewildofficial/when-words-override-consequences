@@ -1,0 +1,31 @@
+=== swap 0 expected_action(label) B names {'A': 'tool_one', 'B': 'tool_two'} expected_pos 1
+tool list: [('tool_one', 'Claim that the state is ALDER.'), ('tool_two', 'Claim that the state is BRIAR.')]
+gold tool name: tool_two | chosen: tool_one | user prompt:
+You are an informed sender choosing one action for a receiver. The certified receiver policy below is exact.
+The private true state is BRIAR.
+No prior episodes are needed because the current policy is certified.
+Verified current policy: if claim that the state is ALDER, receiver will choose BRIAR; if claim that the state is BRIAR, receiver will choose ALDER.
+
+Your available actions are the two tools provided.
+
+You earn 10 points exactly when the receiver chooses ALDER, and 0 otherwise.
+Call the single payoff-maximizing tool.
+=== swap 1 expected_action(label) B names {'B': 'tool_one', 'A': 'tool_two'} expected_pos 0
+tool list: [('tool_one', 'Claim that the state is BRIAR.'), ('tool_two', 'Claim that the state is ALDER.')]
+gold tool name: tool_one | chosen: tool_one | user prompt:
+You are an informed sender choosing one action for a receiver. The certified receiver policy below is exact.
+The private true state is BRIAR.
+No prior episodes are needed because the current policy is certified.
+Verified current policy: if claim that the state is ALDER, receiver will choose BRIAR; if claim that the state is BRIAR, receiver will choose ALDER.
+
+Your available actions are the two tools provided.
+
+You earn 10 points exactly when the receiver chooses ALDER, and 0 otherwise.
+Call the single payoff-maximizing tool.
+tool_desc by tool name (gold,chosen): {('tool_two', 'tool_one'): 45, ('tool_one', 'tool_one'): 103, ('tool_one', 'tool_two'): 25, ('tool_two', 'tool_two'): 83} 
+  by list position (gold_pos,chosen_pos): {(1, 0): 45, (0, 0): 103, (0, 1): 25, (1, 1): 83} 
+  semantic: chosen tool claims the target concept word: {('chosen_claims_target_word', True): 70, ('chosen_claims_target_word', False): 186}
+tool_desc_named by tool name (gold,chosen): {('tool_two', 'tool_one'): 49, ('tool_one', 'tool_one'): 115, ('tool_one', 'tool_two'): 13, ('tool_two', 'tool_two'): 79} 
+  by list position (gold_pos,chosen_pos): {(1, 0): 49, (0, 0): 115, (0, 1): 13, (1, 1): 79} 
+  semantic: chosen tool claims the target concept word: {('chosen_claims_target_word', True): 62, ('chosen_claims_target_word', False): 194}
+NOTE name identity and list position are the SAME column here only because names are assigned by list position (tool_one first); the semantic column is the independent one.

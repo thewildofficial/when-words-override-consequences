@@ -1,0 +1,72 @@
+seman [32] prompts 33 ever_top1 25 top1&KL<1 at some alpha 1 0.03 failure(<=5%) KL at first flip median 3.66 min 0.14
+seman [34] prompts 33 ever_top1 24 top1&KL<1 at some alpha 1 0.03 failure(<=5%) KL at first flip median 4.11 min 0.14
+seman [40] prompts 33 ever_top1 24 top1&KL<1 at some alpha 1 0.03 failure(<=5%) KL at first flip median 3.85 min 0.15
+unrel [32] prompts 33 ever_top1 1 top1&KL<1 at some alpha 0 0.00 failure(<=5%) KL at first flip median 1.77 min 1.77
+unrel [34] prompts 33 ever_top1 1 top1&KL<1 at some alpha 0 0.00 failure(<=5%) KL at first flip median 1.41 min 1.41
+unrel [40] prompts 33 ever_top1 1 top1&KL<1 at some alpha 0 0.00 failure(<=5%) KL at first flip median 1.5 min 1.5
+seman [32] 0.5 33 top1 1 medKL 0.005 KL<1 33
+seman [32] 0.55 33 top1 3 medKL 0.011 KL<1 31
+seman [32] 0.6 33 top1 3 medKL 0.018 KL<1 31
+seman [32] 0.65 33 top1 4 medKL 0.06 KL<1 29
+seman [32] 0.7 33 top1 7 medKL 0.084 KL<1 24
+seman [32] 0.75 33 top1 9 medKL 0.184 KL<1 21
+seman [32] 0.8 33 top1 11 medKL 0.954 KL<1 17
+seman [32] 0.85 33 top1 16 medKL 2.575 KL<1 14
+seman [32] 0.9 33 top1 19 medKL 3.197 KL<1 11
+seman [32] 0.95 33 top1 23 medKL 4.063 KL<1 7
+seman [32] 1.0 33 top1 25 medKL 5.117 KL<1 5
+seman [34] 0.5 33 top1 1 medKL 0.005 KL<1 33
+seman [34] 0.55 33 top1 1 medKL 0.009 KL<1 32
+seman [34] 0.6 33 top1 3 medKL 0.034 KL<1 31
+seman [34] 0.65 33 top1 5 medKL 0.055 KL<1 28
+seman [34] 0.7 33 top1 6 medKL 0.105 KL<1 23
+seman [34] 0.75 33 top1 9 medKL 0.194 KL<1 22
+seman [34] 0.8 33 top1 12 medKL 0.723 KL<1 18
+seman [34] 0.85 33 top1 14 medKL 2.522 KL<1 12
+seman [34] 0.9 33 top1 19 medKL 3.246 KL<1 9
+seman [34] 0.95 33 top1 23 medKL 4.1 KL<1 7
+seman [34] 1.0 33 top1 24 medKL 5.137 KL<1 5
+seman [40] 0.5 33 top1 1 medKL 0.027 KL<1 32
+seman [40] 0.55 33 top1 2 medKL 0.043 KL<1 31
+seman [40] 0.6 33 top1 3 medKL 0.087 KL<1 28
+seman [40] 0.65 33 top1 6 medKL 0.18 KL<1 26
+seman [40] 0.7 33 top1 8 medKL 0.398 KL<1 23
+seman [40] 0.75 33 top1 9 medKL 0.706 KL<1 19
+seman [40] 0.8 33 top1 12 medKL 1.158 KL<1 13
+seman [40] 0.85 33 top1 15 medKL 2.069 KL<1 11
+seman [40] 0.9 33 top1 18 medKL 2.877 KL<1 8
+seman [40] 0.95 33 top1 20 medKL 3.126 KL<1 3
+seman [40] 1.0 33 top1 24 medKL 3.638 KL<1 3
+unrel [32] 0.5 33 top1 0 medKL 0.005 KL<1 33
+unrel [32] 0.55 33 top1 0 medKL 0.022 KL<1 29
+unrel [32] 0.6 33 top1 0 medKL 0.045 KL<1 29
+unrel [32] 0.65 33 top1 0 medKL 0.065 KL<1 28
+unrel [32] 0.7 33 top1 1 medKL 0.161 KL<1 21
+unrel [32] 0.75 33 top1 1 medKL 0.445 KL<1 19
+unrel [32] 0.8 33 top1 1 medKL 2.095 KL<1 16
+unrel [32] 0.85 33 top1 1 medKL 3.199 KL<1 12
+unrel [32] 0.9 33 top1 0 medKL 3.632 KL<1 8
+unrel [32] 0.95 33 top1 0 medKL 4.649 KL<1 6
+unrel [32] 1.0 33 top1 0 medKL 5.39 KL<1 5
+unrel [34] 0.5 33 top1 0 medKL 0.005 KL<1 33
+unrel [34] 0.55 33 top1 0 medKL 0.019 KL<1 31
+unrel [34] 0.6 33 top1 0 medKL 0.039 KL<1 29
+unrel [34] 0.65 33 top1 0 medKL 0.065 KL<1 28
+unrel [34] 0.7 33 top1 1 medKL 0.181 KL<1 21
+unrel [34] 0.75 33 top1 1 medKL 0.396 KL<1 21
+unrel [34] 0.8 33 top1 1 medKL 0.723 KL<1 19
+unrel [34] 0.85 33 top1 1 medKL 2.584 KL<1 9
+unrel [34] 0.9 33 top1 1 medKL 3.45 KL<1 7
+unrel [34] 0.95 33 top1 0 medKL 4.518 KL<1 6
+unrel [34] 1.0 33 top1 0 medKL 5.875 KL<1 5
+unrel [40] 0.5 33 top1 0 medKL 0.042 KL<1 31
+unrel [40] 0.55 33 top1 0 medKL 0.073 KL<1 29
+unrel [40] 0.6 33 top1 0 medKL 0.152 KL<1 26
+unrel [40] 0.65 33 top1 0 medKL 0.242 KL<1 23
+unrel [40] 0.7 33 top1 0 medKL 0.433 KL<1 20
+unrel [40] 0.75 33 top1 0 medKL 0.706 KL<1 18
+unrel [40] 0.8 33 top1 0 medKL 1.275 KL<1 13
+unrel [40] 0.85 33 top1 1 medKL 2.508 KL<1 11
+unrel [40] 0.9 33 top1 1 medKL 2.877 KL<1 8
+unrel [40] 0.95 33 top1 1 medKL 3.431 KL<1 6
+unrel [40] 1.0 33 top1 1 medKL 3.907 KL<1 6

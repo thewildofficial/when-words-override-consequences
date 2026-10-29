@@ -1,0 +1,6 @@
+cap 400 rows 512
+tool_fixed_worded_desc gold_tool x chosen_tool {('tool_beta', 'tool_alpha'): 29, ('tool_beta', 'tool_beta'): 105, ('tool_alpha', 'tool_alpha'): 112, ('tool_alpha', 'tool_beta'): 8, ('tool_beta', None): 2}
+tool_fixed_worded_desc 256 {'wrong': 37, 'right': 217, 'nocall': 2} acc 0.848 by swap [102, 115] | chose first 137 second 117 | confusion (expected_pos,chosen_pos) {(1, 0): 24, (0, 0): 113, (0, 1): 13, (1, 1): 104, (0, None): 2} | swap-pairs (right@0,right@1) {(False, True): 13, (False, False): 13, (True, True): 102} capHit 0 median ntok 15
+tool_fixed_blank_desc gold_tool x chosen_tool {('tool_beta', 'tool_alpha'): 24, ('tool_beta', 'tool_beta'): 112, ('tool_alpha', 'tool_alpha'): 97, ('tool_alpha', 'tool_beta'): 23}
+tool_fixed_blank_desc 256 {'wrong': 47, 'right': 209} acc 0.816 by swap [102, 107] | chose first 133 second 123 | confusion (expected_pos,chosen_pos) {(1, 0): 26, (0, 1): 21, (0, 0): 107, (1, 1): 102} | swap-pairs (right@0,right@1) {(False, False): 17, (False, True): 9, (True, True): 98, (True, False): 4} capHit 0 median ntok 15
+tool_fixed_worded_desc - tool_fixed_blank_desc all 3.1 pts [-3.1,9.8] (cluster=base game, 2000 resamples)

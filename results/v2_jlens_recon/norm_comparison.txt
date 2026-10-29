@@ -1,0 +1,6 @@
+Median over prompts that reach target top-1. delta_l2 and delta_rms_ratio are the per-layer mean-over-positions values stored by the run (delta_rms_ratio = rms(delta)/rms(hidden)). 'sum' adds the layers (a total-magnitude proxy, not a norm of the combined delta).
+clean_L40_a1 {'n_flip': 26, 'layers': 1, 'median_sum_delta_l2': 15.06, 'median_sum_over_layers_of_dRMS': 0.173, 'median_mean_over_layers_dRMS': 0.173}
+clean_B8_36_43_a0.1 {'n_flip': 9, 'layers': 8, 'median_sum_delta_l2': 11.79, 'median_sum_over_layers_of_dRMS': 0.141, 'median_mean_over_layers_dRMS': 0.0176}
+clean_B8_36_43_a0.15 {'n_flip': 29, 'layers': 8, 'median_sum_delta_l2': 17.16, 'median_sum_over_layers_of_dRMS': 0.193, 'median_mean_over_layers_dRMS': 0.0241}
+clean_B7_36_42_a0.15 {'n_flip': 25, 'layers': 7, 'median_sum_delta_l2': 15.62, 'median_sum_over_layers_of_dRMS': 0.177, 'median_mean_over_layers_dRMS': 0.0253}
+clean_B8_36_43_a0.5 {'n_flip': 32, 'layers': 8, 'median_sum_delta_l2': 57.95, 'median_sum_over_layers_of_dRMS': 0.652, 'median_mean_over_layers_dRMS': 0.0815}

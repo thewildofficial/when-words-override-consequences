@@ -1,0 +1,5 @@
+# Y15 result (exploratory; competence gate FAILED, so cell contrasts are not interpretable as depth or attraction effects)
+768 prompts, Qwen3.6-27B rev 6a9e13bd..., A100, one forward pass each, thinking off, A/B logits. Full table: analysis.txt.
+Gate: opaque (h1,s0) = 59.4% [42,74] and (h1,s1) = 43.8%, both below the locked 90%. Pooled recall opaque A 74.5% vs B 20.8%; meaningful A 70.8% vs B 32.8%: strong letter-A bias, so most cells mostly reflect position, not relay composition.
+Locked predictions: P1/P2/P4 are not resolved (all CIs include 0 or are gated). Only visible pattern: meaningful (h1,s0) 100% vs opaque (h1,s0) 59% (+40.6 [31,50]), i.e. when the literal answer is right, meaningful wording helps; at odd s meaningful accuracy is 6-44%, below chance in several cells (literal attractor), consistent with H_literal but not separable from A-bias here.
+Not claimed: any depth effect. Post hoc note: prompt requires two lookups (relay map then receiver map) even at s=0, which the frozen WWOC prompts (explicit consequence table, constrained to an option) do not.

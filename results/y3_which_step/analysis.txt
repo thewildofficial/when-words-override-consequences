@@ -1,0 +1,8 @@
+D1_both_stated         V1_plain    acc 120/120=1.00 CI(0.97, 1.0) balacc 1.00 majority-class 0.50 recall {'Fold': '60/60', 'Call': '60/60'} gold-letter recall A 63/63 B 57/57 predA 0.53
+D1_both_stated         V2_prefill  acc 120/120=1.00 CI(0.97, 1.0) balacc 1.00 majority-class 0.50 recall {'Fold': '60/60', 'Call': '60/60'} gold-letter recall A 63/63 B 57/57 predA 0.53
+D2_equity_stated_thr_derived V1_plain    acc 107/120=0.89 CI(0.82, 0.94) balacc 0.89 majority-class 0.50 recall {'Fold': '47/60', 'Call': '60/60'} gold-letter recall A 47/59 B 60/61 predA 0.40
+D2_equity_stated_thr_derived V2_prefill  acc 104/120=0.87 CI(0.79, 0.92) balacc 0.87 majority-class 0.50 recall {'Fold': '44/60', 'Call': '60/60'} gold-letter recall A 46/59 B 58/61 predA 0.41
+D3_equity_derived_thr_stated V1_plain    acc 73/120=0.61 CI(0.52, 0.69) balacc 0.61 majority-class 0.50 recall {'Fold': '13/60', 'Call': '60/60'} gold-letter recall A 34/58 B 39/62 predA 0.47
+D3_equity_derived_thr_stated V2_prefill  acc 60/120=0.50 CI(0.41, 0.59) balacc 0.50 majority-class 0.50 recall {'Fold': '0/60', 'Call': '60/60'} gold-letter recall A 31/58 B 29/62 predA 0.53
+D4_both_derived        V1_plain    acc 65/120=0.54 CI(0.45, 0.63) balacc 0.54 majority-class 0.50 recall {'Fold': '5/60', 'Call': '60/60'} gold-letter recall A 27/56 B 38/64 predA 0.44
+D4_both_derived        V2_prefill  acc 61/120=0.51 CI(0.42, 0.6) balacc 0.51 majority-class 0.50 recall {'Fold': '1/60', 'Call': '60/60'} gold-letter recall A 28/56 B 33/64 predA 0.49
