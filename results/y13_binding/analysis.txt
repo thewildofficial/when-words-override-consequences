@@ -1,0 +1,9 @@
+cap 400 rows 1024
+tool_desc 256 {'wrong': 65, 'right': 191} acc 0.746 by swap [76, 115] | chose first 149 second 107 | confusion (expected_pos,chosen_pos) {(1, 0): 43, (0, 0): 106, (1, 1): 85, (0, 1): 22} | swap-pairs (right@0,right@1) {(False, True): 46, (True, True): 69, (True, False): 7, (False, False): 6} capHit 0 median ntok 15
+tool_desc_restate 256 {'right': 250, 'wrong': 6} acc 0.977 by swap [122, 128] | chose first 134 second 122 | confusion (expected_pos,chosen_pos) {(1, 1): 122, (0, 0): 128, (1, 0): 6} | swap-pairs (right@0,right@1) {(True, True): 122, (False, True): 6} capHit 0 median ntok 48
+tool_desc_generic 256 {'wrong': 19, 'right': 237} acc 0.926 by swap [111, 126] | chose first 143 second 113 | confusion (expected_pos,chosen_pos) {(1, 0): 17, (0, 0): 126, (1, 1): 111, (0, 1): 2} | swap-pairs (right@0,right@1) {(False, True): 15, (True, True): 111, (False, False): 2} capHit 0 median ntok 54
+tool_optok_worded 256 {'right': 238, 'wrong': 18} acc 0.93 by swap [115, 123] | chose first 122 second 134 | confusion (expected_pos,chosen_pos) {(1, 1): 122, (0, 0): 116, (1, 0): 6, (0, 1): 12} | swap-pairs (right@0,right@1) {(True, True): 110, (False, True): 13, (True, False): 5} capHit 0 median ntok 16
+tool_desc_restate - tool_desc all 23.0 pts [18.4,28.1] (cluster=base game, 2000 resamples)
+tool_desc_generic - tool_desc all 18.0 pts [13.3,22.7] (cluster=base game, 2000 resamples)
+tool_desc_restate - tool_desc_generic all 5.1 pts [1.6,8.6] (cluster=base game, 2000 resamples)
+tool_optok_worded - tool_desc all 18.4 pts [14.1,23.0] (cluster=base game, 2000 resamples)

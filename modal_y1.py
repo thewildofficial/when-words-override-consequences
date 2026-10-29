@@ -349,3 +349,25 @@ def y12_remote(rows: list) -> str:
             r["gen"] = tok.decode(out[i, enc["input_ids"].shape[1]:], skip_special_tokens=False)
             r["n_new_tokens"] = int((out[i, enc["input_ids"].shape[1]:] != tok.pad_token_id).sum())
     return json.dumps({"elapsed": time.perf_counter() - started, "cap": CAP, "rows": rows, "meta": metadata})
+
+
+@app.function(image=image, volumes={"/cache": cache}, cpu=8.0, memory=65536, gpu="A100-80GB", timeout=3300, max_containers=1, retries=0)
+def y13_remote(rows: list) -> str:
+    """Same as y11_remote (CAP=400, greedy, batch 12), distinct function name for a fresh container."""
+    import torch, transformers
+    started = time.perf_counter()
+    model, _, metadata = _load_model(with_lens=False)
+    hf = model._hf_model
+    tok = transformers.AutoTokenizer.from_pretrained(MODEL_ID, revision=MODEL_REVISION); tok.padding_side = "left"
+    CAP = 400
+    def ctx(r):
+        return tok.apply_chat_template([{"role": "user", "content": r["user"]}], tools=r["tools"], tokenize=False, add_generation_prompt=True, enable_thinking=False)
+    for s in range(0, len(rows), 16):
+        part = rows[s:s + 16]
+        enc = tok([ctx(r) for r in part], return_tensors="pt", padding=True, add_special_tokens=False).to("cuda")
+        with torch.inference_mode():
+            out = hf.generate(**enc, max_new_tokens=CAP, do_sample=False)
+        for i, r in enumerate(part):
+            r["gen"] = tok.decode(out[i, enc["input_ids"].shape[1]:], skip_special_tokens=False)
+            r["n_new_tokens"] = int((out[i, enc["input_ids"].shape[1]:] != tok.pad_token_id).sum())
+    return json.dumps({"elapsed": time.perf_counter() - started, "cap": CAP, "rows": rows, "meta": metadata})

@@ -1,0 +1,2 @@
+tool_desc (gold_tool, chosen_tool) counts {('tool_two', 'tool_one'): 45, ('tool_one', 'tool_one'): 103, ('tool_one', 'tool_two'): 25, ('tool_two', 'tool_two'): 83}
+tool_desc_named (gold_tool, chosen_tool) counts {('tool_two', 'tool_one'): 49, ('tool_one', 'tool_one'): 115, ('tool_one', 'tool_two'): 13, ('tool_two', 'tool_two'): 79}
