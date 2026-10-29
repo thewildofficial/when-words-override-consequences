@@ -266,7 +266,7 @@ def y7_remote(rows: list) -> str:
 
 
 @app.function(image=image, volumes={"/cache": cache}, cpu=8.0, memory=65536, gpu="A100-80GB", timeout=3000, max_containers=1, retries=0)
-def y8_remote(rows: list) -> str:
+def y9_remote(rows: list) -> str:
     """Native tool-call generation for tool rows (greedy, <=80 new tokens, no prefill, thinking off). Raw text returned; parsing/mock execution done offline."""
     import torch, transformers
     started = time.perf_counter()
@@ -275,11 +275,33 @@ def y8_remote(rows: list) -> str:
     tok = transformers.AutoTokenizer.from_pretrained(MODEL_ID, revision=MODEL_REVISION); tok.padding_side = "left"
     def ctx(r):
         return tok.apply_chat_template([{"role": "user", "content": r["user"]}], tools=r["tools"], tokenize=False, add_generation_prompt=True, enable_thinking=False)
-    for s in range(0, len(rows), 8):
-        part = rows[s:s + 8]
+    for s in range(0, len(rows), 6):
+        part = rows[s:s + 6]
         enc = tok([ctx(r) for r in part], return_tensors="pt", padding=True, add_special_tokens=False).to("cuda")
         with torch.inference_mode():
-            out = hf.generate(**enc, max_new_tokens=80, do_sample=False)
+            out = hf.generate(**enc, max_new_tokens=400, do_sample=False)
         for i, r in enumerate(part):
             r["gen"] = tok.decode(out[i, enc["input_ids"].shape[1]:], skip_special_tokens=False)
+    return json.dumps({"elapsed": time.perf_counter() - started, "rows": rows, "meta": metadata})
+
+
+@app.function(image=image, volumes={"/cache": cache}, cpu=8.0, memory=65536, gpu="A100-80GB", timeout=3000, max_containers=1, retries=0)
+def y10_remote(rows: list) -> str:
+    """Y6 cot mode only, max_new_tokens=1000 (same prompt/template as y6 cot)."""
+    import torch, transformers
+    started = time.perf_counter()
+    model, _, metadata = _load_model(with_lens=False)
+    hf = model._hf_model
+    tok = transformers.AutoTokenizer.from_pretrained(MODEL_ID, revision=MODEL_REVISION); tok.padding_side = "left"
+    def prompt(r):
+        q = r["question"]; a, b = r["labels"]
+        t = f"{q}\n\nThink step by step briefly, then finish with the line 'Final answer: {a}' or 'Final answer: {b}'."
+        return tok.apply_chat_template([{"role": "user", "content": t}], tokenize=False, add_generation_prompt=True, enable_thinking=False)
+    for s in range(0, len(rows), 8):
+        part = rows[s:s + 8]
+        enc = tok([prompt(r) for r in part], return_tensors="pt", padding=True, add_special_tokens=False).to("cuda")
+        with torch.inference_mode():
+            out = hf.generate(**enc, max_new_tokens=1000, do_sample=False)
+        for i, r in enumerate(part):
+            r["gen"] = {"cot1000": tok.decode(out[i, enc["input_ids"].shape[1]:], skip_special_tokens=True)}
     return json.dumps({"elapsed": time.perf_counter() - started, "rows": rows, "meta": metadata})

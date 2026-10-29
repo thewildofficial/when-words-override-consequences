@@ -1,0 +1,8 @@
+('D1_both_stated', 'cot') 57/60=95% [86,98] unparsed=3 {'gold=Fold': '29/32', 'gold=Call': '28/28'} {'pred_Fold': 29, 'pred_Call': 28, 'pred_None': 3}
+('D1_both_stated', 'free_word') 60/60=100% [94,100] unparsed=0 {'gold=Fold': '32/32', 'gold=Call': '28/28'} {'pred_Fold': 32, 'pred_Call': 28}
+('D2_equity_stated_thr_derived', 'cot') 1/60=2% [0,9] unparsed=59 {'gold=Fold': '1/32', 'gold=Call': '0/28'} {'pred_None': 59, 'pred_Fold': 1}
+('D2_equity_stated_thr_derived', 'free_word') 54/60=90% [80,95] unparsed=0 {'gold=Fold': '32/32', 'gold=Call': '22/28'} {'pred_Fold': 38, 'pred_Call': 22}
+('D3_equity_derived_thr_stated', 'cot') 60/60=100% [94,100] unparsed=0 {'gold=Fold': '32/32', 'gold=Call': '28/28'} {'pred_Fold': 32, 'pred_Call': 28}
+('D3_equity_derived_thr_stated', 'free_word') 49/60=82% [70,89] unparsed=0 {'gold=Fold': '21/32', 'gold=Call': '28/28'} {'pred_Call': 39, 'pred_Fold': 21}
+('D4_both_derived', 'cot') 0/60=0% [0,6] unparsed=60 {'gold=Fold': '0/32', 'gold=Call': '0/28'} {'pred_None': 60}
+('D4_both_derived', 'free_word') 41/60=68% [56,79] unparsed=0 {'gold=Fold': '13/32', 'gold=Call': '28/28'} {'pred_Call': 47, 'pred_Fold': 13}

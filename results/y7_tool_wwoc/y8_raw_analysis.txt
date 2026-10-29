@@ -1,0 +1,18 @@
+Y8 native generation + mock executor (reward 10=target reached; invalid calls count 0)
+('tool_assertion_desc', 'none', 'prose') 11/32=34% [20,52]
+('tool_assertion_desc', 'none', 'table') 20/32=62% [45,77]
+('tool_assertion_desc', 'redundant', 'prose') 12/32=38% [23,55]
+('tool_assertion_desc', 'redundant', 'table') 25/32=78% [61,89]
+('tool_assertion_name', 'none', 'prose') 0/32=0% [0,11]
+('tool_assertion_name', 'none', 'table') 13/32=41% [26,58]
+('tool_assertion_name', 'redundant', 'prose') 7/32=22% [11,39]
+('tool_assertion_name', 'redundant', 'table') 28/32=88% [72,95]
+('tool_opaque', 'none', 'prose') 32/32=100% [89,100]
+('tool_opaque', 'none', 'table') 32/32=100% [89,100]
+('tool_opaque', 'redundant', 'prose') 30/32=94% [80,98]
+('tool_opaque', 'redundant', 'table') 32/32=100% [89,100]
+ALL tool_assertion_desc 68/128=53% [45,62] invalid: 23
+ALL tool_assertion_name 48/128=38% [30,46] invalid: 73
+ALL tool_opaque 126/128=98% [94,100] invalid: 2
+paired tool_assertion_name -opaque mean diff -0.609 n 128
+paired tool_assertion_desc -opaque mean diff -0.453 n 128
