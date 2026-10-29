@@ -395,3 +395,24 @@ def y14_remote(rows: list) -> str:
     return json.dumps({"elapsed": time.perf_counter() - started, "cap": CAP, "rows": rows, "meta": metadata})
 
 
+
+
+@app.function(image=image, volumes={"/cache": cache}, cpu=8.0, memory=65536, gpu="A100-80GB", timeout=1500, max_containers=1, retries=0)
+def y15_remote(rows: list) -> str:
+    """A/B letter logits (thinking off, forced choice), batched left-padded; also prompt token length."""
+    import torch, transformers
+    started = time.perf_counter()
+    model, _, metadata = _load_model(with_lens=False)
+    hf = model._hf_model
+    tok = transformers.AutoTokenizer.from_pretrained(MODEL_ID, revision=MODEL_REVISION); tok.padding_side = "left"
+    ctx0 = tok.apply_chat_template([{"role": "user", "content": "x"}], tokenize=False, add_generation_prompt=True, enable_thinking=False)
+    A = _continuation_id(tok, ctx0, "A"); B = _continuation_id(tok, ctx0, "B")
+    texts = [tok.apply_chat_template([{"role": "user", "content": r["prompt"]}], tokenize=False, add_generation_prompt=True, enable_thinking=False) for r in rows]
+    for s in range(0, len(rows), 8):
+        enc = tok(texts[s:s + 8], return_tensors="pt", padding=True, add_special_tokens=False).to("cuda")
+        with torch.inference_mode():
+            lg = hf(**enc, logits_to_keep=1).logits[:, -1].float()
+        for i, r in enumerate(rows[s:s + 8]):
+            r["score"] = {"A": float(lg[i, A]), "B": float(lg[i, B])}
+            r["n_tokens"] = int(enc["attention_mask"][i].sum())
+    return json.dumps({"elapsed": time.perf_counter() - started, "rows": rows, "meta": metadata})
